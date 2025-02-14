@@ -1,11 +1,26 @@
 import Link from "next/link";
-
+"use client";
 export default function Home() {
   return (
+    <div className="relative min-h-screen overflow-hidden bg-base-200">
+      {/* SVGs de burbujas animadas */}
+      <div className="absolute inset-0 pointer-events-none">
+        {[...Array(10)].map((_, i) => (
+          <div
+            key={i}
+            className={`absolute w-16 h-16 rounded-full opacity-50 animate-bubble`}
+            style={{
+              backgroundColor: ["#00CDB7", "#FF52D9", "#7480FF"][i % 3],
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 5}s`,
+              animationDuration: `${5 + Math.random() * 5}s`,
+            }}
+          />
+        ))}
+      </div>
 
-    <div className="min-h-screen bg-base-200">
       {/* Hero section */}
-      <div className="hero min-h-[calc(100vh-64px)] bg-base-200">
+      <div className="hero min-h-[calc(100vh-64px)] bg-base-200 relative z-10">
         <div className="hero-content text-center">
           <div className="max-w-3xl">
             <h1 className="text-7xl font-bold mb-8">
@@ -32,6 +47,28 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* Animaciones CSS */}
+      <style jsx>{`
+        @keyframes bubble {
+          0% {
+            transform: translateY(100vh) scale(0.8);
+            opacity: 0;
+          }
+          50% {
+            opacity: 0.6;
+          }
+          100% {
+            transform: translateY(-10vh) scale(1.2);
+            opacity: 0;
+          }
+        }
+        .animate-bubble {
+          animation: bubble linear infinite;
+          border-radius: 50%;
+          position: absolute;
+        }
+      `}</style>
     </div>
   );
 }
