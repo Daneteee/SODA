@@ -4,7 +4,7 @@ const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 
 const registerUser = async (req, res) => {
-
+  console.log(req.body);
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -45,7 +45,7 @@ const registerUser = async (req, res) => {
   } 
   catch (err) {
     console.error(err.message);
-    res.status(500).send('Error en el servidor');
+    res.status(500).send('ola');
   }
 };
 
