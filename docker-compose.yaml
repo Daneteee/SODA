@@ -8,4 +8,4 @@ services:
     volumes:
       - mongodb_data:/data/db
 volumes:
-  mongodb_data:
+  mongodb_data: 
