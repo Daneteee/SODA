@@ -1,5 +1,7 @@
-import Link from "next/link";
 "use client";
+
+import Link from "next/link";
+
 export default function Home() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-base-200">
@@ -12,7 +14,7 @@ export default function Home() {
             style={{
               backgroundColor: ["#00CDB7", "#FF52D9", "#7480FF"][i % 3],
               left: `${Math.random() * 100}%`,
-              bottom: `-${Math.random() * 10}%`, // Empiezan desde abajo
+              top: `105vh`, // Empiezan desde abajo
               animationDelay: `${Math.random() * 10}s`, // Más variación en los delays
               animationDuration: `${8 + Math.random() * 7}s`, // Duraciones más largas
               transform: `scale(${0.5 + Math.random() * 1})`, // Tamaños variables
