@@ -22,3 +22,5 @@ app.use('/api/users', userRoutes);
 app.listen(4000, () => {
   console.log('Servidor corriendo en http://localhost:4000');
 });
+
+console.log("MONGO_URI:", process.env.MONGO_URI);

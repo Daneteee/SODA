@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Alert from "../../components/Alert";
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -16,7 +17,7 @@ export default function Register() {
     special: false,
   });
 
-  const isFormValid = Object.values(validations).every(Boolean);
+  const [alert, setAlert] = useState<{ type: "success" | "warning" | "error"; message: string } | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -53,15 +54,13 @@ export default function Register() {
       const data = await response.json();
   
       if (response.ok) {
-        console.log("Registro exitoso:", data);
-        alert("Registro exitoso!");
+        setAlert({ type: "success", message: "¡Tu registro se ha completado con éxito!" });
       } else {
-        console.error("Error en el registro:", data);
-        alert("Error en el registro: " + data.message);
+        setAlert({ type: "error", message: data.msg || "Hubo un problema con el registro." });
       }
     } catch (error) {
       console.error("Error de conexión:", error);
-      alert("Error de conexión con el servidor.");
+      setAlert({ type: "error", message: "Error de conexión con el servidor." });
     }
   };
   
@@ -71,6 +70,10 @@ export default function Register() {
       <div className="card w-[28rem] bg-base-100 shadow-xl">
         <div className="card-body">
           <h2 className="card-title text-2xl text-center">Registrate! :)</h2>
+
+          {/* Alertas */}
+          {alert && <Alert type={alert.type} message={alert.message} />}
+
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
               <label className="block text-lg font-semibold">Nombre</label>
@@ -126,9 +129,7 @@ export default function Register() {
                   </div>
                 ))}
               </div>
-            </div>
-
-            
+            </div>            
 
             <div>
               <label className="block text-lg font-semibold">Teléfono</label>
