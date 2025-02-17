@@ -1,22 +1,17 @@
-const User = require('../models/user.js');
+const User = require("../models/user");
 
-// Crear un nuevo usuario
-exports.createUser = async (req, res) => {
+const getUserProfile = async (req, res) => {
   try {
-    const user = new User(req.body);
-    await user.save();
-    res.status(201).json(user);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
+    const user = await User.findById(req.user.id).select("-password"); s
+    if (!user) {
+      return res.status(404).json({ msg: "Usuario no encontrado" });
+    }
+
+    res.json(user);
+  } catch (err) {
+    console.error("Error al obtener el perfil:", err);
+    res.status(500).json({ msg: "Error del servidor" });
   }
 };
 
-// Obtener todos los usuarios
-exports.getUsers = async (req, res) => {
-  try {
-    const users = await User.find();
-    res.status(200).json(users);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+module.exports = { getUserProfile };
