@@ -1,11 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 export default function Navbar() {
-  // Estado para simular si el usuario está logueado
+ // Estado para verificar si el usuario está autenticado
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    // Simulación: Verifica si existe un token en las cookies
+    const token = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('token='));
+    setIsAuthenticated(!!token);
+  }, []);
 
   return (
     <div className="navbar bg-base-100">
@@ -72,13 +80,31 @@ export default function Navbar() {
                 <span className="badge badge-xs badge-primary indicator-item"></span>
               </div>
             </button>
+            <div className="dropdown dropdown-end">
+              <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
+                <div className="w-10 rounded-full">
+                  <img
+                    alt="Tailwind CSS Navbar component"
+                    src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+                </div>
+              </div>
+              <ul
+                tabIndex={0}
+                className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
+                <li>
+                  <Link href="/dashboard" >Perfil</Link>
+                </li>
+                <li><a>Settings</a></li>
+                <li><a>Logout</a></li>
+              </ul>
+            </div>
           </>
         ) : (
           <>
             {/* Botones cuando el usuario NO está logueado */}
             <div className="flex gap-x-4">
-              <Link href="/login" className="btn btn-neutral">Iniciar sesión</Link>
-              <Link href="/register" className="btn btn-primary">Registrarse</Link>
+              <Link href="/auth/login" className="btn btn-neutral">Iniciar sesión</Link>
+              <Link href="/auth/register" className="btn btn-primary">Registrarse</Link>
             </div>
           </>
         )}

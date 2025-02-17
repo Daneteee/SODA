@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import Alert from "../../components/Alert";
+import Alert from "../../../components/Alert";
 
 export default function Register() {
   const [formData, setFormData] = useState({
