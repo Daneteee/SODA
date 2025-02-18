@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Cookies from 'js-cookie';
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -19,18 +20,14 @@ export default function LoginPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
+        credentials: 'include',
       });
 
       const data = await res.json();
-
       if (!res.ok) {
         throw new Error(data.msg || "Error al iniciar sesión");
       }
-
-      // Guardar el token en localStorage
-      document.cookie = `token=${data.token}; path=/; secure; samesite=strict; max-age=86400`;
-
-      // Redirigir a otra página (ejemplo: dashboard)
+      Cookies.set('jwtToken', data.token, { expires: 7, path: '/' });
       router.push("/dashboard");
     } catch (err: any) {
       setError(err.message);
@@ -63,7 +60,7 @@ export default function LoginPage() {
             <button className="btn btn-primary btn-lg w-full">Entrar</button>
           </form>
           <p className="text-md text-center mt-3">
-            ¿No tienes cuenta? <a href="/register" className="link">Regístrate</a>
+            ¿No tienes cuenta? <a href="/auth/register" className="link">Regístrate</a>
           </p>
         </div>
       </div>

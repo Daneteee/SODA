@@ -1,19 +1,27 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function Navbar() {
- // Estado para verificar si el usuario está autenticado
+  // Estado para verificar si el usuario está autenticado
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     // Simulación: Verifica si existe un token en las cookies
     const token = document.cookie
       .split('; ')
-      .find(row => row.startsWith('token='));
+      .find(row => row.startsWith('jwtToken='));
     setIsAuthenticated(!!token);
   }, []);
+
+  const handleLogout = () => {
+    document.cookie = "jwtToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    setIsAuthenticated(false);
+    router.push("/");
+  };
 
   return (
     <div className="navbar bg-base-100">
@@ -95,7 +103,7 @@ export default function Navbar() {
                   <Link href="/dashboard" >Perfil</Link>
                 </li>
                 <li><a>Settings</a></li>
-                <li><a>Logout</a></li>
+                <li><button onClick={handleLogout}>Cerrar sesión</button></li>
               </ul>
             </div>
           </>

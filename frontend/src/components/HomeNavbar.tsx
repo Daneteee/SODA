@@ -13,7 +13,7 @@ export default function Navbar() {
     // Simulación: Verifica si existe un token en las cookies
     const token = document.cookie
       .split('; ')
-      .find(row => row.startsWith('token='));
+      .find(row => row.startsWith('jwtToken='));
     setIsAuthenticated(!!token);
   }, []);
 

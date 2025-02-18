@@ -1,26 +1,15 @@
 const jwt = require("jsonwebtoken");
-
+require("dotenv").config();
 
 const authMiddleware = (req, res, next) => {
-  // 1️⃣ Obtener el token desde el header
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    console.log("No autorizado, token requerido");
-    return res.status(401).json({ msg: "No autorizado, token requerido" });
-  }
-
-  // 2️⃣ Extraer el token sin "Bearer "
-  const token = authHeader.split(" ")[1];
-
+  const token = req.cookies.jwtToken; 
+  if (!token) return res.status(401).json({ msg: "No autorizado" });
   try {
-    // 3️⃣ Verificar el token
-    const decoded = jwt.verify(token, config.JWT_SECRET);
-    req.user = decoded; // Añadir el usuario al request
-    next();
+    const decoded = jwt.verify(token, process.env.JWT_SECRET); 
+    req.user = decoded.user; 
+    next(); 
   } catch (err) {
-    console.error(err.message);
-    return res.status(401).json({ msg: "Token no válido" });
+    return res.status(401).json({ msg: "Token inválido" });
   }
 };
 
