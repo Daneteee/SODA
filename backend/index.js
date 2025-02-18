@@ -4,6 +4,7 @@ const cors = require('cors'); // <-- Importar cors
 const cookieParser = require('cookie-parser');
 const userRoutes = require('./src/routes/userRoutes');
 const authRoutes = require('./src/routes/authRoutes');
+const marketRoutes = require('./src/routes/marketRoutes');
 const bodyParser = require('body-parser');
 
 const app = express();
@@ -18,6 +19,7 @@ app.use(bodyParser.json());
 // Rutas
 app.use('/api/auth', authRoutes); 
 app.use('/api/user', userRoutes); 
+app.use('/api/market', marketRoutes)
 
 // Iniciar servidor
 app.listen(4000, () => {
