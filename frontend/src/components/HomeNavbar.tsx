@@ -1,11 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
-  // Estado para simular si el usuario está logueado
+  // Estado para verificar si el usuario está autenticado
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    // Simulación: Verifica si existe un token en las cookies
+    const token = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('jwtToken='));
+    setIsAuthenticated(!!token);
+  }, []);
+
+  const handleLogout = () => {
+    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    setIsAuthenticated(false);
+    router.push("/");
+  };
 
   return (
     <div className="fixed top-4 left-1/2 z-50 w-[90%] max-w-6xl -translate-x-1/2 rounded-2xl bg-opacity-40 backdrop-blur-md shadow-lg bg-base-100">
@@ -72,11 +88,29 @@ export default function Navbar() {
                   <span className="badge badge-xs badge-primary indicator-item"></span>
                 </div>
               </button>
+              <div className="dropdown dropdown-end">
+                <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
+                  <div className="w-10 rounded-full">
+                    <img
+                      alt="Tailwind CSS Navbar component"
+                      src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+                  </div>
+                </div>
+                <ul
+                  tabIndex={0}
+                  className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
+                  <li>
+                    <Link href="/dashboard" >Perfil</Link>
+                  </li>
+                  <li><a>Settings</a></li>
+                  <li><button onClick={handleLogout}>Cerrar sesión</button></li>
+                </ul>
+              </div>
             </>
           ) : (
             <div className="flex gap-x-4">
-              <Link href="/login" className="btn btn-neutral">Iniciar sesión</Link>
-              <Link href="/register" className="btn btn-primary">Registrarse</Link>
+              <Link href="/auth/login" className="btn btn-neutral">Iniciar sesión</Link>
+              <Link href="/auth/register" className="btn btn-primary">Registrarse</Link>
             </div>
           )}
         </div>

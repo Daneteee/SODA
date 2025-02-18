@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import Alert from "../../components/Alert";
+import Alert from "../../../components/Alert";
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -147,7 +147,7 @@ export default function Register() {
             </button>
           </form>
           <p className="text-md text-center mt-3">
-            ¿Ya tienes cuenta? <a href="/login" className="link">Inicia sesión</a>
+            ¿Ya tienes cuenta? <a href="/auth/login" className="link">Inicia sesión</a>
           </p>
         </div>
       </div>
