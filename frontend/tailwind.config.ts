@@ -17,4 +17,11 @@ export default {
   plugins: [
     require('daisyui'),
   ],
+
+  daisyui: {
+    themes: true,
+    styled: true, // include daisyUI colors and design decisions for all components
+    utils: true, // adds responsive and modifier utility classes
+    prefix: "", // prefix for daisyUI classnames (components, modifiers and responsive class names. Not colors)
+  },
 } satisfies Config;
