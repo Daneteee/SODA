@@ -10,9 +10,8 @@ export default function Home() {
         {[...Array(15)].map((_, i) => (
           <div
             key={i}
-            className={`absolute w-16 h-16 rounded-full opacity-50 animate-bubble`}
+            className={`absolute w-16 h-16 rounded-full opacity-50 animate-bubble ${["bg-primary", "bg-secondary", "bg-accent"][i % 3]}`}
             style={{
-              backgroundColor: ["#00CDB7", "#FF52D9", "#7480FF"][i % 3],
               left: `${Math.random() * 100}%`,
               top: `105vh`, // Empiezan desde abajo
               animationDelay: `${Math.random() * 10}s`, // Más variación en los delays

@@ -1,16 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useRouter, usePathname } from "next/navigation";
+import ThemeSelector from "@/components/ThemeSelector";
 
 export default function Navbar() {
-  // Estado para verificar si el usuario está autenticado
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const router = useRouter();
-
+  const pathname = usePathname();
+  
   useEffect(() => {
-    // Simulación: Verifica si existe un token en las cookies
     const token = document.cookie
       .split('; ')
       .find(row => row.startsWith('jwtToken='));
@@ -23,6 +23,111 @@ export default function Navbar() {
     router.push("/");
   };
 
+  // Common navigation items
+  const navigationItems = (
+    <ul tabIndex={0} className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
+      <li>
+        <Link href="/">
+          <div className="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+            </svg>
+            Home
+          </div>
+        </Link>
+      </li>
+      <li>
+        <Link href="/portfolio">
+          <div className="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            Portfolio
+          </div>
+        </Link>
+      </li>
+      <li>
+        <Link href="/about">
+          <div className="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            About
+          </div>
+        </Link>
+      </li>
+    </ul>
+  );
+
+  // Common authenticated user controls
+  const authenticatedControls = (
+    <>
+      <button className="btn btn-ghost btn-circle">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </button>
+      <button className="btn btn-ghost btn-circle">
+        <div className="indicator">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+          </svg>
+          <span className="badge badge-xs badge-primary indicator-item"></span>
+        </div>
+      </button>
+      <div className="dropdown dropdown-end">
+        <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
+          <div className="w-10 rounded-full">
+            <img
+              alt="Tailwind CSS Navbar component"
+              src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+          </div>
+        </div>
+        <ul tabIndex={0} className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
+          <li><Link href="/dashboard">Perfil</Link></li>
+          <li><a>Settings</a></li>
+          <li><button onClick={handleLogout}>Cerrar sesión</button></li>
+        </ul>
+      </div>
+    </>
+  );
+
+  // Common unauthenticated controls
+  const unauthenticatedControls = (
+    <div className="flex gap-x-4">
+      <Link href="/auth/login" className="btn btn-neutral">Iniciar sesión</Link>
+      <Link href="/auth/register" className="btn btn-primary">Registrarse</Link>
+    </div>
+  );
+
+  if (pathname === '/') {
+    return (
+      <div className="fixed top-4 left-1/2 z-50 w-[90%] max-w-6xl -translate-x-1/2 rounded-2xl bg-opacity-40 backdrop-blur-md shadow-lg bg-base-100">
+        <div className="navbar">
+          <div className="navbar-start">
+            <div className="dropdown">
+              <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h7" />
+                </svg>
+              </div>
+              {navigationItems}
+            </div>
+          </div>
+
+          <div className="navbar-center">
+            <Link href="/" className="btn btn-ghost text-xl">SODA</Link>
+          </div>
+
+          <div className="navbar-end">
+            <ThemeSelector /> 
+            {isAuthenticated ? authenticatedControls : unauthenticatedControls}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="navbar bg-base-100">
       <div className="navbar-start">
@@ -32,88 +137,24 @@ export default function Navbar() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h7" />
             </svg>
           </div>
-          <ul tabIndex={0} className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
-            <li>
-              <Link href="/">
-                <div className="flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                  </svg>
-                  Home
-                </div>
-              </Link>
-            </li>
-            <li>
-              <Link href="/portfolio">
-                <div className="flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
-                  Portfolio
-                </div>
-              </Link>
-            </li>
-            <li>
-              <Link href="/about">
-                <div className="flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  About
-                </div>
-              </Link>
-            </li>
-          </ul>
+          {navigationItems}
         </div>
-      </div>
-      
-      <div className="navbar-center">
-            <Link href="/" className="btn btn-ghost text-xl">SODA</Link>
+        <Link href="/market" className="btn btn-ghost text-xl">Market</Link>
       </div>
 
+      <div className="navbar-center">
+        <Link href="/" className="btn btn-ghost text-xl">SODA</Link>
+      </div>
+
+
       <div className="navbar-end">
+        <ThemeSelector /> 
         {isAuthenticated ? (
-          <>
-            {/* Íconos cuando el usuario está logueado */}
-            <button className="btn btn-ghost btn-circle">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </button>
-            <button className="btn btn-ghost btn-circle">
-              <div className="indicator">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                </svg>
-                <span className="badge badge-xs badge-primary indicator-item"></span>
-              </div>
-            </button>
-            <div className="dropdown dropdown-end">
-              <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-                <div className="w-10 rounded-full">
-                  <img
-                    alt="Tailwind CSS Navbar component"
-                    src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
-                </div>
-              </div>
-              <ul
-                tabIndex={0}
-                className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
-                <li>
-                  <Link href="/dashboard" >Perfil</Link>
-                </li>
-                <li><a>Settings</a></li>
-                <li><button onClick={handleLogout}>Cerrar sesión</button></li>
-              </ul>
-            </div>
-          </>
+          authenticatedControls
         ) : (
           <>
-            {/* Botones cuando el usuario NO está logueado */}
-            <div className="flex gap-x-4">
-              <Link href="/auth/login" className="btn btn-neutral">Iniciar sesión</Link>
-              <Link href="/auth/register" className="btn btn-primary">Registrarse</Link>
-            </div>
+            <div className="skeleton h-10 w-32"></div>
+            <div className="skeleton h-11 w-11 shrink-0 rounded-full"></div>
           </>
         )}
       </div>
