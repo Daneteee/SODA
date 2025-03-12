@@ -18,13 +18,21 @@ const userSchema = new mongoose.Schema({
     required: true
   },
   phone: {
-    type: String,  // Cambiado de Int a String para evitar problemas
+    type: String,
     required: false
   },
   createdAt: {
     type: Date,
     default: Date.now
-  }
+  },
+  stocks: [
+    {
+      symbol: { type: String, required: true },  
+      quantity: { type: Number, required: true },
+      purchasePrice: { type: Number, required: true }, 
+      purchaseDate: { type: Date, default: Date.now } 
+    }
+  ]
 });
 
 // Método para comparar contraseñas en el login
