@@ -6,6 +6,7 @@ const userRoutes = require('./src/routes/userRoutes');
 const authRoutes = require('./src/routes/authRoutes');
 const marketRoutes = require('./src/routes/marketRoutes');
 const bodyParser = require('body-parser');
+const { initializeWebSocket } = require('./src/controllers/stock'); // Import WebSocket initializer
 
 const app = express();
 require('dotenv').config();
@@ -13,16 +14,28 @@ connectDB();
 app.use(cookieParser()); 
 
 // Middleware
-app.use(cors({ origin: 'http://localhost:3000', credentials: true })); // <-- Permitir solicitudes desde el frontend
+app.use(cors({ 
+  origin: 'http://localhost:3000', 
+  credentials: true 
+})); // <-- Permitir solicitudes desde el frontend
 app.use(bodyParser.json());
 
 // Rutas
 app.use('/api/auth', authRoutes); 
 app.use('/api/user', userRoutes); 
-app.use('/api/market', marketRoutes)
+app.use('/api/market', marketRoutes);
 
-// Iniciar servidor
-app.listen(4000, () => {
+// Servir archivos estáticos para el frontend
+app.use(express.static('public'));
+
+// Crear el servidor HTTP
+const server = require('http').createServer(app);
+
+// Inicializar WebSocket
+initializeWebSocket(server);
+
+// Iniciar servidor (ahora usamos 'server' en lugar de 'app')
+server.listen(4000, () => {
   console.log('Servidor corriendo en http://localhost:4000');
 });
 
