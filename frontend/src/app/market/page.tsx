@@ -20,6 +20,8 @@ const MarketPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [connected, setConnected] = useState(false);
   const ws = useRef<WebSocket | null>(null);
+  const router = useRouter();
+
   
   // Map para almacenar nombre de empresa por símbolo
   const companyNames: Record<string, string> = {
@@ -216,7 +218,8 @@ const MarketPage = () => {
                 </thead>
                 <tbody>
                   {filteredStocks.map((stock) => (
-                    <tr key={stock.symbol} className="hover:bg-base-200 transition-colors duration-200">
+                    <tr key={stock.symbol} className="hover:bg-base-200 transition-colors duration-200"   onClick={() => router.push(`/market/${stock.symbol}`)}
+>
                       <td>
                         <div className="flex items-center gap-3">
                           <div className="avatar placeholder">
