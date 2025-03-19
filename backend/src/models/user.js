@@ -32,7 +32,11 @@ const userSchema = new mongoose.Schema({
       purchasePrice: { type: Number, required: true }, 
       purchaseDate: { type: Date, default: Date.now } 
     }
-  ]
+  ],
+  credit: {
+    type: Number,
+    default: 50000
+  },
 });
 
 // Método para comparar contraseñas en el login

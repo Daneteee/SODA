@@ -1,10 +1,11 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
 import { Search, LayoutDashboard, Users, FileText, Settings, LogOut, TrendingUp, TrendingDown, Activity, PieChart, Wallet, History } from 'lucide-react';
 
 const DashboardLayout = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  
+  const [credit, setCredit] = useState(0);
+
   const stocks = [
     { id: 1, symbol: 'AAPL', name: 'Apple Inc.', price: 182.52, change: +1.25, volume: '45.2M', market_cap: '2.85T', trend: [65, 70, 68, 74, 72, 75, 78] },
     { id: 2, symbol: 'MSFT', name: 'Microsoft', price: 402.15, change: -0.54, volume: '22.1M', market_cap: '2.98T', trend: [80, 78, 82, 79, 85, 83, 82] },
@@ -17,6 +18,25 @@ const DashboardLayout = () => {
     stock.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     stock.symbol.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch("http://localhost:4000/api/user/profile", {
+          method: "GET",
+          credentials: "include", // <-- Esto permite que se envíen las cookies
+        });
+        if (!response.ok) throw new Error("Error obteniendo datos del usuario");
+        const data = await response.json();
+        setCredit(data.credit);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+  
+    fetchUserData();
+  }, []);
+  
 
   return (
     <div className="drawer lg:drawer-open ">
@@ -52,7 +72,8 @@ const DashboardLayout = () => {
             <div className="stats shadow bg-neutral text-neutral-content">
               <div className="stat">
                 <div className="stat-title text-neutral-content/60">Balance</div>
-                <div className="stat-value text-neutral-content/60">$12,180</div>
+                <div className="stat-value text-neutral-content/60">${credit.toFixed(2)}
+                </div>
                 <div className="stat-desc text-neutral-content/60">Disponible para trading</div>
               </div>
             </div>

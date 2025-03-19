@@ -6,7 +6,7 @@ import { useRouter, usePathname } from "next/navigation";
 import ThemeSelector from "@/components/ThemeSelector";
 
 export default function Navbar() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const router = useRouter();
   const pathname = usePathname();
   
@@ -15,7 +15,7 @@ export default function Navbar() {
       .split('; ')
       .find(row => row.startsWith('jwtToken='));
     setIsAuthenticated(!!token);
-  }, []);
+  }, [pathname]); 
 
   const handleLogout = () => {
     document.cookie = "jwtToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
@@ -100,7 +100,7 @@ export default function Navbar() {
     </div>
   );
 
-  if (pathname === '/') {
+  if (pathname === '/' || pathname === '/auth/login' || pathname === '/auth/register') {
     return (
       <div className="fixed top-4 left-1/2 z-50 w-[90%] max-w-6xl -translate-x-1/2 rounded-2xl bg-opacity-40 backdrop-blur-md shadow-lg bg-base-100">
         <div className="navbar">
