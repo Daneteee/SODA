@@ -23,7 +23,7 @@ app.use(bodyParser.json());
 // Rutas
 app.use('/api/auth', authRoutes); 
 app.use('/api/user', userRoutes); 
-app.use('/api/market', marketRoutes);
+// app.use('/api/market', marketRoutes);
 
 // Servir archivos estáticos para el frontend
 app.use(express.static('public'));
