@@ -1,6 +1,6 @@
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
-const User = require('../models/user'); 
+const User = require('../../models/user'); 
 const jwt = require('jsonwebtoken');
 
 const registerUser = async (req, res) => {
@@ -21,11 +21,14 @@ const registerUser = async (req, res) => {
     // Generar el hash de la contraseña
     const salt = await bcrypt.genSalt(10);  
     const hashedPassword = await bcrypt.hash(password, salt);  
+
+    // Crear el usuario incluyendo el campo profileImage con el valor por defecto
     user = new User({
       name,
       email,
       password: hashedPassword, 
       phone,
+      profileImage: "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
     });
 
     await user.save();

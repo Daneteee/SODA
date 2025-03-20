@@ -1,6 +1,6 @@
 const WebSocket = require('ws');
 const mongoose = require('mongoose');
-const Stock = require('../models/stock'); // Importa tu modelo
+const Stock = require('../../models/stock'); // Importa tu modelo
 
 const initializeWebSocket = async (server) => {
   const wss = new WebSocket.Server({ server });
