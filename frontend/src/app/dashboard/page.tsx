@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { 
-  Search, LayoutDashboard, Activity, PieChart, Wallet, History, Settings, LogOut 
+  Search, Activity
 } from 'lucide-react';
 import { useRouter } from "next/navigation";
 import DrawerSide from "@/components/DrawerSide";
@@ -11,23 +11,24 @@ const DashboardLayout = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [credit, setCredit] = useState(0);
   const [userStocks, setUserStocks] = useState<any[]>([]);
+  const [transactionsCount, setTransactionsCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  // Obtener perfil y portafolio del usuario
+  // Obtener datos del usuario: perfil, acciones y transacciones
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        // Obtener datos del perfil (por ejemplo, crédito)
+        // Obtener perfil (crédito)
         const profileResponse = await fetch("http://localhost:4000/api/user/profile", {
           method: "GET",
-          credentials: "include", // Enviar cookies para autenticación
+          credentials: "include",
         });
         if (!profileResponse.ok) throw new Error("Error obteniendo datos del usuario");
         const profileData = await profileResponse.json();
         setCredit(profileData.credit);
 
-        // Obtener acciones (stocks) del usuario
+        // Obtener acciones (stocks)
         const stocksResponse = await fetch("http://localhost:4000/api/user/stocks", {
           method: "GET",
           credentials: "include",
@@ -35,7 +36,16 @@ const DashboardLayout = () => {
         if (!stocksResponse.ok) throw new Error("Error obteniendo acciones del usuario");
         const stocksData = await stocksResponse.json();
         setUserStocks(stocksData.stocks || []);
-        
+
+        // Obtener transacciones para contar operaciones
+        const transactionsResponse = await fetch("http://localhost:4000/api/transactions", {
+          method: "GET",
+          credentials: "include",
+        });
+        if (!transactionsResponse.ok) throw new Error("Error obteniendo transacciones");
+        const transactionsData = await transactionsResponse.json();
+        setTransactionsCount(transactionsData.transactions.length);
+
         setLoading(false);
       } catch (error) {
         console.error("Error al obtener datos del usuario:", error);
@@ -46,12 +56,21 @@ const DashboardLayout = () => {
     fetchUserData();
   }, []);
 
+  // Calcular el valor total de las acciones
+  const totalStockValue = userStocks.reduce((acc, stock) => {
+    // Se asume que stock.currentPrice existe. Si no, se usa stock.purchasePrice como valor aproximado.
+    const currentPrice = stock.currentPrice || stock.purchasePrice;
+    return acc + currentPrice * stock.quantity;
+  }, 0);
+
+  // Valor del portafolio = crédito + valor total de las acciones
+  const portfolioValue = credit + totalStockValue;
+
   // Filtrar acciones según búsqueda
   const filteredStocks = userStocks.filter((stock) =>
     stock.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (stock.name && stock.name.toLowerCase().includes(searchTerm.toLowerCase()))
   );
-
 
   return (
     <div className="drawer lg:drawer-open ">
@@ -60,11 +79,12 @@ const DashboardLayout = () => {
         <main className="flex-1 p-6 bg-base-200">
           {/* Tarjetas de estadísticas */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div className="stats shadow bg-primary text-primary-content">
+            {/* Portfolio Value: muestra el crédito + valor actual de las acciones */}
+            <div className="stats shadow bg-primary text-primary-content overflow-hidden">
               <div className="stat">
                 <div className="stat-title text-primary-content/60">Portfolio Value</div>
-                <div className="stat-value text-primary-content/60">$89,432</div>
-                <div className="stat-desc text-primary-content/60">↗︎ 45% más que el mes pasado</div>
+                <div className="stat-value text-primary-content/60">${portfolioValue.toFixed(2)}</div>
+                <div className="stat-desc text-primary-content/60">Valor actualizado</div>
               </div>
             </div>
             
@@ -79,12 +99,12 @@ const DashboardLayout = () => {
             <div className="stats shadow bg-secondary text-secondary-content">
               <div className="stat">
                 <div className="stat-title text-secondary-content/60">Operaciones</div>
-                <div className="stat-value text-secondary-content/60">23</div>
+                <div className="stat-value text-secondary-content/60">{transactionsCount}</div>
                 <div className="stat-desc text-secondary-content/60">↘︎ 4 pendientes</div>
               </div>
             </div>
 
-            <div className="stats shadow bg-neutral text-neutral-content">
+            <div className="stats shadow bg-neutral text-neutral-content overflow-hidden">
               <div className="stat">
                 <div className="stat-title text-neutral-content/60">Balance</div>
                 <div className="stat-value text-neutral-content/60">${credit.toFixed(2)}</div>
@@ -120,12 +140,14 @@ const DashboardLayout = () => {
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
-                    className="stroke-info h-6 w-6 shrink-0">
+                    className="stroke-info h-6 w-6 shrink-0"
+                  >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth="2"
-                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    ></path>
                   </svg>
                   <span>No tienes acciones en tu portafolio.</span>
                 </div>
@@ -143,12 +165,15 @@ const DashboardLayout = () => {
                     </thead>
                     <tbody>
                       {filteredStocks.map((stock) => (
-                        <tr key={stock.symbol} className="hover:bg-base-200 transition-colors duration-200 cursor-pointer"
-                        onClick={() => router.push(`/market/${stock.symbol}`)}>
+                        <tr 
+                          key={stock.symbol} 
+                          className="hover:bg-base-200 transition-colors duration-200 cursor-pointer"
+                          onClick={() => router.push(`/market/${stock.symbol}`)}
+                        >
                           <td>
                             <div className="flex items-center gap-3">
                               <div className="avatar placeholder">
-                                <div className="bg-neutral text-neutral-content rounded-full w-8 ">
+                                <div className="bg-neutral text-neutral-content rounded-full w-8">
                                   <span>{stock.symbol.substring(0, 2)}</span>
                                 </div>
                               </div>

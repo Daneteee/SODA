@@ -7,15 +7,38 @@ import ThemeSelector from "@/components/ThemeSelector";
 
 export default function Navbar() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [userData, setUserData] = useState({
+    profileImage: "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
+  });
   const router = useRouter();
   const pathname = usePathname();
-  
+
+  // Verificar autenticación y obtener datos del usuario
   useEffect(() => {
     const token = document.cookie
-      .split('; ')
-      .find(row => row.startsWith('jwtToken='));
+      .split("; ")
+      .find(row => row.startsWith("jwtToken="));
     setIsAuthenticated(!!token);
-  }, [pathname]); 
+
+    if (token) {
+      const fetchUserData = async () => {
+        try {
+          const profileResponse = await fetch("http://localhost:4000/api/user/profile", {
+            method: "GET",
+            credentials: "include", // Enviar cookies para autenticación
+          });
+          if (!profileResponse.ok) throw new Error("Error obtaining user data");
+          const profileData = await profileResponse.json();
+          setUserData({
+            profileImage: profileData.profileImage || "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
+          });
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
+      };
+      fetchUserData();
+    }
+  }, [pathname]);
 
   const handleLogout = () => {
     document.cookie = "jwtToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
@@ -78,14 +101,12 @@ export default function Navbar() {
       <div className="dropdown dropdown-end">
         <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
           <div className="w-10 rounded-full">
-            <img
-              alt="Tailwind CSS Navbar component"
-              src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+            <img src={`http://localhost:4000${userData.profileImage}` || "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"} alt="Profile" />
           </div>
         </div>
         <ul tabIndex={0} className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
           <li><Link href="/dashboard">Perfil</Link></li>
-          <li><a>Settings</a></li>
+          <li><Link href="/user/profile">Configuración</Link></li>
           <li><button onClick={handleLogout}>Cerrar sesión</button></li>
         </ul>
       </div>

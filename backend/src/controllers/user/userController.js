@@ -1,4 +1,5 @@
 const User = require("../../models/user");
+const bcrypt = require("bcryptjs");
 
 // Función para obtener el perfil del usuario autenticado
 const getUserProfile = async (req, res) => {  
@@ -64,4 +65,44 @@ const getUserStocks = async (req, res) => {
   }
 };
 
-module.exports = { getUserProfile, updateUserProfile, getUserStocks };
+const changePassword = async (req, res) => {
+  try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ msg: "No autorizado" });
+    }
+
+    const { currentPassword, newPassword } = req.body;
+
+    // Verificar que los campos están completos
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ msg: "Por favor, completa todos los campos" });
+    }
+
+    // Obtener usuario
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ msg: "Usuario no encontrado" });
+    }
+
+    // Verificar si la contraseña actual es correcta
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ msg: "La contraseña actual es incorrecta" });
+    }
+
+    // Encriptar la nueva contraseña
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // Actualizar la contraseña en la base de datos
+    user.password = hashedPassword;
+    await user.save();
+
+    res.json({ msg: "Contraseña actualizada correctamente" });
+  } catch (err) {
+    console.error("Error al cambiar la contraseña:", err);
+    res.status(500).json({ msg: "Error del servidor" });
+  }
+};
+
+module.exports = { getUserProfile, updateUserProfile, getUserStocks, changePassword };

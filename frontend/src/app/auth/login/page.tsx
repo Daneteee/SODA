@@ -35,10 +35,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex h-[80vh] items-center justify-center bg-base-200">
+    <div className="flex h-screen items-center justify-center bg-base-200">
       <div className="card w-[28rem] bg-base-100 shadow-xl">
         <div className="card-body">
-          <h2 className="card-title text-2xl text-center">Iniciar sesión</h2>
+          <h2 className="card-title text-2xl text-center">Iniciar sesión :)</h2>
           {error && <p className="text-red-500 text-center">{error}</p>}
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <input

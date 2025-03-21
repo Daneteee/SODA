@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   LayoutDashboard,
   PieChart,
@@ -13,6 +13,31 @@ import { usePathname } from "next/navigation";
 
 const DrawerSide = () => {
   const pathname = usePathname();
+  const [user, setUser] = useState<{ name: string; profileImage: string } | null>(null);
+
+  // Obtener datos del usuario al cargar el componente
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const res = await fetch("http://localhost:4000/api/user/profile", {
+          method: "GET",
+          credentials: "include",
+        });
+        if (!res.ok) throw new Error("Error obteniendo el usuario");
+        const data = await res.json();
+        setUser({
+          name: data.name || "Usuario",
+          profileImage: data.profileImage
+            ? `http://localhost:4000${data.profileImage}`
+            : "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
+        });
+      } catch (error) {
+        console.error("Error cargando el perfil:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const isActive = (href: string) => {
     return pathname === href ? "active" : "hover:bg-base-200";
@@ -24,18 +49,24 @@ const DrawerSide = () => {
       <aside className="bg-base-100 w-80 border-r border-base-200 flex flex-col h-full">
         <div className="p-4 bg-primary text-primary-content">
           <div className="flex items-center gap-4">
-            <div className="avatar placeholder">
-              <div className="bg-neutral text-neutral-content rounded-full w-12 h-12 flex items-center justify-center">
-                <span>MX</span>
+            <div className="avatar">
+              <div className="w-12 h-12 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                {user?.profileImage ? (
+                  <img src={user.profileImage} alt="User Profile" />
+                ) : (
+                  <span className="flex items-center justify-center w-full h-full bg-neutral text-neutral-content">
+                    ?
+                  </span>
+                )}
               </div>
             </div>
             <div>
-              <h2 className="text-xl font-bold">MaxTrade Pro</h2>
-              <p className="text-sm opacity-80">Trading Platform</p>
+              <h2 className="text-xl font-bold">{user?.name || "Cargando..."}</h2>
+              <p className="text-sm opacity-80">Trader</p>
             </div>
           </div>
         </div>
-        
+
         <ul className="menu p-4 gap-2 flex-1">
           <li>
             <Link href="/dashboard" className={isActive("/dashboard")}>
@@ -56,7 +87,7 @@ const DrawerSide = () => {
             </Link>
           </li>
           <li>
-            <Link href="/dashboard/history" className={isActive("/dashboard/history")}>
+            <Link href="/dashboard/transactions" className={isActive("/dashboard/transactions")}>
               <History className="h-5 w-5" />
               Historial
             </Link>
@@ -77,7 +108,7 @@ const DrawerSide = () => {
               <button className="btn btn-primary btn-sm mt-2">Renovar Plan</button>
             </div>
           </div>
-          
+
           <button className="btn btn-error btn-block mt-4">
             <LogOut className="h-5 w-5" />
             Cerrar Sesión

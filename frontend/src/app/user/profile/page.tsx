@@ -11,7 +11,7 @@ const EditProfilePage = () => {
     name: "",
     email: "",
     phone: "",
-    profilePicture: ""
+    profileImage: ""
   });
 
   const [password, setPassword] = useState({
@@ -31,6 +31,7 @@ const EditProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [alert, setAlert] = useState<{ type: "success" | "warning" | "error"; message: string } | null>(null);
   const router = useRouter();
+  const [showImageAlert, setShowImageAlert] = useState(false);
 
   // Fetch user data
   useEffect(() => {
@@ -45,12 +46,11 @@ const EditProfilePage = () => {
         
         const profileData = await profileResponse.json();
         setUserData({
-            name: profileData.name || "",
-            email: profileData.email || "",
-            phone: profileData.phone || "",
-            profilePicture: profileData.profileImage || "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-          });
-          
+          name: profileData.name || "",
+          email: profileData.email || "",
+          phone: profileData.phone || "",
+          profileImage: profileData.profileImage || "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+        });
         
         setLoading(false);
       } catch (error) {
@@ -100,10 +100,9 @@ const EditProfilePage = () => {
     }
   };
 
-    // Handle profile picture upload
-    const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
+  const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
         const formData = new FormData();
         formData.append('profileImage', file);
     
@@ -115,7 +114,7 @@ const EditProfilePage = () => {
             .then((res) => res.json())
             .then((data) => {
             console.log("Imagen actualizada:", data);
-            // Actualiza el estado o notifica al usuario según sea necesario
+            setShowImageAlert(true);
             })
             .catch((error) => console.error("Error al actualizar la imagen:", error));
         }
@@ -139,7 +138,6 @@ const EditProfilePage = () => {
           name: userData.name,
           email: userData.email,
           phone: userData.phone,
-          // profilePicture would be handled separately in a real implementation
         }),
       });
       
@@ -204,43 +202,79 @@ const EditProfilePage = () => {
       <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
       <div className="drawer-content flex flex-col">
         <main className="flex-1 p-6 bg-base-200">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold">Editar Perfil</h1>
-            <p className="text-gray-600">Actualiza tu información personal y configuraciones</p>
-          </div>
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold">Editar Perfil</h1>
+                <p className="text-gray-600">Actualiza tu información personal y configuraciones</p>
+            </div>
 
-          {/* Alerts */}
-          {alert && <Alert type={alert.type} message={alert.message} />}
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Profile Information Card */}
-            <div className="card bg-base-100 shadow-xl">
-              <div className="card-body">
-                <h2 className="card-title text-xl flex items-center gap-2">
-                  <User className="h-5 w-5 text-primary" />
-                  Información Personal
-                </h2>
+            {/* Alertas */}
+            {showImageAlert && (
+            <div role="alert" className="alert shadow-lg mb-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    className="stroke-info h-6 w-6 shrink-0">
+                    <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <div>
+                    <h3 className="font-bold">¡Imagen actualizada!</h3>
+                    <div className="text-xs">Refresca la página para ver los cambios.</div>
+                </div>
+                </div>
                 
-                <form onSubmit={handleProfileUpdate} className="flex flex-col gap-4 mt-4">
-                  {/* Profile Picture */}
-                  <div className="flex flex-col items-center mb-4">
-                    <div className="avatar">
-                        <div className="w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                        <img src={`http://localhost:4000${userData.profilePicture}` || "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"} alt="Profile" />
+                {/* Botones alineados horizontalmente */}
+                <div className="flex gap-2">
+                <button className="btn btn-sm btn-primary" onClick={() => window.location.reload()}>
+                    Refrescar
+                </button>
+                <button className="btn btn-sm" onClick={() => setShowImageAlert(false)}>
+                    Cerrar
+                </button>
+                </div>
+            </div>
+            )}
+
+            {alert && (
+            <div className="mb-4">
+                <Alert type={alert.type} message={alert.message} onClose={() => setAlert(null)} />
+            </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Profile Information Card */}
+                <div className="card bg-base-100 shadow-xl">
+                    <div className="card-body">
+                        <h2 className="card-title text-xl flex items-center gap-2">
+                        <User className="h-5 w-5 text-primary" />
+                        Información Personal
+                        </h2>
+                    
+                    <form onSubmit={handleProfileUpdate} className="flex flex-col gap-4 mt-4">
+                    {/* Profile Picture */}
+                    <div className="flex flex-col items-center mb-4">
+                        <div className="avatar">
+                            <div className="w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                            <img src={`http://localhost:4000${userData.profileImage}` || "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"} alt="Profile" />
+                            </div>
                         </div>
-                    </div>
-                    <div className="mt-4">
-                        <label className="btn btn-sm btn-outline gap-2">
-                        <Camera className="h-4 w-4" />
-                        Cambiar Foto
-                        <input 
-                            type="file" 
-                            className="hidden" 
-                            accept="image/*"
-                            onChange={handleProfilePictureChange}
-                        />
-                        </label>
-                    </div>
+                        <div className="mt-4">
+                            <label className="btn btn-sm btn-outline gap-2">
+                            <Camera className="h-4 w-4" />
+                            Cambiar Foto
+                            <input 
+                                type="file" 
+                                className="hidden" 
+                                accept="image/*"
+                                onChange={handleProfilePictureChange}
+                            />
+                            </label>
+                        </div>
                     </div>
 
                   

@@ -1,5 +1,6 @@
 const User = require('../../models/user');
 const Stock = require('../../models/stock');
+const Transaction = require('../../models/transaction'); // Asegúrate de tener este modelo
 
 // Función para procesar la venta de acciones
 const sellStock = async (req, res) => {
@@ -43,17 +44,27 @@ const sellStock = async (req, res) => {
 
     // Actualizar o eliminar la posición en el portafolio
     if (quantity === existingStock.quantity) {
-      // Vende todas las acciones: elimina la entrada
       user.stocks = user.stocks.filter((s) => s.symbol !== symbol);
     } else {
-      // Si vende solo una parte, reduce la cantidad\n      
       existingStock.quantity -= quantity;
     }
 
-    // Guardar los cambios en la base de datos
+    // Guardar los cambios en el usuario
     await user.save();
 
-    return res.status(200).json({ message: 'Venta realizada exitosamente', user });
+    // Crear y guardar la transacción
+    const transaction = new Transaction({
+      userId: req.user.id,
+      stock: symbol,
+      type: "sell",
+      amount: quantity,
+      price: sellPrice,
+      total: totalRevenue,
+      date: new Date()
+    });
+    await transaction.save();
+
+    return res.status(200).json({ message: 'Venta realizada exitosamente', user, transaction });
   } catch (error) {
     console.error("Error en la venta: ", error);
     return res.status(500).json({ message: 'Error en el servidor' });

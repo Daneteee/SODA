@@ -66,7 +66,7 @@ export default function Register() {
   
 
   return (
-    <div className="flex h-[90vh] items-center justify-center transition-all duration-300 bg-base-200">
+    <div className="flex h-screen items-center justify-center transition-all duration-300 bg-base-200 pt-10">
       <div className="card w-[28rem] bg-base-100 shadow-xl">
         <div className="card-body">
           <h2 className="card-title text-2xl text-center">Registrate! :)</h2>
