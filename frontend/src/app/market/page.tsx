@@ -95,7 +95,6 @@ const MarketPage = () => {
           updatedStocks.push(newStock);
         }
       });
-
       return updatedStocks;
     });
   };
