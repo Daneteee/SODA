@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import Navbar from "@/components/Navbar"; 
 import Footer from "@/components/Footer";
+import { WebSocketProvider } from "../context/WebSocketProvider"; // Asegúrate de ajustar la ruta
 import type { Metadata } from "next";
 import "./globals.css";
 
@@ -22,10 +23,12 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased text-base-content `}>
-          <Navbar />
-          <main >{children}</main>
-          <Footer />
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased text-base-content`}>
+        <Navbar />
+        <WebSocketProvider>
+          <main>{children}</main>
+        </WebSocketProvider>
+        <Footer />
       </body>
     </html>
   );

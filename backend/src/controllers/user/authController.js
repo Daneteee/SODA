@@ -43,7 +43,7 @@ const registerUser = async (req, res) => {
     console.log("JWT_SECRET:", process.env.JWT_SECRET);
     console.log("Payload del token:", payload);
 
-    jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' }, (err, token) => {
+    jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' }, (err, token) => {
       if (err) throw err;
       res.status(200).json({ msg: 'Usuario registrado', token });
     });

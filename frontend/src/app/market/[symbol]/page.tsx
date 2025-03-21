@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { TrendingUp, TrendingDown, RefreshCw, Star, MoreHorizontal, Clock, Info, Wallet, Zap } from "lucide-react";
 import { Line } from "react-chartjs-2";
@@ -14,6 +14,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { useWebSocket } from "@/context/WebSocketProvider";
 
 ChartJS.register(
   CategoryScale,
@@ -28,10 +29,9 @@ ChartJS.register(
 const StockDetail = () => {
   const { symbol } = useParams();
   const router = useRouter();
-  const ws = useRef<WebSocket | null>(null);
+  const { connected, stockData } = useWebSocket();
   const [stock, setStock] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
-  const [connected, setConnected] = useState(false);
   const [activeTab, setActiveTab] = useState("Buy");
   const [amount, setAmount] = useState(0);
   const [shares, setShares] = useState(0);
@@ -47,8 +47,8 @@ const StockDetail = () => {
   });
   const [activeTimeframe, setActiveTimeframe] = useState("1D");
 
-  // Asumo que dailyHistory es un array con datos históricos, asegúrate de tenerlo definido
-  const dailyHistory = []; // <-- Debes reemplazarlo con tus datos reales
+  // Asumo que dailyHistory es un array con datos históricos, reemplázalo con tus datos reales
+  const dailyHistory = [];
 
   const chartDataValues = {
     times: dailyHistory.map((item: any) =>
@@ -94,21 +94,20 @@ const StockDetail = () => {
     ],
   };
 
+  // Obtener datos de usuario (perfil y acciones)
   useEffect(() => {
     if (!symbol) return;
 
     const fetchUserData = async () => {
       try {
-        // Obtener datos del perfil (por ejemplo, crédito)
         const profileResponse = await fetch("http://localhost:4000/api/user/profile", {
           method: "GET",
-          credentials: "include", // Enviar cookies para autenticación
+          credentials: "include",
         });
         if (!profileResponse.ok) throw new Error("Error obteniendo datos del usuario");
         const profileData = await profileResponse.json();
         setCredit(profileData.credit);
-        
-        // Obtener acciones (stocks) del usuario
+
         const stocksResponse = await fetch("http://localhost:4000/api/user/stocks", {
           method: "GET",
           credentials: "include",
@@ -122,59 +121,36 @@ const StockDetail = () => {
     };
 
     fetchUserData();
-
-    ws.current = new WebSocket("ws://localhost:4000");
-
-    ws.current.onopen = () => {
-      console.log(`✅ Conectado al WebSocket para ${symbol}`);
-      setConnected(true);
-      ws.current?.send(JSON.stringify({ type: "subscribe", symbol }));
-      setLoading(false);
-    };
-
-    ws.current.onmessage = (event) => {
-      try {
-        const message = JSON.parse(event.data);
-        if (message.type === "trade" && Array.isArray(message.data)) {
-          const trade = message.data.find((t: any) => t.symbol === symbol);
-          if (trade) {
-            setStock((prevStock: any) => {
-              const newStock = {
-                ...prevStock,
-                symbol: trade.symbol,
-                price: trade.price,
-                previousPrice: prevStock?.price || trade.price,
-                priceChange: prevStock?.price
-                  ? ((trade.price - prevStock.price) / prevStock.price) * 100
-                  : 0,
-                volume: trade.volume,
-                lastUpdate: new Date(trade.timestamp).toLocaleTimeString(),
-                company: trade.company || prevStock?.company || {},
-              };
-              return newStock;
-            });
-          }
-        }
-      } catch (error) {
-        console.error("❌ Error procesando mensaje WebSocket:", error);
-      }
-    };
-
-    ws.current.onclose = () => {
-      console.log("🔴 WebSocket cerrado");
-      setConnected(false);
-    };
-
-    ws.current.onerror = (error) => {
-      console.error("❌ Error en WebSocket:", error);
-    };
-
-    return () => {
-      if (ws.current) {
-        ws.current.close();
-      }
-    };
   }, [symbol]);
+
+  // Actualizar la acción específica a partir de los datos globales del WebSocket
+  useEffect(() => {
+    if (!symbol) return;
+    // Busca la transacción correspondiente al símbolo
+    const trade = stockData.find((t: any) => t.symbol === symbol);
+    if (trade) {
+      setStock((prevStock: any) => {
+        const newStock = {
+          ...prevStock,
+          symbol: trade.symbol,
+          price: trade.price,
+          previousPrice: prevStock?.price || trade.price,
+          priceChange: prevStock?.price
+            ? ((trade.price - prevStock.price) / prevStock.price) * 100
+            : 0,
+          volume: trade.volume,
+          lastUpdate: new Date(trade.timestamp).toLocaleTimeString(),
+          company: trade.company || prevStock?.company || {},
+        };
+        return newStock;
+      });
+    }
+  }, [stockData, symbol]);
+
+  // Finalizar loading cuando se obtenga información de la acción
+  useEffect(() => {
+    if (stock) setLoading(false);
+  }, [stock]);
 
   // Calcular la posición cuando cambian los datos de usuario o stock
   useEffect(() => {
@@ -188,9 +164,7 @@ const StockDetail = () => {
       const performance = currentValue - initialValue;
       const performancePercent = initialValue > 0 ? (performance / initialValue) * 100 : 0;
       
-      // Calcular el porcentaje de la cartera
       const totalPortfolioValue = userStocks.reduce((total, s) => {
-        // Si tenemos el precio actual del stock en tiempo real, usarlo, de lo contrario usar el precio de compra
         const currentStockPrice = s.symbol === symbol ? stock.price : s.purchasePrice;
         return total + (s.quantity * currentStockPrice);
       }, 0);
@@ -242,8 +216,6 @@ const StockDetail = () => {
       purchasePrice: stock.price,
     };
   
-    console.log("purchaseData:", purchaseData);
-  
     try {
       const response = await fetch("http://localhost:4000/api/market/buy", {
         method: "POST",
@@ -255,12 +227,10 @@ const StockDetail = () => {
       if (!response.ok) {
         const errorData = await response.json();
         console.error("Error al comprar acción:", errorData);
-        // Aquí podrías mostrar un mensaje de error al usuario
       } else {
         const result = await response.json();
         console.log("Compra realizada exitosamente:", result);
         
-        // Actualizar datos del usuario después de la compra
         const profileResponse = await fetch("http://localhost:4000/api/user/profile", {
           method: "GET",
           credentials: "include",
@@ -275,7 +245,6 @@ const StockDetail = () => {
         const stocksData = await stocksResponse.json();
         setUserStocks(stocksData.stocks || []);
         
-        // Resetear los campos de compra
         setAmount(0);
         setShares(0);
       }
@@ -308,7 +277,6 @@ const StockDetail = () => {
         const result = await response.json();
         console.log("Venta realizada exitosamente:", result);
         
-        // Actualizar datos del usuario después de la venta
         const profileResponse = await fetch("http://localhost:4000/api/user/profile", {
           method: "GET",
           credentials: "include",
@@ -323,7 +291,6 @@ const StockDetail = () => {
         const stocksData = await stocksResponse.json();
         setUserStocks(stocksData.stocks || []);
         
-        // Resetear los campos
         setAmount(0);
         setShares(0);
       }
@@ -331,7 +298,6 @@ const StockDetail = () => {
       console.error("Error en la venta de acciones:", error);
     }
   };
-
 
   const handleSellPercentage = (percent: number) => {
     if (position.shares) {
@@ -375,7 +341,6 @@ const StockDetail = () => {
         <div className="flex flex-col md:flex-row gap-4">
           {/* Columna izquierda: Gráfico y detalles */}
           <div className="w-full md:w-8/12 bg-base-100 rounded-xl shadow-xl p-4 md:p-6">
-            {/* Encabezado */}
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center gap-3">
                 <div className="text-4xl font-bold">{stock.symbol}</div>
@@ -388,19 +353,15 @@ const StockDetail = () => {
               </button>
             </div>
 
-            {/* Nombre de la empresa */}
             <div className="text-lg font-medium text-base-content/70 mb-4">
               {stock.company?.name || "Interactive Broker"}
             </div>
 
-            {/* Precio actual */}
             <div className="flex items-baseline gap-3 mb-4">
               <div className="text-3xl font-bold">
                 {stock.price?.toFixed(2)} €
               </div>
-              <div
-                className={`flex items-center gap-1 font-bold ${priceChangeColor}`}
-              >
+              <div className={`flex items-center gap-1 font-bold ${priceChangeColor}`}>
                 {stock.priceChange >= 0 ? (
                   <TrendingUp className="h-4 w-4" />
                 ) : (
@@ -411,16 +372,11 @@ const StockDetail = () => {
               </div>
             </div>
 
-            {/* Selector de período */}
             <div className="flex gap-2 mb-4 flex-wrap">
               {["1D", "1W", "1M", "6M", "1Y", "5Y"].map((period) => (
                 <button
                   key={period}
-                  className={`btn btn-sm ${
-                    activeTimeframe === period
-                      ? "btn-primary"
-                      : "btn-outline"
-                  }`}
+                  className={`btn btn-sm ${activeTimeframe === period ? "btn-primary" : "btn-outline"}`}
                   onClick={() => setActiveTimeframe(period)}
                 >
                   {period}
@@ -428,12 +384,10 @@ const StockDetail = () => {
               ))}
             </div>
 
-            {/* Gráfico con el histórico diario */}
             <div className="h-64 md:h-80 mt-4 mb-4">
               <Line options={chartOptions} data={chartConfig} />
             </div>
 
-            {/* Hora actual */}
             <div className="flex justify-between items-center text-base-content/70 text-sm">
               <div className="flex items-center gap-1">
                 <Clock className="h-4 w-4" />
@@ -462,7 +416,6 @@ const StockDetail = () => {
 
           {/* Columna derecha: Compra/Venta y Posición */}
           <div className="w-full md:w-4/12 flex flex-col gap-4">
-            {/* Panel de compra/venta */}
             <div className="card bg-base-100 shadow-xl">
               <div className="card-body p-4 md:p-6">
                 <div className="tabs tabs-boxed mb-4">
@@ -560,8 +513,6 @@ const StockDetail = () => {
               </div>
             </div>
 
-
-            {/* Panel de posición */}
             <div className="card bg-base-100 shadow-xl">
               <div className="card-body p-4 md:p-6">
                 <h2 className="card-title mb-4">Posición</h2>
@@ -577,20 +528,13 @@ const StockDetail = () => {
 
                     <div className="mb-4">
                       <div className="text-sm text-base-content/70">Rendimiento</div>
-                      <div
-                        className={`text-lg font-bold flex items-center gap-1 ${
-                          position.performance >= 0
-                            ? "text-success"
-                            : "text-error"
-                        }`}
-                      >
+                      <div className={`text-lg font-bold flex items-center gap-1 ${position.performance >= 0 ? "text-success" : "text-error"}`}>
                         {position.performance >= 0 ? (
                           <TrendingUp className="h-4 w-4" />
                         ) : (
                           <TrendingDown className="h-4 w-4" />
                         )}
-                        {position.performance.toFixed(2)} € (
-                        {position.performancePercent.toFixed(2)}%)
+                        {position.performance.toFixed(2)} € ({position.performancePercent.toFixed(2)}%)
                       </div>
                     </div>
 

@@ -3,6 +3,7 @@ import { useState } from "react";
 import Alert from "../../../components/Alert";
 
 export default function Register() {
+  // Estat per emmagatzemar les dades del formulari
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -10,6 +11,7 @@ export default function Register() {
     phone: "",
   });
 
+  // Estat per gestionar la validació de la contrasenya
   const [validations, setValidations] = useState({
     length: false,
     letter: false,
@@ -17,19 +19,22 @@ export default function Register() {
     special: false,
   });
 
+  // Estat per mostrar alertes a l'usuari
   const [alert, setAlert] = useState<{ type: "success" | "warning" | "error"; message: string } | null>(null);
 
+  // Funció per gestionar els canvis en els camps del formulari
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
     if (name === "phone") {
-      // Solo permite números en el teléfono
+      // Permetem només números de telèfon
       if (!/^\d*$/.test(value)) return;
     }
 
     setFormData({ ...formData, [name]: value });
 
     if (name === "password") {
+      // Comprovem els requisits de la contrasenya
       setValidations({
         length: value.length >= 8,
         letter: /[a-zA-Z]/.test(value),
@@ -39,6 +44,7 @@ export default function Register() {
     }
   };
 
+  // Enviem les dades al backend per registrar l'usuari
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
   
@@ -54,29 +60,28 @@ export default function Register() {
       const data = await response.json();
   
       if (response.ok) {
-        setAlert({ type: "success", message: "¡Tu registro se ha completado con éxito!" });
+        setAlert({ type: "success", message: "El teu registre s'ha completat amb èxit!" });
       } else {
-        setAlert({ type: "error", message: data.msg || "Hubo un problema con el registro." });
+        setAlert({ type: "error", message: data.msg || "Hi ha hagut un problema amb el registre." });
       }
     } catch (error) {
-      console.error("Error de conexión:", error);
-      setAlert({ type: "error", message: "Error de conexión con el servidor." });
+      console.error("Error de connexió:", error);
+      setAlert({ type: "error", message: "Error de connexió amb el servidor." });
     }
   };
   
-
   return (
     <div className="flex h-screen items-center justify-center transition-all duration-300 bg-base-200 pt-10">
       <div className="card w-[28rem] bg-base-100 shadow-xl">
         <div className="card-body">
-          <h2 className="card-title text-2xl text-center">Registrate! :)</h2>
+          <h2 className="card-title text-2xl text-center">Registra't! :)</h2>
 
-          {/* Alertas */}
+          {/* Mostrem alertes si n'hi ha */}
           {alert && <Alert type={alert.type} message={alert.message} />}
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
-              <label className="block text-lg font-semibold">Nombre</label>
+              <label className="block text-lg font-semibold">Nom</label>
               <input
                 type="text"
                 name="name"
@@ -87,7 +92,7 @@ export default function Register() {
               />
             </div>
             <div>
-              <label className="block text-lg font-semibold">Correo electrónico</label>
+              <label className="block text-lg font-semibold">Correu electrònic</label>
               <input
                 type="email"
                 name="email"
@@ -98,7 +103,7 @@ export default function Register() {
               />
             </div>
             <div>
-              <label className="block text-lg font-semibold">Contraseña</label>
+              <label className="block text-lg font-semibold">Contrasenya</label>
               <input
                 type="password"
                 name="password"
@@ -107,13 +112,13 @@ export default function Register() {
                 onChange={handleChange}
                 required
               />
-              {/* Reglas de validación de contraseña */}
+              {/* Regles de validació de la contrasenya */}
               <div className="text-sm mt-0.5">
                 {[
-                  { label: "Mínimo 8 caracteres", valid: validations.length },
-                  { label: "Al menos 1 letra", valid: validations.letter },
-                  { label: "Al menos 1 número", valid: validations.number },
-                  { label: "Al menos 1 carácter especial", valid: validations.special },
+                  { label: "Mínim 8 caràcters", valid: validations.length },
+                  { label: "Almenys 1 lletra", valid: validations.letter },
+                  { label: "Almenys 1 número", valid: validations.number },
+                  { label: "Almenys 1 caràcter especial", valid: validations.special },
                 ].map(({ label, valid }, index) => (
                   <div key={index} className={`flex items-center gap-2 ${valid ? "text-green-500" : "text-red-500"}`}>
                     {valid ? (
@@ -130,9 +135,8 @@ export default function Register() {
                 ))}
               </div>
             </div>            
-
             <div>
-              <label className="block text-lg font-semibold">Teléfono</label>
+              <label className="block text-lg font-semibold">Telèfon</label>
               <input
                 type="text"
                 name="phone"
@@ -143,15 +147,14 @@ export default function Register() {
               />
             </div>
             <button type="submit" className="btn btn-primary btn-lg w-full">
-              Registrarse
+              Registrar-se
             </button>
           </form>
           <p className="text-md text-center mt-3">
-            ¿Ya tienes cuenta? <a href="/auth/login" className="link">Inicia sesión</a>
+            Ja tens un compte? <a href="/auth/login" className="link">Inicia sessió</a>
           </p>
         </div>
       </div>
     </div>
-
   );
 }
