@@ -24,7 +24,7 @@ const initializeWebSocket = async (server) => {
   });
 
   // Conectar a Finnhub
-  const finnhubSocket = new WebSocket('wss://ws.finnhub.io?token=cv8t89pr01qk2jfseiugcv8t89pr01qk2jfseiv0');
+  const finnhubSocket = new WebSocket('wss://ws.finnhub.io?token=cv7g9fhr01qpecifqecgcv7g9fhr01qpecifqed0');
 
   finnhubSocket.on('open', () => {
     console.log('✅ Conectado a Finnhub WebSocket');

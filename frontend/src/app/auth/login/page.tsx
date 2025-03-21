@@ -13,6 +13,7 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
 
+    // Connectem a l'API per fer el login
     try {
       const res = await fetch("http://localhost:4000/api/auth/login", {
         method: "POST",
