@@ -47,14 +47,12 @@ const StockDetail = () => {
   });
   const [activeTimeframe, setActiveTimeframe] = useState("1D");
 
-  // Asumo que dailyHistory es un array con datos históricos, asegúrate de tenerlo definido
-  const dailyHistory = []; // <-- Debes reemplazarlo con tus datos reales
-
+  // Datos para el gráfico
   const chartDataValues = {
-    times: dailyHistory.map((item: any) =>
+    times: stock?.history?.map((item: any) =>
       new Date(item.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    ),
-    prices: dailyHistory.map((item: any) => item.close),
+    ) || [],
+    prices: stock?.history?.map((item: any) => item.close) || [],
   };
 
   const chartOptions = {
@@ -94,21 +92,41 @@ const StockDetail = () => {
     ],
   };
 
+  const fetchStockData = async (interval: string = '5m', range: string = "1d") => {
+    try {
+      // Obtener datos históricos
+      let link = `http://localhost:4000/api/market/${symbol}/?interval=${interval}&range=${range}`;
+      console.log(link)
+      const historyResponse = await fetch(link);
+      if (!historyResponse.ok) throw new Error("Error obteniendo datos históricos");
+      const historyData = await historyResponse.json();
+      
+      setStock({
+        history: historyData, // Asignar datos históricos al estado del stock
+      });
+      setLoading(false);
+    } catch (error) {
+      console.error("Error al obtener datos del stock:", error);
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!symbol) return;
+    
+
+    fetchStockData();
 
     const fetchUserData = async () => {
       try {
-        // Obtener datos del perfil (por ejemplo, crédito)
         const profileResponse = await fetch("http://localhost:4000/api/user/profile", {
           method: "GET",
-          credentials: "include", // Enviar cookies para autenticación
+          credentials: "include",
         });
         if (!profileResponse.ok) throw new Error("Error obteniendo datos del usuario");
         const profileData = await profileResponse.json();
         setCredit(profileData.credit);
-        
-        // Obtener acciones (stocks) del usuario
+
         const stocksResponse = await fetch("http://localhost:4000/api/user/stocks", {
           method: "GET",
           credentials: "include",
@@ -181,22 +199,20 @@ const StockDetail = () => {
     if (!stock || !userStocks.length) return;
 
     const userPosition = userStocks.find((s) => s.symbol === symbol);
-    
+
     if (userPosition) {
       const currentValue = userPosition.quantity * stock.price;
       const initialValue = userPosition.quantity * userPosition.purchasePrice;
       const performance = currentValue - initialValue;
       const performancePercent = initialValue > 0 ? (performance / initialValue) * 100 : 0;
-      
-      // Calcular el porcentaje de la cartera
+
       const totalPortfolioValue = userStocks.reduce((total, s) => {
-        // Si tenemos el precio actual del stock en tiempo real, usarlo, de lo contrario usar el precio de compra
         const currentStockPrice = s.symbol === symbol ? stock.price : s.purchasePrice;
         return total + (s.quantity * currentStockPrice);
       }, 0);
-      
+
       const portfolioPercent = totalPortfolioValue > 0 ? (currentValue / totalPortfolioValue) * 100 : 0;
-      
+
       setPosition({
         total: currentValue,
         performance: performance,
@@ -235,15 +251,13 @@ const StockDetail = () => {
 
   const handleBuyStock = async () => {
     if (!stock || !stock.price || shares <= 0) return;
-  
+
     const purchaseData = {
       symbol: stock.symbol,
       quantity: shares,
       purchasePrice: stock.price,
     };
-  
-    console.log("purchaseData:", purchaseData);
-  
+
     try {
       const response = await fetch("http://localhost:4000/api/market/buy", {
         method: "POST",
@@ -251,31 +265,28 @@ const StockDetail = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(purchaseData),
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         console.error("Error al comprar acción:", errorData);
-        // Aquí podrías mostrar un mensaje de error al usuario
       } else {
         const result = await response.json();
         console.log("Compra realizada exitosamente:", result);
-        
-        // Actualizar datos del usuario después de la compra
+
         const profileResponse = await fetch("http://localhost:4000/api/user/profile", {
           method: "GET",
           credentials: "include",
         });
         const profileData = await profileResponse.json();
         setCredit(profileData.credit);
-        
+
         const stocksResponse = await fetch("http://localhost:4000/api/user/stocks", {
           method: "GET",
           credentials: "include",
         });
         const stocksData = await stocksResponse.json();
         setUserStocks(stocksData.stocks || []);
-        
-        // Resetear los campos de compra
+
         setAmount(0);
         setShares(0);
       }
@@ -286,13 +297,13 @@ const StockDetail = () => {
 
   const handleSellStock = async () => {
     if (!stock || !stock.price || shares <= 0) return;
-  
+
     const sellData = {
       symbol: stock.symbol,
       quantity: shares,
       sellPrice: stock.price,
     };
-  
+
     try {
       const response = await fetch("http://localhost:4000/api/market/sell", {
         method: "POST",
@@ -300,30 +311,28 @@ const StockDetail = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(sellData),
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         console.error("Error al vender acción:", errorData);
       } else {
         const result = await response.json();
         console.log("Venta realizada exitosamente:", result);
-        
-        // Actualizar datos del usuario después de la venta
+
         const profileResponse = await fetch("http://localhost:4000/api/user/profile", {
           method: "GET",
           credentials: "include",
         });
         const profileData = await profileResponse.json();
         setCredit(profileData.credit);
-        
+
         const stocksResponse = await fetch("http://localhost:4000/api/user/stocks", {
           method: "GET",
           credentials: "include",
         });
         const stocksData = await stocksResponse.json();
         setUserStocks(stocksData.stocks || []);
-        
-        // Resetear los campos
+
         setAmount(0);
         setShares(0);
       }
@@ -331,8 +340,44 @@ const StockDetail = () => {
       console.error("Error en la venta de acciones:", error);
     }
   };
-
-
+  const getInterval = (period: string): string => {
+    switch (period) {
+      case "1D":
+        return "5m"; // 1 día, cada 5 minutos
+      case "1W":
+        return "1h"; // 1 semana, cada hora
+      case "1M":
+        return "1d"; // 1 mes, cada hora
+      case "6M":
+        return "1d"; // 6 meses, cada día
+      case "1Y":
+        return "1d"; // 1 año, cada día
+      case "5Y":
+        return "1wk"; // 5 años, cada día
+      default:
+        return "5m"; // Valor por defecto
+    }
+  };
+  
+  const getRange = (period: string): string => {
+    switch (period) {
+      case "1D":
+        return "1d"; // 1 día
+      case "1W":
+        return "5d"; // 1 semana
+      case "1M":
+        return "1mo"; // 1 mes
+      case "6M":
+        return "6mo"; // 6 meses
+      case "1Y":
+        return "1y"; // 1 año
+      case "5Y":
+        return "5y"; // 5 años
+      default:
+        return "1d"; // Valor por defecto
+    }
+  };
+  
   const handleSellPercentage = (percent: number) => {
     if (position.shares) {
       const sellShares = position.shares * percent;
@@ -353,7 +398,7 @@ const StockDetail = () => {
   if (!stock)
     return (
       <div className="flex justify-center items-start h-[80vh] bg-base-200 pt-[15em]">
-        <div className="card bg-base-100  p-8 shadow-xl">
+        <div className="card bg-base-100 p-8 shadow-xl">
           <p className="text-error font-bold">
             No se encontró la acción {symbol}
           </p>
@@ -413,20 +458,25 @@ const StockDetail = () => {
 
             {/* Selector de período */}
             <div className="flex gap-2 mb-4 flex-wrap">
-              {["1D", "1W", "1M", "6M", "1Y", "5Y"].map((period) => (
-                <button
-                  key={period}
-                  className={`btn btn-sm ${
-                    activeTimeframe === period
-                      ? "btn-primary"
-                      : "btn-outline"
-                  }`}
-                  onClick={() => setActiveTimeframe(period)}
-                >
-                  {period}
-                </button>
-              ))}
-            </div>
+  {["1D", "1W", "1M", "6M", "1Y", "5Y"].map((period) => (
+    <button
+      key={period}
+      className={`btn btn-sm ${
+        activeTimeframe === period ? "btn-primary" : "btn-outline"
+      }`}
+      onClick={() => {
+        setActiveTimeframe(period); // Cambiar el período activo
+        // Llamar a la función fetchStockData con el intervalo y el rango adecuados
+        const interval = getInterval(period); // Una función para mapear el periodo
+        const range = getRange(period); // Una función para mapear el rango
+        fetchStockData(interval, range); // Llamar a la función con los valores
+      }}
+    >
+      {period}
+    </button>
+  ))}
+</div>
+
 
             {/* Gráfico con el histórico diario */}
             <div className="h-64 md:h-80 mt-4 mb-4">
@@ -466,13 +516,13 @@ const StockDetail = () => {
             <div className="card bg-base-100 shadow-xl">
               <div className="card-body p-4 md:p-6">
                 <div className="tabs tabs-boxed mb-4">
-                  <a 
+                  <a
                     className={`tab flex-1 ${activeTab === "Buy" ? "tab-active" : ""}`}
                     onClick={() => setActiveTab("Buy")}
                   >
                     Comprar
                   </a>
-                  <a 
+                  <a
                     className={`tab flex-1 ${activeTab === "Sell" ? "tab-active" : ""}`}
                     onClick={() => setActiveTab("Sell")}
                   >
@@ -560,7 +610,6 @@ const StockDetail = () => {
               </div>
             </div>
 
-
             {/* Panel de posición */}
             <div className="card bg-base-100 shadow-xl">
               <div className="card-body p-4 md:p-6">
@@ -599,12 +648,12 @@ const StockDetail = () => {
                         <div className="stat-title">Acciones</div>
                         <div className="stat-value text-base">{position.shares.toFixed(6)}</div>
                       </div>
-                      
+
                       <div className="stat">
                         <div className="stat-title">Precio compra</div>
                         <div className="stat-value text-base">{position.buyIn.toFixed(2)} €</div>
                       </div>
-                      
+
                       <div className="stat">
                         <div className="stat-title">% Cartera</div>
                         <div className="stat-value text-base">{position.portfolio.toFixed(2)}%</div>

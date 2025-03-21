@@ -24,7 +24,7 @@ const initializeWebSocket = async (server) => {
   });
 
   // Conectar a Finnhub
-  const finnhubSocket = new WebSocket('wss://ws.finnhub.io?token=cv7g9fhr01qpecifqecgcv7g9fhr01qpecifqed0');
+  const finnhubSocket = new WebSocket('wss://ws.finnhub.io?token=cv8t89pr01qk2jfseiugcv8t89pr01qk2jfseiv0');
 
   finnhubSocket.on('open', () => {
     console.log('✅ Conectado a Finnhub WebSocket');
@@ -78,7 +78,7 @@ const stockDetail = async (req, res) => {
   console.log('Rango:', range);
 
   try {
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=${interval}&range=${range}`;
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=${interval}&range=${range}&includePrePost=true`;
     console.log('URL de la API de Yahoo Finance:', url);
 
     const response = await fetch(url);
