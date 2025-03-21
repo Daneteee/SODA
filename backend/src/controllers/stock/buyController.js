@@ -1,12 +1,12 @@
-// src/controllers/stock/buyController.js
-
 const User = require('../../models/user');
 const Stock = require('../../models/stock');
+const Transaction = require('../../models/transaction'); // Asegúrate de tener este modelo
 
 // Función para procesar la compra de acciones
 const buyStock = async (req, res) => {
   const { symbol, quantity, purchasePrice } = req.body;
   console.log("Datos recibidos:", req.body);
+  
   if (symbol == null || quantity == null || purchasePrice == null) {
     return res.status(400).json({ message: 'Faltan datos requeridos' });
   }
@@ -14,7 +14,6 @@ const buyStock = async (req, res) => {
     return res.status(400).json({ message: 'La cantidad debe ser mayor que 0' });
   }
   
-
   try {
     // Verificar que el stock existe en la base de datos
     const stockInfo = await Stock.findOne({ symbol });
@@ -56,10 +55,22 @@ const buyStock = async (req, res) => {
       });
     }
 
-    // Guardar los cambios en la base de datos
+    // Guardar los cambios en el usuario
     await user.save();
 
-    return res.status(200).json({ message: 'Compra realizada exitosamente', user });
+    // Crear y guardar la transacción
+    const transaction = new Transaction({
+      userId: req.user.id,
+      stock: symbol,
+      type: "buy",
+      amount: quantity,
+      price: purchasePrice,
+      total: totalCost,
+      date: new Date()
+    });
+    await transaction.save();
+
+    return res.status(200).json({ message: 'Compra realizada exitosamente', user, transaction });
   } catch (error) {
     console.error("Error en la compra: ", error);
     return res.status(500).json({ message: 'Error en el servidor' });
