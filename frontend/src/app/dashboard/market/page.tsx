@@ -171,7 +171,6 @@ const DashboardMarketPage = () => {
               <div className="stat">
                 <div className="stat-title text-secondary-content/60">Operaciones</div>
                 <div className="stat-value text-secondary-content/60">{transactionsCount}</div>
-                <div className="stat-desc text-secondary-content/60">Pendientes</div>
               </div>
             </div>
             {/* Balance */}

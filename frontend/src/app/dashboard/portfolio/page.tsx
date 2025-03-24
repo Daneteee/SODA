@@ -201,9 +201,6 @@ const DashboardPortfolio = () => {
                 <div className="stat-value text-secondary-content/60">
                   {transactionsCount}
                 </div>
-                <div className="stat-desc text-secondary-content/60">
-                  Pendientes
-                </div>
               </div>
             </div>
             {/* Balance */}
@@ -284,7 +281,7 @@ const DashboardPortfolio = () => {
                           <tr
                             key={stock.symbol}
                             className="hover:bg-base-200 transition-colors duration-200 cursor-pointer"
-                            onClick={() => router.push(`/market/${stock.symbol}`)}
+                            onClick={() => router.push(`/dashboard/market/${stock.symbol}`)}
                           >
                             <td>
                               <div className="flex items-center gap-3">
