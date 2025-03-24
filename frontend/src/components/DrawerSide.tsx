@@ -69,7 +69,7 @@ const DrawerSide = () => {
 
         <ul className="menu p-4 gap-2 flex-1">
           <li>
-            <Link href="/dashboard" className={isActive("/dashboard")}>
+            <Link href="/dashboard/market" className={isActive("/dashboard/market")}>
               <LayoutDashboard className="h-5 w-5" />
               Dashboard
             </Link>
