@@ -105,7 +105,7 @@ export default function Navbar() {
           </div>
         </div>
         <ul tabIndex={0} className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
-          <li><Link href="/dashboard">Perfil</Link></li>
+          <li><Link href="/dashboard/market">Perfil</Link></li>
           <li><Link href="/user/profile">Configuración</Link></li>
           <li><button onClick={handleLogout}>Cerrar sesión</button></li>
         </ul>
@@ -160,7 +160,6 @@ export default function Navbar() {
           </div>
           {navigationItems}
         </div>
-        <Link href="/market" className="btn btn-ghost text-xl">Market</Link>
       </div>
 
       <div className="navbar-center">
