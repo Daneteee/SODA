@@ -61,7 +61,7 @@ const initializeWebSocket = async (server) => {
     console.log('✅ Conectado a Redis');
 
     redisClient.on('error', (err) => console.error('❌ Error en Redis:', err));
-    
+    // hola dan
     const wss = new WebSocket.Server({ server });
     
     // Obtener el listado de acciones (usando la función con caché)
