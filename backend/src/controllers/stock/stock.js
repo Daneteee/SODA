@@ -5,7 +5,8 @@ const redis = require('redis');
 const axios = require('axios');
 // Inicializar el cliente Redis
 const redisClient = redis.createClient({});
-
+// Importar env
+const finnhubApiKey = process.env.FINNHUB_API_KEY;
 // Clave para la caché del listado de acciones
 const STOCKS_CACHE_KEY = 'stocks:list';
 const STOCKS_CACHE_TTL = 3600 * 24; 
@@ -66,7 +67,7 @@ const initializeWebSocket = async (server) => {
     // Obtener el listado de acciones (usando la función con caché)
     const stockInfoMap = await getStocksList();
 
-    const finnhubSocket = new WebSocket('wss://ws.finnhub.io?token=cv7g9fhr01qpecifqecgcv7g9fhr01qpecifqed0');
+    const finnhubSocket = new WebSocket(`wss://ws.finnhub.io?token=${finnhubApiKey}`);
 
     finnhubSocket.on('open', () => {
       console.log('✅ Conectado a Finnhub WebSocket');
