@@ -11,7 +11,6 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { useWebSocket } from "@/context/WebSocketProvider";
-import DrawerSide from "@/components/DrawerSide";
 
 // Definición de la interfaz de Stock para datos de WS y de usuario
 interface Stock {
@@ -140,9 +139,6 @@ const DashboardMarketPage = () => {
   };
 
   return (
-    <div className="drawer lg:drawer-open">
-      <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
-      <div className="drawer-content flex flex-col">
         <main className="flex-1 p-6 bg-base-200">
           {/* Tarjetas de estadísticas */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -184,7 +180,7 @@ const DashboardMarketPage = () => {
           </div>
 
           {/* Sección "Mercado en Vivo" */}
-          <div className="card bg-base-100 shadow-xl">
+          <div className="card bg-base-100 shadow-xl ">
             <div className="card-body">
               <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
                 <div className="flex items-center gap-2">
@@ -220,7 +216,7 @@ const DashboardMarketPage = () => {
                   <span>Esperando datos de transacciones...</span>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
+                <div className="overflow-y-auto max-h-[450px]">
                   <table className="table table-zebra">
                     <thead>
                       <tr className="bg-base-200">
@@ -278,11 +274,6 @@ const DashboardMarketPage = () => {
             </div>
           </div>
         </main>
-      </div>
-
-      {/* Sidebar (Drawer) */}
-      <DrawerSide />
-    </div>
   );
 };
 

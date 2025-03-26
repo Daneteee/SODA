@@ -375,7 +375,7 @@ export default function StockDetailPage() {
               </button>
             </div>
             {/* Nombre de la empresa */}
-             <div className="text-3xl font-bold mb-2">{stock.company?.name || "Cargando"}</div>
+            <div className="text-3xl font-bold mb-2">{stock.company?.name || "Cargando"}</div>
             {/* Precio actual */}
             <div className="flex items-baseline gap-3 mb-4">
               <div className="text-3xl font-bold">

@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import DrawerSide from "@/components/DrawerSide";
-import Alert from "@/components/Alert"; // Ajusta la ruta según corresponda
+import Alert from "@/components/Alert";
 
 const WalletPage = () => {
   const [credit, setCredit] = useState(0);
@@ -93,9 +92,7 @@ const WalletPage = () => {
   };
 
   return (
-    <div className="drawer lg:drawer-open">
-      <input id="wallet-drawer" type="checkbox" className="drawer-toggle" />
-      <div className="drawer-content p-6 bg-base-200">
+    <main className="flex-1 p-6 bg-base-200">
         <h1 className="text-3xl font-bold mb-6">Mi Wallet</h1>
 
         {/* Alerta utilizando el componente Alert sin el SVG y con botón de cierre */}
@@ -140,9 +137,7 @@ const WalletPage = () => {
             </button>
           </div>
         </div>
-      </div>
-      <DrawerSide />
-    </div>
+    </main>
   );
 };
 
