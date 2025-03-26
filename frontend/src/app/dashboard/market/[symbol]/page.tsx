@@ -14,12 +14,29 @@ import {
   Zap,
 } from "lucide-react";
 import { Line } from "react-chartjs-2";
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from "chart.js";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
 import { fetchStockData, fetchUserData } from "@/api/stockApi";
 import { getChartData, chartOptions, getChartConfig } from "@/utils/chartConfig";
 import { useWebSocket } from "@/context/WebSocketProvider";
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 export default function StockDetailPage() {
   const { symbol } = useParams();
@@ -42,6 +59,11 @@ export default function StockDetailPage() {
     portfolio: 0,
   });
   const [activeTimeframe, setActiveTimeframe] = useState("1D");
+
+  // Estados para las noticias
+  const [newsOpen, setNewsOpen] = useState(false);
+  const [newsItems, setNewsItems] = useState<any[]>([]);
+  const [newsLoading, setNewsLoading] = useState(false);
 
   // Construir datos y configuración del gráfico
   const chartDataValues = getChartData(stock);
@@ -73,6 +95,31 @@ export default function StockDetailPage() {
     }
   };
 
+  // Función para cargar noticias desde el backend
+  const loadNewsData = async () => {
+    setNewsLoading(true);
+    try {
+      const response = await fetch(
+        `http://localhost:4000/api/market/news?symbol=${symbol}`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Error al obtener noticias:", errorData);
+      } else {
+        const data = await response.json();
+        // Asumimos que el backend devuelve { articles: [...] }
+        setNewsItems(data.articles || data);
+      }
+    } catch (error) {
+      console.error("Error en la carga de noticias:", error);
+    }
+    setNewsLoading(false);
+  };
+
   // Cargar datos al inicio cuando cambia el símbolo
   useEffect(() => {
     if (!symbol) return;
@@ -80,20 +127,29 @@ export default function StockDetailPage() {
     loadUserData();
   }, [symbol]);
 
+  // Cargar noticias cuando se despliega el menú
+  useEffect(() => {
+    if (newsOpen && symbol) {
+      loadNewsData();
+    }
+  }, [newsOpen, symbol]);
+
   // Actualizar la información en tiempo real usando el context
   useEffect(() => {
     if (!symbol) return;
     const realtimeTrade = stockData.find((t: any) => t.symbol === symbol);
+    const image = stockData.find((t: any) => t.symbol === symbol)?.company?.logo;
     if (realtimeTrade) {
       setStock((prevStock: any) => {
-        const previousPrice = prevStock?.price || realtimeTrade.price;
-        const priceChange = prevStock?.price
-          ? ((realtimeTrade.price - previousPrice) / previousPrice) * 100
-          : 0;
+        const previousPrice = stock?.history?.[0]?.open || realtimeTrade.price;
+        const priceChange = previousPrice
+        ? ((realtimeTrade.price - previousPrice) / previousPrice) * 100
+        : 0;
         return {
           ...prevStock,
           symbol: realtimeTrade.symbol,
           price: realtimeTrade.price,
+          image: image,
           previousPrice,
           priceChange,
           volume: realtimeTrade.volume,
@@ -114,14 +170,17 @@ export default function StockDetailPage() {
       const currentValue = userPosition.quantity * stock.price;
       const initialValue = userPosition.quantity * userPosition.purchasePrice;
       const performance = currentValue - initialValue;
-      const performancePercent = initialValue > 0 ? (performance / initialValue) * 100 : 0;
+      const performancePercent =
+        initialValue > 0 ? (performance / initialValue) * 100 : 0;
 
       const totalPortfolioValue = userStocks.reduce((total, s) => {
-        const currentStockPrice = s.symbol === symbol ? stock.price : s.purchasePrice;
+        const currentStockPrice =
+          s.symbol === symbol ? stock.price : s.purchasePrice;
         return total + s.quantity * currentStockPrice;
       }, 0);
 
-      const portfolioPercent = totalPortfolioValue > 0 ? (currentValue / totalPortfolioValue) * 100 : 0;
+      const portfolioPercent =
+        totalPortfolioValue > 0 ? (currentValue / totalPortfolioValue) * 100 : 0;
 
       setPosition({
         total: currentValue,
@@ -277,7 +336,10 @@ export default function StockDetailPage() {
       <div className="flex justify-center items-start h-[80vh] bg-base-200 pt-[15em]">
         <div className="card bg-base-100 p-8 shadow-xl">
           <p className="text-error font-bold">No se encontró la acción {symbol}</p>
-          <button className="mt-4 btn btn-primary" onClick={() => router.push("/market")}>
+          <button
+            className="mt-4 btn btn-primary"
+            onClick={() => router.push("/market")}
+          >
             Volver al mercado
           </button>
         </div>
@@ -295,7 +357,15 @@ export default function StockDetailPage() {
             {/* Encabezado */}
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center gap-3">
-                <div className="text-4xl font-bold">{stock.symbol}</div>
+                {stock.image ? (
+                  <img
+                    src={stock.image}
+                    alt={`${stock.company.name} icon`}
+                    className="h-10 w-10 rounded-full"
+                  />
+                ) : (
+                  <div className="text-4xl font-bold">{stock.symbol}</div>
+                )}
                 <button className="btn btn-ghost btn-circle">
                   <Star className="h-6 w-6 text-base-content hover:text-warning" />
                 </button>
@@ -305,12 +375,12 @@ export default function StockDetailPage() {
               </button>
             </div>
             {/* Nombre de la empresa */}
-            <div className="text-lg font-medium text-base-content/70 mb-4">
-              {stock.company?.name || "Interactive Broker"}
-            </div>
+             <div className="text-3xl font-bold mb-2">{stock.company?.name || "Cargando"}</div>
             {/* Precio actual */}
             <div className="flex items-baseline gap-3 mb-4">
-              <div className="text-3xl font-bold">{stock.price?.toFixed(2)} €</div>
+              <div className="text-3xl font-bold">
+                {stock.price?.toFixed(2)} €
+              </div>
               <div className={`flex items-center gap-1 font-bold ${priceChangeColor}`}>
                 {stock.priceChange >= 0 ? (
                   <TrendingUp className="h-4 w-4" />
@@ -326,7 +396,9 @@ export default function StockDetailPage() {
               {["1D", "1W", "1M", "6M", "1Y", "5Y"].map((period) => (
                 <button
                   key={period}
-                  className={`btn btn-sm ${activeTimeframe === period ? "btn-primary" : "btn-outline"}`}
+                  className={`btn btn-sm ${
+                    activeTimeframe === period ? "btn-primary" : "btn-outline"
+                  }`}
                   onClick={() => {
                     setActiveTimeframe(period);
                     const interval = getInterval(period);
@@ -368,33 +440,53 @@ export default function StockDetailPage() {
               </div>
             </div>
           </div>
-          {/* Columna derecha: Compra/Venta y Posición */}
+          {/* Columna derecha: Compra/Venta, Posición y Noticias */}
           <div className="w-full md:w-4/12 flex flex-col gap-4">
             {/* Panel de compra/venta */}
             <div className="card bg-base-100 shadow-xl">
               <div className="card-body p-4 md:p-6">
                 <div className="tabs tabs-boxed mb-4">
-                  <a className={`tab flex-1 ${activeTab === "Buy" ? "tab-active" : ""}`} onClick={() => setActiveTab("Buy")}>
+                  <a
+                    className={`tab flex-1 ${
+                      activeTab === "Buy" ? "tab-active" : ""
+                    }`}
+                    onClick={() => setActiveTab("Buy")}
+                  >
                     Comprar
                   </a>
-                  <a className={`tab flex-1 ${activeTab === "Sell" ? "tab-active" : ""}`} onClick={() => setActiveTab("Sell")}>
+                  <a
+                    className={`tab flex-1 ${
+                      activeTab === "Sell" ? "tab-active" : ""
+                    }`}
+                    onClick={() => setActiveTab("Sell")}
+                  >
                     Vender
                   </a>
                 </div>
                 <div className="flex items-center text-sm mb-4">
                   <Wallet className="h-4 w-4 mr-2 text-base-content/70" />
-                  <span className="text-base-content/70">{credit.toFixed(2)} € disponibles</span>
+                  <span className="text-base-content/70">
+                    {credit.toFixed(2)} € disponibles
+                  </span>
                 </div>
                 <div className="flex items-center text-sm mb-4">
                   <Zap className="h-4 w-4 mr-2 text-base-content/70" />
-                  <span className="text-base-content/70">Acciones: {position.shares.toFixed(6)}</span>
+                  <span className="text-base-content/70">
+                    Acciones: {position.shares.toFixed(6)}
+                  </span>
                 </div>
                 <div className="form-control mb-4">
                   <label className="label">
                     <span className="label-text">Cantidad (€)</span>
                   </label>
                   <div className="input-group">
-                    <input type="text" className="input input-bordered w-full text-right" value={amount || ""} onChange={handleAmountChange} min="0" />
+                    <input
+                      type="text"
+                      className="input input-bordered w-full text-right"
+                      value={amount || ""}
+                      onChange={handleAmountChange}
+                      min="0"
+                    />
                   </div>
                 </div>
                 <div className="form-control mb-6">
@@ -402,22 +494,57 @@ export default function StockDetailPage() {
                     <span className="label-text">Acciones</span>
                   </label>
                   <div className="input-group">
-                    <input type="text" className="input input-bordered w-full text-right" value={shares} onChange={handleSharesChange} min="0" />
+                    <input
+                      type="text"
+                      className="input input-bordered w-full text-right"
+                      value={shares}
+                      onChange={handleSharesChange}
+                      min="0"
+                    />
                   </div>
                 </div>
                 {activeTab === "Sell" && (
                   <div className="flex justify-center gap-2 mb-4">
-                    <button className="btn btn-outline btn-sm" onClick={() => handleSellPercentage(0.25)}>25%</button>
-                    <button className="btn btn-outline btn-sm" onClick={() => handleSellPercentage(0.5)}>50%</button>
-                    <button className="btn btn-outline btn-sm" onClick={() => handleSellPercentage(1)}>100%</button>
+                    <button
+                      className="btn btn-outline btn-sm"
+                      onClick={() => handleSellPercentage(0.25)}
+                    >
+                      25%
+                    </button>
+                    <button
+                      className="btn btn-outline btn-sm"
+                      onClick={() => handleSellPercentage(0.5)}
+                    >
+                      50%
+                    </button>
+                    <button
+                      className="btn btn-outline btn-sm"
+                      onClick={() => handleSellPercentage(1)}
+                    >
+                      100%
+                    </button>
                   </div>
                 )}
                 {activeTab === "Buy" ? (
-                  <button className={`btn btn-primary w-full ${amount <= 0 || shares <= 0 || amount > credit ? "btn-disabled" : ""}`} onClick={handleBuyStock}>
+                  <button
+                    className={`btn btn-primary w-full ${
+                      amount <= 0 || shares <= 0 || amount > credit
+                        ? "btn-disabled"
+                        : ""
+                    }`}
+                    onClick={handleBuyStock}
+                  >
                     Comprar
                   </button>
                 ) : (
-                  <button className={`btn btn-secondary w-full ${shares <= 0 || shares > position.shares ? "btn-disabled" : ""}`} onClick={handleSellStock}>
+                  <button
+                    className={`btn btn-secondary w-full ${
+                      shares <= 0 || shares > position.shares
+                        ? "btn-disabled"
+                        : ""
+                    }`}
+                    onClick={handleSellStock}
+                  >
                     Vender
                   </button>
                 )}
@@ -443,35 +570,55 @@ export default function StockDetailPage() {
                   <>
                     <div className="mb-4">
                       <div className="text-sm text-base-content/70">Total</div>
-                      <div className="text-2xl font-bold">{position.total.toFixed(2)} €</div>
+                      <div className="text-2xl font-bold">
+                        {position.total.toFixed(2)} €
+                      </div>
                     </div>
                     <div className="mb-4">
-                      <div className="text-sm text-base-content/70">Rendimiento</div>
-                      <div className={`text-lg font-bold flex items-center gap-1 ${position.performance >= 0 ? "text-success" : "text-error"}`}>
+                      <div className="text-sm text-base-content/70">
+                        Rendimiento
+                      </div>
+                      <div
+                        className={`text-lg font-bold flex items-center gap-1 ${
+                          position.performance >= 0
+                            ? "text-success"
+                            : "text-error"
+                        }`}
+                      >
                         {position.performance >= 0 ? (
                           <TrendingUp className="h-4 w-4" />
                         ) : (
                           <TrendingDown className="h-4 w-4" />
                         )}
-                        {position.performance.toFixed(2)} € ({position.performancePercent.toFixed(2)}%)
+                        {position.performance.toFixed(2)} € (
+                        {position.performancePercent.toFixed(2)}%)
                       </div>
                     </div>
                     <div className="stats stats-sm shadow bg-base-200">
                       <div className="stat">
                         <div className="stat-title">Acciones</div>
-                        <div className="stat-value text-base">{position.shares.toFixed(6)}</div>
+                        <div className="stat-value text-base">
+                          {position.shares.toFixed(6)}
+                        </div>
                       </div>
                       <div className="stat">
                         <div className="stat-title">Precio compra</div>
-                        <div className="stat-value text-base">{position.buyIn.toFixed(2)} €</div>
+                        <div className="stat-value text-base">
+                          {position.buyIn.toFixed(2)} €
+                        </div>
                       </div>
                       <div className="stat">
                         <div className="stat-title">% Cartera</div>
-                        <div className="stat-value text-base">{position.portfolio.toFixed(2)}%</div>
+                        <div className="stat-value text-base">
+                          {position.portfolio.toFixed(2)}%
+                        </div>
                       </div>
                     </div>
                     <div className="mt-4">
-                      <a href="#" className="btn btn-link btn-sm p-0 no-underline text-primary">
+                      <a
+                        href="#"
+                        className="btn btn-link btn-sm p-0 no-underline text-primary"
+                      >
                         <Info className="h-4 w-4 mr-1" />
                         Más información sobre la posición
                       </a>
@@ -481,6 +628,57 @@ export default function StockDetailPage() {
                   <div className="alert">
                     <Info className="h-6 w-6" />
                     <span>No tienes ninguna acción de {symbol}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+            {/* Panel de noticias en menú desplegable */}
+            <div className="card bg-base-100 shadow-xl h-full flex flex-col">
+              <div className="card-body p-4 md:p-6 flex flex-col">
+                <div className="flex justify-between items-center overflow-y">
+                  <h2 className="card-title">
+                    Noticias de {stock.symbol}
+                  </h2>
+                  <button
+                    className="btn btn-sm btn-ghost"
+                    onClick={() => setNewsOpen(!newsOpen)}
+                  >
+                    {newsOpen ? "Ocultar" : "Mostrar"}
+                  </button>
+                </div>
+                {newsOpen && (
+                  <div className="mt-4">
+                    {newsLoading ? (
+                      <div className="flex justify-center">
+                        <RefreshCw className="animate-spin h-6 w-6 text-primary" />
+                      </div>
+                    ) : newsItems.length > 0 ? (
+                      <ul className="space-y-4">
+                        {newsItems.map((article, index) => (
+                          <li key={index} className="border-b pb-2">
+                                <a
+                                  href={`/dashboard/news-detail?article=${encodeURIComponent(
+                                    JSON.stringify(article)
+                                  )}`}
+                                  className="text-lg font-semibold text-primary hover:underline"
+                                >
+                                  {article.title}
+                                </a>
+
+                            <p className="text-sm text-base-content/70">
+                              {article.description}
+                            </p>
+                            <p className="text-xs text-base-content/50">
+                              {new Date(article.publishedAt).toLocaleString()}
+                            </p>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-base-content/70">
+                        No hay noticias disponibles.
+                      </p>
+                    )}
                   </div>
                 )}
               </div>

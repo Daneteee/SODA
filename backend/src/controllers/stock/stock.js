@@ -2,7 +2,7 @@ const WebSocket = require('ws');
 const mongoose = require('mongoose');
 const Stock = require('../../models/stock'); 
 const redis = require('redis');
-
+const axios = require('axios');
 // Inicializar el cliente Redis
 const redisClient = redis.createClient({});
 
@@ -182,8 +182,39 @@ const getCacheTTL = (range) => {
   }
 };
 
+const getNews = async (req, res) => {
+  const { symbol } = req.query;
+  const apiKey = '1522002a63ee4ce58b110b2753308adf';
+  const today = new Date();
+  const firstDay = new Date(today.getFullYear(), today.getMonth(), 1)
+    .toISOString()
+    .split('T')[0];
+  const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0)
+    .toISOString()
+    .split('T')[0];
+  console.log('llega');
+
+  // Mejorando la consulta para buscar directamente noticias relevantes
+  const link = `https://newsapi.org/v2/everything?q=${symbol}+financial&from=${firstDay}&to=${lastDay}&sortBy=popularity&pageSize=10&apiKey=${apiKey}`;
+  console.log(link);
+
+  try {
+    const response = await axios.get(link, { timeout: 10000 }); // Timeout de 10 segundos
+    const noticiasRelevantes = response.data.articles;
+
+    // Devolver un objeto con la propiedad articles
+    res.status(200).json({ articles: noticiasRelevantes });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).send('Error fetching news');
+  }
+};
+
+
+
 
 module.exports = { 
   initializeWebSocket, 
-  stockDetail
+  stockDetail,
+  getNews,
 };
