@@ -28,7 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <WebSocketProvider>
           <main>{children}</main>
         </WebSocketProvider>
-        <Footer />
+        {/* <Footer /> */}
       </body>
     </html>
   );

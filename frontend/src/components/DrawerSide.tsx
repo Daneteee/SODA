@@ -47,6 +47,7 @@ const DrawerSide = () => {
     <div className="drawer-side">
       <label htmlFor="my-drawer-2" className="drawer-overlay"></label>
       <aside className="bg-base-100 w-80 border-r border-base-200 flex flex-col h-full">
+        {/* Encabezado del usuario */}
         <div className="p-4 bg-primary text-primary-content">
           <div className="flex items-center gap-4">
             <div className="avatar">
@@ -67,7 +68,8 @@ const DrawerSide = () => {
           </div>
         </div>
 
-        <ul className="menu p-4 gap-2 flex-1">
+        {/* Menú con scroll independiente */}
+        <ul className="menu p-4 gap-2 flex-1 overflow-y-auto">
           <li>
             <Link href="/dashboard/market" className={isActive("/dashboard/market")}>
               <LayoutDashboard className="h-5 w-5" />
@@ -100,16 +102,9 @@ const DrawerSide = () => {
           </li>
         </ul>
 
-        <div className="p-4 mt-auto">
-          <div className="card bg-base-200">
-            <div className="card-body p-4">
-              <h3 className="card-title text-sm">Plan Premium</h3>
-              <p className="text-xs">Tu plan expira en 15 días</p>
-              <button className="btn btn-primary btn-sm mt-2">Renovar Plan</button>
-            </div>
-          </div>
-
-          <button className="btn btn-error btn-block mt-4">
+        {/* Botón de cerrar sesión */}
+        <div className="p-4">
+          <button className="btn btn-error btn-block">
             <LogOut className="h-5 w-5" />
             Cerrar Sesión
           </button>

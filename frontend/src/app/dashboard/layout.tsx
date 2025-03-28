@@ -10,9 +10,9 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="drawer lg:drawer-open">
+    <div className="drawer lg:drawer-open h-full">
       <input id="dashboard-drawer" type="checkbox" className="drawer-toggle" />
-      <div className="drawer-content bg-base-200">
+      <div className="drawer-content bg-base-200 h-full">
         {children}
       </div>
       <DrawerSide />

@@ -104,7 +104,7 @@ export default function Navbar() {
             <img src={`http://localhost:4000${userData.profileImage}` || "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"} alt="Profile" />
           </div>
         </div>
-        <ul tabIndex={0} className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
+        <ul tabIndex={0} className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
           <li><Link href="/dashboard/market">Perfil</Link></li>
           <li><Link href="/user/profile">Configuración</Link></li>
           <li><button onClick={handleLogout}>Cerrar sesión</button></li>
@@ -150,7 +150,7 @@ export default function Navbar() {
   }
 
   return (
-    <div className="navbar bg-base-100">
+    <div className="navbar bg-base-100 h-auto">
       <div className="navbar-start">
         <div className="dropdown">
           <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">

@@ -1,21 +1,31 @@
 import { RefreshCw } from "lucide-react";
 
+interface NewsArticle {
+  title: string;
+  description: string;
+  publishedAt: string;
+}
+
+interface NewsPanelProps {
+  stockSymbol: string;
+  newsOpen: boolean;
+  setNewsOpen: (open: boolean) => void;
+  newsLoading: boolean;
+  newsItems: NewsArticle[];
+}
+
 export default function NewsPanel({
+  stockSymbol,
   newsOpen,
   setNewsOpen,
   newsLoading,
   newsItems,
-}: {
-  newsOpen: boolean;
-  setNewsOpen: (open: boolean) => void;
-  newsLoading: boolean;
-  newsItems: any[];
-}) {
+}: NewsPanelProps) {
   return (
     <div className="card bg-base-100 shadow-xl h-full flex flex-col">
       <div className="card-body p-4 md:p-6 flex flex-col">
         <div className="flex justify-between items-center overflow-y">
-          <h2 className="card-title">Noticias</h2>
+          <h2 className="card-title">Noticias de {stockSymbol}</h2>
           <button
             className="btn btn-sm btn-ghost"
             onClick={() => setNewsOpen(!newsOpen)}
