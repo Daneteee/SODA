@@ -92,7 +92,7 @@ const WalletPage = () => {
   };
 
   return (
-    <main className="flex-1 p-6 bg-base-200">
+    <main className="flex-1 p-6 bg-base-200 h-full">
         <h1 className="text-3xl font-bold mb-6">Mi Wallet</h1>
 
         {/* Alerta utilizando el componente Alert sin el SVG y con botón de cierre */}

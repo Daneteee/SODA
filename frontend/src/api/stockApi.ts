@@ -1,3 +1,4 @@
+// Obtenim l'històric d'una acció
 export const fetchStockData = async (symbol: string, interval: string = '5m', range: string = '1d') => {
     const url = `http://localhost:4000/api/market/${symbol}/?interval=${interval}&range=${range}`;
     const res = await fetch(url);
@@ -7,6 +8,7 @@ export const fetchStockData = async (symbol: string, interval: string = '5m', ra
     return res.json();
   };
   
+  // Obtenim les dades de l'usuari autenticat i les seves accions
   export const fetchUserData = async () => {
     const profileResponse = await fetch("http://localhost:4000/api/user/profile", {
       method: "GET",
@@ -17,6 +19,7 @@ export const fetchStockData = async (symbol: string, interval: string = '5m', ra
     }
     const profileData = await profileResponse.json();
   
+    // Obtenim les accions de l'usuari
     const stocksResponse = await fetch("http://localhost:4000/api/user/stocks", {
       method: "GET",
       credentials: "include",

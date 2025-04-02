@@ -3,17 +3,16 @@
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { RefreshCw} from "lucide-react";
-import PositionPanel from "@/components/PositionPanel";
-import NewsPanel from "@/components/NewsPanel";
-import BuySellPanel from "@/components/BuySellPanel";
-import StockHeader from "@/components/StockHeader";
-import StockChart from "@/components/StockChart";
+import PositionPanel from "@/components/stock/PositionPanel";
+import NewsPanel from "@/components/stock/NewsPanel";
+import BuySellPanel from "@/components/stock/BuySellPanel";
+import StockHeader from "@/components/stock/StockHeader";
+import StockChart from "@/components/stock/StockChart";
 import { getChartData, chartOptions, getChartConfig } from "@/utils/chartConfig";
-import { useWebSocket } from "@/context/WebSocketProvider";
-import { useStockData } from "@/hooks/useStockData";
-import { useNewsData } from "@/hooks/useNewsData";
-import { useUserPosition } from "@/hooks/useUserPosition";
-import { useStockTransactions } from "@/hooks/useStockTransactions";
+import { useStockData } from "@/hooks/stock/useStockData";
+import { useNewsData } from "@/hooks/stock/useNewsData";
+import { useUserPosition } from "@/hooks/stock/useUserPosition";
+import { useStockTransactions } from "@/hooks/stock/useStockTransactions";
 
 
 export default function StockDetailPage() {
@@ -58,19 +57,18 @@ export default function StockDetailPage() {
   const priceChangeColor = stock.priceChange >= 0 ? "text-success" : "text-error";
 
   return (
-    <div className="bg-base-200 p-4 md:p-6 min-h-screen">
+    <div className="bg-base-200 p-4 md:p-6 ">
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row gap-4">
           {/* Columna izquierda: Gráfico y detalles */}
-          <div className="w-full md:w-8/12 bg-base-100 rounded-xl shadow-xl p-4 md:p-6">
+          <div className=" w-full md:w-8/12 bg-base-100 rounded-xl shadow-xl p-4 md:p-6">
             {/* Encabezado */}
             <StockHeader stock={stock} priceChangeColor={priceChangeColor} activeTimeframe={activeTimeframe} setActiveTimeframe={setActiveTimeframe} loadStockData={loadStockData} />
             {/* Gráfico */}
             <StockChart chartConfig={chartConfig} chartOptions={chartOptions}/>
-
           </div>
           {/* Columna derecha: Compra/Venta, Posición y Noticias */}
-          <div className="w-full md:w-4/12 flex flex-col gap-4">
+          <div className="overflow-y-auto h-[70vh] w-full md:w-4/12 flex flex-col gap-4 rounded-xl">
             {/* Panel de compra/venta */}
             
             <BuySellPanel credit={credit} position={position} amount={amount} shares={shares} activeTab={activeTab} setActiveTab={setActiveTab} handleBuy={handleBuyStock} handleSell={handleSellStock} handleSellPercentage={handleSellPercentage} handleAmountChange={handleAmountChange} handleSharesChange={handleSharesChange} />

@@ -9,10 +9,12 @@ import {
   LogOut,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 const DrawerSide = () => {
   const pathname = usePathname();
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const router = useRouter();
   const [user, setUser] = useState<{ name: string; profileImage: string } | null>(null);
 
   // Obtener datos del usuario al cargar el componente
@@ -43,8 +45,14 @@ const DrawerSide = () => {
     return pathname === href ? "active" : "hover:bg-base-200";
   };
 
+  const handleLogout = () => {
+    document.cookie = "jwtToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    setIsAuthenticated(false);
+    router.push("/");
+  };
+
   return (
-    <div className="drawer-side">
+    <div className="drawer-side" style={{ height: "calc(100vh - 5em)" }}>
       <label htmlFor="my-drawer-2" className="drawer-overlay"></label>
       <aside className="bg-base-100 w-80 border-r border-base-200 flex flex-col h-full">
         {/* Encabezado del usuario */}
@@ -95,7 +103,7 @@ const DrawerSide = () => {
             </Link>
           </li>
           <li>
-            <Link href="/user/profile" className={isActive("/user/profile")}>
+            <Link href="/dashboard/profile" className={isActive("/dashboard/profile")}>
               <Settings className="h-5 w-5" />
               Configuración
             </Link>
@@ -104,8 +112,7 @@ const DrawerSide = () => {
 
         {/* Botón de cerrar sesión */}
         <div className="p-4">
-          <button className="btn btn-error btn-block">
-            <LogOut className="h-5 w-5" />
+          <button className="btn btn-error btn-block" onClick={handleLogout}>
             Cerrar Sesión
           </button>
         </div>

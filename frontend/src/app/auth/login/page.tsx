@@ -29,7 +29,7 @@ export default function LoginPage() {
         throw new Error(data.msg || "Error al iniciar sesión");
       }
       Cookies.set('jwtToken', data.token, { expires: 7, path: '/' });
-      router.push("/dashboard");
+      router.push("/dashboard/market");
     } catch (err: any) {
       setError(err.message);
     }
