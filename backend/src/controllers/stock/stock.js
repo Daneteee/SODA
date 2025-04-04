@@ -3,129 +3,36 @@ const mongoose = require('mongoose');
 const Stock = require('../../models/stock'); 
 const redis = require('redis');
 const axios = require('axios');
-// Inicializar el cliente Redis
+
+// Initialize Redis client
 const redisClient = redis.createClient({});
-// Importar env
+
+// Environment variables
 const finnhubApiKey = process.env.FINNHUB_API_KEY;
-// Clave para la caché del listado de acciones
+
+// Cache constants
 const STOCKS_CACHE_KEY = 'stocks:list';
-const STOCKS_CACHE_TTL = 3600 * 24; 
+const STOCKS_CACHE_TTL = 3600 * 24; // 24 hours
 
-// Conectar a Redis y WebSocket
-const initializeWebSocket = async (server) => {
-  try {
-    // Conectar a Redis explícitamente
-    await redisClient.connect();
-    console.log('✅ Conectado a Redis');
-
-    redisClient.on('error', (err) => console.error('❌ Error en Redis:', err));
-    // hola dan
-    const wss = new WebSocket.Server({ server });
-    
-    // Obtener el listado de acciones (usando la función con caché)
-    const stockInfoMap = await getStocksList();
-
-    const finnhubSocket = new WebSocket(`wss://ws.finnhub.io?token=${finnhubApiKey}`);
-
-    finnhubSocket.on('open', () => {
-      console.log('✅ Conectado a Finnhub WebSocket');
-      Object.keys(stockInfoMap).forEach(symbol => {
-        finnhubSocket.send(JSON.stringify({ type: 'subscribe', symbol }));
-      });
-    });
-
-    finnhubSocket.on('message', async (data) => {
-      const message = JSON.parse(data);
-    
-      if (message.type === 'trade' && message.data) {
-        const enrichedData = message.data.map(trade => ({
-          symbol: trade.s,
-          price: trade.p,
-          timestamp: trade.t,
-          volume: trade.v,
-          company: stockInfoMap[trade.s] || null,
-          firstPriceToday: stockInfoMap[trade.s]?.firstPriceToday  // Incluye el primer precio del día
-        }));
-        wss.clients.forEach(client => {
-          if (client.readyState === WebSocket.OPEN) {
-            client.send(JSON.stringify({ type: 'trade', data: enrichedData }));
-          }
-        });
-      }
-    });
-    
-    wss.on('connection', (ws) => {
-      console.log('🟢 Nuevo cliente conectado al WebSocket');
-
-      ws.on('close', () => {
-        console.log('🔴 Cliente desconectado del WebSocket');
-      });
-    });
-    return wss;
-  } catch (error) {
-    console.error('Error al inicializar WebSocket:', error);
-    throw error;
+/**
+ * Cache TTL helper function
+ */
+const getCacheTTL = (range) => {
+  switch (range) {
+    case '1d': return 300;     // 5 minutes
+    case '1wk': return 3600;   // 1 hour
+    case '1mo': return 43200;  // 12 hours
+    case '1y': return 86400;   // 24 hours
+    default: return 3600;      // Default: 1 hour
   }
 };
 
-const getStockHistoricalData = async (symbol, interval = '1d', range = '1mo') => {
-  const cacheKey = `stock:${symbol}:${interval}:${range}`;
-
-  try {
-    // Intentar recuperar de la caché
-    const cachedData = await redisClient.get(cacheKey);
-    
-    if (cachedData) {
-      console.log(`📀 Cache encontrada para ${cacheKey}`);
-      return JSON.parse(cachedData);
-    }
-    
-    // console.log(`🆕 Creando cache para ${cacheKey}`);
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=${interval}&range=${range}&includePrePost=true`;
-    const response = await fetch(url);
-    const data = await response.json();
-
-    if (!data.chart || !data.chart.result || data.chart.result.length === 0) {
-      throw new Error('Datos no disponibles o símbolo incorrecto');
-    }
-
-    const chartData = data.chart.result[0];
-    if (!chartData.timestamp || !chartData.indicators || !chartData.indicators.quote) {
-      throw new Error('Estructura de datos inesperada en la API');
-    }
-
-    const timestamps = chartData.timestamp;
-    const quotes = chartData.indicators.quote[0];
-
-    if (!quotes.open || !quotes.high || !quotes.low || !quotes.close || !quotes.volume) {
-      throw new Error('Faltan datos de cotización en la API');
-    }
-
-    const historial = timestamps.map((timestamp, index) => ({
-      date: new Date(timestamp * 1000).toISOString(),
-      open: quotes.open[index] ?? null,
-      high: quotes.high[index] ?? null,
-      low: quotes.low[index] ?? null,
-      close: quotes.close[index] ?? null,
-      volume: quotes.volume[index] ?? null
-    }));
-
-    // Guardar en caché con tiempo de expiración variable
-    await redisClient.set(cacheKey, JSON.stringify(historial), {
-      EX: getCacheTTL(range)
-    });
-
-    return historial;
-  } catch (error) {
-    console.error(`Error en getStockHistoricalData para ${symbol}:`, error);
-    throw error;
-  }
-};
-
-// Modificación de getStocksList para incluir el primer precio del día
+/**
+ * Get stock list from database with caching
+ */
 const getStocksList = async () => {
   // flush
-  await redisClient.flushAll();
+  // await redisClient.flushAll();
   try {
     // Intentar recuperar de la caché
     const cachedStocks = await redisClient.get(STOCKS_CACHE_KEY);
@@ -184,32 +91,160 @@ const getStocksList = async () => {
   }
 };
 
-// Modificación de stockDetail para usar la nueva función
+/**
+ * Get historical data for a stock
+ */
+const getStockHistoricalData = async (symbol, interval = '1d', range = '1mo') => {
+  const cacheKey = `stock:${symbol}:${interval}:${range}`;
+
+  try {
+    // Try to retrieve from cache
+    const cachedData = await redisClient.get(cacheKey);
+    
+    if (cachedData) {
+      console.log(`📀 Cache found for ${cacheKey}`);
+      return JSON.parse(cachedData);
+    }
+    
+    console.log(`🆕 Creating cache for ${cacheKey}`);
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=${interval}&range=${range}&includePrePost=true`;
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (!data.chart || !data.chart.result || data.chart.result.length === 0) {
+      throw new Error('Data not available or incorrect symbol');
+    }
+
+    const chartData = data.chart.result[0];
+    if (!chartData.timestamp || !chartData.indicators || !chartData.indicators.quote) {
+      throw new Error('Unexpected data structure from API');
+    }
+
+    const timestamps = chartData.timestamp;
+    const quotes = chartData.indicators.quote[0];
+
+    if (!quotes.open || !quotes.high || !quotes.low || !quotes.close || !quotes.volume) {
+      throw new Error('Missing quote data from API');
+    }
+
+    const history = timestamps.map((timestamp, index) => ({
+      date: new Date(timestamp * 1000).toISOString(),
+      open: quotes.open[index] ?? null,
+      high: quotes.high[index] ?? null,
+      low: quotes.low[index] ?? null,
+      close: quotes.close[index] ?? null,
+      volume: quotes.volume[index] ?? null
+    }));
+
+    // Save to cache with variable expiration time
+    await redisClient.set(cacheKey, JSON.stringify(history), {
+      EX: getCacheTTL(range)
+    });
+
+    return history;
+  } catch (error) {
+    console.error(`Error in getStockHistoricalData for ${symbol}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * Initialize WebSocket connection for real-time stock data ONLY
+ * This no longer sends company data, just price updates
+ */
+const initializeWebSocket = async (server) => {
+  try {
+    // Connect to Redis explicitly
+    await redisClient.connect();
+    console.log('✅ Connected to Redis');
+
+    redisClient.on('error', (err) => console.error('❌ Redis error:', err));
+    
+    const wss = new WebSocket.Server({ server });
+    
+    // Get stock list for symbols only - we just need to know what to subscribe to
+    const stocksData = await getStocksList();
+    const symbols = Object.keys(stocksData);
+
+    const finnhubSocket = new WebSocket(`wss://ws.finnhub.io?token=${finnhubApiKey}`);
+
+    finnhubSocket.on('open', () => {
+      console.log('✅ Connected to Finnhub WebSocket');
+      // Subscribe to all symbols
+      symbols.forEach(symbol => {
+        finnhubSocket.send(JSON.stringify({ type: 'subscribe', symbol }));
+      });
+    });
+
+    finnhubSocket.on('message', async (data) => {
+      const message = JSON.parse(data);
+    
+      if (message.type === 'trade' && message.data) {
+        // Send only the trade data, without enriching it with company info
+        const tradeData = message.data.map(trade => ({
+          symbol: trade.s,
+          price: trade.p,
+          timestamp: trade.t,
+          volume: trade.v
+        }));
+        
+        wss.clients.forEach(client => {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify({ type: 'trade', data: tradeData }));
+          }
+        });
+      }
+    });
+    
+    wss.on('connection', (ws) => {
+      console.log('🟢 New client connected to WebSocket');
+
+      ws.on('close', () => {
+        console.log('🔴 Client disconnected from WebSocket');
+      });
+    });
+    
+    return wss;
+  } catch (error) {
+    console.error('Error initializing WebSocket:', error);
+    throw error;
+  }
+};
+
+/**
+ * API endpoint to get stock detail/historical data
+ */
 const stockDetail = async (req, res) => {
   const { symbol } = req.params;
   const { interval = '1d', range = '1mo' } = req.query;
 
   try {
-    const historial = await getStockHistoricalData(symbol, interval, range);
-    res.json(historial);
+    const history = await getStockHistoricalData(symbol, interval, range);
+    res.json(history);
   } catch (error) {
-    console.error('Error en stockDetail:', error);
-    res.status(500).json({ error: 'Error al obtener los datos de Yahoo Finance' });
+    console.error('Error in stockDetail:', error);
+    res.status(500).json({ error: 'Error getting data from Yahoo Finance' });
+  }
+};
+
+/**
+ * API endpoint to get all stocks information
+ */
+const getAllStocks = async (req, res) => {
+  try {
+    const stocks = await getStocksList();
+    res.json(stocks);
+  } catch (error) {
+    console.error('Error in getAllStocks:', error);
+    res.status(500).json({ error: 'Error retrieving stocks list' });
   }
 };
 
 
-// Función para determinar TTL de caché
-const getCacheTTL = (range) => {
-  switch (range) {
-    case '1d': return 300; 
-    case '1wk': return 3600; 
-    case '1mo': return 43200; 
-    case '1y': return 86400; 
-    default: return 3600;
-  }
-};
 
+/**
+ * API endpoint to get stock news
+ */
 const getNews = async (req, res) => {
   const { symbol } = req.query;
   const apiKey = '1522002a63ee4ce58b110b2753308adf';
@@ -220,29 +255,37 @@ const getNews = async (req, res) => {
   const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0)
     .toISOString()
     .split('T')[0];
-  console.log('llega');
 
-  // Mejorando la consulta para buscar directamente noticias relevantes
+  // Improved query to find relevant news directly
   const link = `https://newsapi.org/v2/everything?q=${symbol}+financial&from=${firstDay}&to=${lastDay}&sortBy=popularity&pageSize=10&apiKey=${apiKey}`;
-  console.log(link);
-
+  
   try {
-    const response = await axios.get(link, { timeout: 10000 }); // Timeout de 10 segundos
-    const noticiasRelevantes = response.data.articles;
+    const response = await axios.get(link, { timeout: 10000 }); // 10 second timeout
+    const relevantNews = response.data.articles;
 
-    // Devolver un objeto con la propiedad articles
-    res.status(200).json({ articles: noticiasRelevantes });
+    // Return object with articles property
+    res.status(200).json({ articles: relevantNews });
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error fetching news:', error);
     res.status(500).send('Error fetching news');
   }
 };
 
-
-
+// Cache flush utility function (for development/testing)
+const flushCache = async (req, res) => {
+  try {
+    await redisClient.flushAll();
+    res.status(200).json({ message: 'Cache cleared successfully' });
+  } catch (error) {
+    console.error('Error flushing cache:', error);
+    res.status(500).json({ error: 'Error flushing cache' });
+  }
+};
 
 module.exports = { 
-  initializeWebSocket, 
+  initializeWebSocket,
   stockDetail,
+  getAllStocks,
   getNews,
+  flushCache
 };
