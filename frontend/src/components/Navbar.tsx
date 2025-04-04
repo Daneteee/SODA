@@ -141,7 +141,7 @@ export default function Navbar() {
             <Link href="/" className="p-1">
               <div className="flex items-center justify-center h-[6vh]">
                 <img
-                  src="/teal_soda.svg"
+                  src="/blue_soda.svg"
                   alt="Logo"
                   className="h-full w-auto transition-transform duration-200 hover:scale-110"
                 />
