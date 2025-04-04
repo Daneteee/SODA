@@ -34,10 +34,16 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
             prevData.forEach((stock) => stocksMap.set(stock.symbol, stock));
             // Recorremos los nuevos datos y calculamos el porcentaje de cambio
             message.data.forEach((trade: any) => {
-              const previousStock = stocksMap.get(trade.symbol);
-              const previousPrice = previousStock ? previousStock.price : trade.price;
-              const priceChange = previousStock ? ((trade.price - previousPrice) / previousPrice) * 100 : 0;
-              const updatedTrade = { ...trade, previousPrice, priceChange };
+              // Usamos firstPriceToday como previousPrice
+              const firstPriceToday = trade.firstPriceToday;
+              const priceChange = firstPriceToday
+                ? ((trade.price - firstPriceToday) / firstPriceToday) * 100
+                : 0;
+              const updatedTrade = {
+                ...trade,
+                previousPrice: firstPriceToday, // Establecemos previousPrice como firstPriceToday
+                priceChange
+              };
               stocksMap.set(trade.symbol, updatedTrade);
             });
             return Array.from(stocksMap.values());
@@ -47,6 +53,7 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
         console.error("Error al procesar mensaje WebSocket:", error);
       }
     };
+    
 
     ws.current.onclose = () => {
       console.log("🔴 Conexión WebSocket cerrada");

@@ -10,48 +10,6 @@ const finnhubApiKey = process.env.FINNHUB_API_KEY;
 // Clave para la caché del listado de acciones
 const STOCKS_CACHE_KEY = 'stocks:list';
 const STOCKS_CACHE_TTL = 3600 * 24; 
-const getStocksList = async () => {
-
-  try {
-    // Intentar recuperar de la caché
-    const cachedStocks = await redisClient.get(STOCKS_CACHE_KEY);
-    
-    if (cachedStocks) {
-      console.log('📀 Listado de acciones encontrado en cache');
-      return JSON.parse(cachedStocks);
-    }
-    
-    console.log('🆕 Creando cache para el listado');
-    
-    // Obtener de la base de datos
-    const stocks = await Stock.find({}, 'symbol name sector industry exchange country currency description website logo');
-    const stockInfoMap = {};
-
-    stocks.forEach(stock => {
-      stockInfoMap[stock.symbol] = { 
-        name: stock.name,
-        sector: stock.sector,
-        industry: stock.industry,
-        exchange: stock.exchange,
-        country: stock.country,
-        currency: stock.currency,
-        description: stock.description,
-        website: stock.website,
-        logo: stock.logo
-      };
-    });
-    
-    // Guardar en caché
-    await redisClient.set(STOCKS_CACHE_KEY, JSON.stringify(stockInfoMap), {
-      EX: STOCKS_CACHE_TTL
-    });
-    
-    return stockInfoMap;
-  } catch (error) {
-    console.error('Error al obtener listado de acciones:', error);
-    throw error;
-  }
-};
 
 // Conectar a Redis y WebSocket
 const initializeWebSocket = async (server) => {
@@ -78,14 +36,15 @@ const initializeWebSocket = async (server) => {
 
     finnhubSocket.on('message', async (data) => {
       const message = JSON.parse(data);
-      
+    
       if (message.type === 'trade' && message.data) {
         const enrichedData = message.data.map(trade => ({
           symbol: trade.s,
           price: trade.p,
           timestamp: trade.t,
           volume: trade.v,
-          company: stockInfoMap[trade.s] || null
+          company: stockInfoMap[trade.s] || null,
+          firstPriceToday: stockInfoMap[trade.s]?.firstPriceToday  // Incluye el primer precio del día
         }));
         wss.clients.forEach(client => {
           if (client.readyState === WebSocket.OPEN) {
@@ -94,7 +53,7 @@ const initializeWebSocket = async (server) => {
         });
       }
     });
-
+    
     wss.on('connection', (ws) => {
       console.log('🟢 Nuevo cliente conectado al WebSocket');
 
@@ -102,7 +61,6 @@ const initializeWebSocket = async (server) => {
         console.log('🔴 Cliente desconectado del WebSocket');
       });
     });
-
     return wss;
   } catch (error) {
     console.error('Error al inicializar WebSocket:', error);
@@ -110,45 +68,37 @@ const initializeWebSocket = async (server) => {
   }
 };
 
-
-// Stock Detail con Cache (sin cambios)
-const stockDetail = async (req, res) => {
-  const { symbol } = req.params;
-  const { interval = '1d', range = '1mo' } = req.query;
+const getStockHistoricalData = async (symbol, interval = '1d', range = '1mo') => {
   const cacheKey = `stock:${symbol}:${interval}:${range}`;
 
   try {
     // Intentar recuperar de la caché
-    const [cachedData, ttl] = await redisClient
-    .multi()
-    .get(cacheKey)
-    .ttl(cacheKey)
-    .exec();
-
-    if (cachedData && ttl > 0) {
-      console.log(`📀 Cache encontrada para ${cacheKey}. Caduca en ${ttl} segundos`);
-      return res.json(JSON.parse(cachedData));
+    const cachedData = await redisClient.get(cacheKey);
+    
+    if (cachedData) {
+      console.log(`📀 Cache encontrada para ${cacheKey}`);
+      return JSON.parse(cachedData);
     }
-    console.log(`🆕 Creando cache para ${cacheKey}`);
+    
+    // console.log(`🆕 Creando cache para ${cacheKey}`);
     const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=${interval}&range=${range}&includePrePost=true`;
-
     const response = await fetch(url);
     const data = await response.json();
 
     if (!data.chart || !data.chart.result || data.chart.result.length === 0) {
-      return res.status(400).json({ error: 'Datos no disponibles o símbolo incorrecto' });
+      throw new Error('Datos no disponibles o símbolo incorrecto');
     }
 
     const chartData = data.chart.result[0];
     if (!chartData.timestamp || !chartData.indicators || !chartData.indicators.quote) {
-      return res.status(400).json({ error: 'Estructura de datos inesperada en la API' });
+      throw new Error('Estructura de datos inesperada en la API');
     }
 
     const timestamps = chartData.timestamp;
     const quotes = chartData.indicators.quote[0];
 
     if (!quotes.open || !quotes.high || !quotes.low || !quotes.close || !quotes.volume) {
-      return res.status(400).json({ error: 'Faltan datos de cotización en la API' });
+      throw new Error('Faltan datos de cotización en la API');
     }
 
     const historial = timestamps.map((timestamp, index) => ({
@@ -165,12 +115,89 @@ const stockDetail = async (req, res) => {
       EX: getCacheTTL(range)
     });
 
+    return historial;
+  } catch (error) {
+    console.error(`Error en getStockHistoricalData para ${symbol}:`, error);
+    throw error;
+  }
+};
+
+// Modificación de getStocksList para incluir el primer precio del día
+const getStocksList = async () => {
+  // flush
+  await redisClient.flushAll();
+  try {
+    // Intentar recuperar de la caché
+    const cachedStocks = await redisClient.get(STOCKS_CACHE_KEY);
+    
+    if (cachedStocks) {
+      console.log('📀 Listado de acciones encontrado en cache');
+      return JSON.parse(cachedStocks);
+    }
+    
+    console.log('🆕 Creando cache para el listado');
+    
+    // Obtener de la base de datos
+    const stocks = await Stock.find({}, 'symbol name sector industry exchange country currency description website logo');
+    const stockInfoMap = {};
+
+    // Obtener datos históricos para cada acción (solo necesitamos el primer precio del día)
+    for (const stock of stocks) {
+      try {
+        const historicalData = await getStockHistoricalData(stock.symbol, '5m', '1d');
+        if (stock.symbol === 'AMZN'){
+          console.log(`📈 Obteniendo datos históricos para ${stock.symbol}`);
+          console.log('historicalData', historicalData[0].close);
+        }
+        const firstPrice = historicalData.length > 0 ? historicalData[0].close : null;
+        
+        stockInfoMap[stock.symbol] = { 
+          name: stock.name,
+          sector: stock.sector,
+          industry: stock.industry,
+          exchange: stock.exchange,
+          country: stock.country,
+          currency: stock.currency,
+          description: stock.description,
+          website: stock.website,
+          logo: stock.logo,
+          firstPriceToday: firstPrice
+        };
+      } catch (error) {
+        console.error(`Error obteniendo datos para ${stock.symbol}:`, error);
+        stockInfoMap[stock.symbol] = { 
+          ...stock.toObject(),
+          firstPriceToday: null
+        };
+      }
+    }
+    
+    // Guardar en caché
+    await redisClient.set(STOCKS_CACHE_KEY, JSON.stringify(stockInfoMap), {
+      EX: STOCKS_CACHE_TTL
+    });
+    
+    return stockInfoMap;
+  } catch (error) {
+    console.error('Error al obtener listado de acciones:', error);
+    throw error;
+  }
+};
+
+// Modificación de stockDetail para usar la nueva función
+const stockDetail = async (req, res) => {
+  const { symbol } = req.params;
+  const { interval = '1d', range = '1mo' } = req.query;
+
+  try {
+    const historial = await getStockHistoricalData(symbol, interval, range);
     res.json(historial);
   } catch (error) {
     console.error('Error en stockDetail:', error);
     res.status(500).json({ error: 'Error al obtener los datos de Yahoo Finance' });
   }
 };
+
 
 // Función para determinar TTL de caché
 const getCacheTTL = (range) => {
