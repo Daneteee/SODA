@@ -86,34 +86,36 @@ const TransactionPage = () => {
               <span>No se han encontrado transacciones.</span>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="table table-zebra w-full">
-                <thead>
-                  <tr className="bg-base-200">
-                    <th>Tipo</th>
-                    <th>Activo</th>
-                    <th>Cantidad</th>
-                    <th>Precio</th>
-                    <th>Total</th>
-                    <th>Fecha</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredTransactions.map((tx) => (
-                    <tr
-                      key={tx._id}
-                      className="hover:bg-base-200 transition-colors duration-200 "
-                    >
-                      <td className="capitalize">{tx.type}</td>
-                      <td>{tx.stock}</td>
-                      <td className="font-mono font-bold">{tx.amount}</td>
-                      <td className="font-mono font-bold">${Number(tx.price).toFixed(2)}</td>
-                      <td className="font-mono font-bold">${Number(tx.total).toFixed(2)}</td>
-                      <td>{new Date(tx.date).toLocaleDateString()}</td>
+            <div className="overflow-x-auto ">
+              <div className="overflow-y-auto max-h-[445px]">
+                <table className="table table-zebra w-full">
+                  <thead>
+                    <tr className="bg-base-200">
+                      <th>Tipo</th>
+                      <th>Activo</th>
+                      <th>Cantidad</th>
+                      <th>Precio</th>
+                      <th>Total</th>
+                      <th>Fecha</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {filteredTransactions.map((tx) => (
+                      <tr
+                        key={tx._id}
+                        className="hover:bg-base-200 transition-colors duration-200 "
+                      >
+                        <td className="capitalize">{tx.type}</td>
+                        <td>{tx.stock}</td>
+                        <td className="font-mono font-bold">{tx.amount}</td>
+                        <td className="font-mono font-bold">${Number(tx.price).toFixed(2)}</td>
+                        <td className="font-mono font-bold">${Number(tx.total).toFixed(2)}</td>
+                        <td>{new Date(tx.date).toLocaleDateString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import Footer from "@/components/Footer";
 import Link from "next/link";
 import { 
   Users, 
@@ -169,6 +170,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+      
+      <Footer />
 
       {/* Bubble Animation Styles (from original code) */}
       <style jsx>{`
