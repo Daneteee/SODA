@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import ThemeSelector from "@/components/ThemeSelector";
+import Image from "next/image";
 
 export default function Navbar() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -137,7 +138,15 @@ export default function Navbar() {
           </div>
 
           <div className="navbar-center">
-            <Link href="/" className="btn btn-ghost text-xl">SODA</Link>
+            <Link href="/" className="p-1">
+              <div className="flex items-center justify-center h-[6vh]">
+                <img
+                  src="/teal_soda.svg"
+                  alt="Logo"
+                  className="h-full w-auto transition-transform duration-200 hover:scale-110"
+                />
+              </div>
+            </Link>
           </div>
 
           <div className="navbar-end">
