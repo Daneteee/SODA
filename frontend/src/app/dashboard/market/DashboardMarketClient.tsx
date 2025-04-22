@@ -165,11 +165,16 @@ const DashboardMarketClient: React.FC<Props> = ({
                     const isPositive = change >= 0;
 
                     return (
-                      <tr
-                        key={stock.symbol}
-                        className="hover:bg-base-200 transition-colors duration-200 cursor-pointer"
-                        onClick={() => router.push(`/dashboard/market/${stock.symbol}`)}
-                      >
+                        <tr
+                            key={stock.symbol}
+                            className="hover:bg-base-200 transition-colors duration-200 cursor-pointer"
+                            onClick={() => {
+                            if (typeof window !== "undefined") {
+                                sessionStorage.setItem("selectedStock", JSON.stringify(stock));
+                            }
+                            router.push(`/dashboard/market/${stock.symbol}`);
+                            }}
+                        >
                         <td>
                           <div className="flex items-center gap-3">
                             {renderStockLogo(stock)}

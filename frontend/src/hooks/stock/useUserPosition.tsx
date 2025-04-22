@@ -62,7 +62,7 @@ export function useUserPosition(stock: any, userStocks: any[], symbol: string) {
         price: 0, // Establecer 'price' en 0 si no hay posición
       });
     }
-  }, [stock, userStocks, symbol]);
+  }, [stock?.price, userStocks, symbol]);
 
   return position;
 }
