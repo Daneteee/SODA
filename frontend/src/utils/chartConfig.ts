@@ -2,7 +2,6 @@
 import { ChartOptions } from "chart.js";
 
 export const getChartData = (stock: any) => {
-  console.log(stock)
   const times = stock?.history?.map((item: any) =>
     new Date(item.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   ) || [];

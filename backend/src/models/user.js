@@ -41,6 +41,12 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 50000
   },
+  favs: [
+    { 
+      type: String, 
+      required: false 
+    }
+  ]
 });
 
 // Método para comparar contraseñas en el login

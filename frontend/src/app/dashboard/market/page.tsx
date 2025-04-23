@@ -55,7 +55,6 @@ export default async function DashboardMarketPage() {
   );
   const credit = (profileRes as Profile).credit;
   const userStocks = (stocksRes as UserStocksResponse).stocks || [];
-  const transactionsCount = (txRes as TransactionsResponse).transactions.length;
 
   return (
     <>
