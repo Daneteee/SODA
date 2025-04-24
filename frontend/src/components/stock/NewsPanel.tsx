@@ -12,6 +12,7 @@ interface NewsPanelProps {
   setNewsOpen: (open: boolean) => void;
   newsLoading: boolean;
   newsItems: NewsArticle[];
+  companyName: string;
 }
 
 export default function NewsPanel({

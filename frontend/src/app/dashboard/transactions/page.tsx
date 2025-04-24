@@ -6,7 +6,6 @@ import type { Transaction } from "@/types/transaction";
 
 const TransactionPage = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
@@ -19,10 +18,8 @@ const TransactionPage = () => {
         if (!response.ok) throw new Error("Error al obtener las transacciones");
         const data = await response.json();
         setTransactions(data.transactions);
-        setLoading(false);
       } catch (error) {
         console.error("Error al obtener transacciones:", error);
-        setLoading(false);
       }
     };
 

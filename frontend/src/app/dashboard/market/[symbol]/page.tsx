@@ -185,14 +185,14 @@ export default function StockDetailPage() {
             <PositionPanel position={position} symbol={symbol} />
             
             {/* Panel de noticias con nombre de empresa mejorado */}
-            {/* <NewsPanel 
+            <NewsPanel 
               stockSymbol={symbol} 
               newsOpen={newsOpen} 
               setNewsOpen={setNewsOpen} 
               newsLoading={newsLoading} 
               newsItems={newsItems} 
               companyName={combinedStock.company?.name || symbol}
-            /> */}
+            />
           </div>
         </div>
       </div>

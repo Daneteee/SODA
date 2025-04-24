@@ -4,6 +4,16 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, RefreshCw } from "lucide-react";
 
+interface NewsArticle {
+  urlToImage?: string;
+  title: string;
+  author?: string;
+  publishedAt: string;
+  description?: string;
+  content?: string;
+  url: string;
+}
+
 export default function NewsDetailPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -16,7 +26,7 @@ export default function NewsDetailPage() {
     content?: string;
     url: string;
   } | null>(null);
-  const [otherNews, setOtherNews] = useState<any[]>([]);
+  const [otherNews, setOtherNews] = useState<NewsArticle[]>([]);
   const [newsLoading, setNewsLoading] = useState(false);
   const [newsOpen, setNewsOpen] = useState(false);
 

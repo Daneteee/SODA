@@ -2,8 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { User, Camera, Settings } from 'lucide-react';
-import { useRouter } from "next/navigation";
-import DrawerSide from "@/components/DrawerSide";
 import Alert from "@/components/Alert";
 
 const EditProfilePage = () => {
@@ -28,9 +26,7 @@ const EditProfilePage = () => {
     match: false
   });
 
-  const [loading, setLoading] = useState(true);
   const [alert, setAlert] = useState<{ type: "success" | "warning" | "error"; message: string } | null>(null);
-  const router = useRouter();
   const [showImageAlert, setShowImageAlert] = useState(false);
 
   // Fetch user data
@@ -52,11 +48,9 @@ const EditProfilePage = () => {
           profileImage: profileData.profileImage || "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
         });
         
-        setLoading(false);
       } catch (error) {
         console.error("Error fetching user data:", error);
         setAlert({ type: "error", message: "Error loading user profile data." });
-        setLoading(false);
       }
     };
 

@@ -6,14 +6,12 @@ import {
   Wallet,
   History,
   Settings,
-  LogOut,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 
 const DrawerSide = () => {
   const pathname = usePathname();
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const router = useRouter();
   const [user, setUser] = useState<{ name: string; profileImage: string } | null>(null);
 
@@ -47,7 +45,6 @@ const DrawerSide = () => {
 
   const handleLogout = () => {
     document.cookie = "jwtToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-    setIsAuthenticated(false);
     router.push("/");
   };
 

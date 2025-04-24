@@ -147,7 +147,7 @@ export default function Home() {
                     </div>
                   </div>
                   <blockquote className="italic text-base-content/80">
-                    "{testimonial.quote}"
+                    &quot;{testimonial.quote}&quot;
                   </blockquote>
                 </div>
               </div>

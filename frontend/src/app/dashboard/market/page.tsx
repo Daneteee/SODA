@@ -16,7 +16,6 @@ export interface Stock {
 }
 interface Profile { credit: number; }
 interface UserStocksResponse { stocks: { symbol: string; purchasePrice: number; quantity: number }[]; }
-interface TransactionsResponse { transactions: any[]; }
 
 export default async function DashboardMarketPage() {
   // 1. Obtener cookies entrantes
@@ -24,7 +23,7 @@ export default async function DashboardMarketPage() {
   const cookie = headersList.get("cookie") || "";
 
   // 2. Parallel fetch (reenviando la cookie al perfil)
-  const [marketRes, profileRes, stocksRes, txRes] = await Promise.all([
+  const [marketRes, profileRes, stocksRes] = await Promise.all([
     fetch("http://localhost:4000/api/market/stocks").then(r => {
       if (!r.ok) throw new Error("Error fetching market stocks");
       return r.json();
@@ -51,7 +50,7 @@ export default async function DashboardMarketPage() {
 
   // 3. Transformar y renderizar (igual que antes)
   const apiStocks: Stock[] = Object.entries(marketRes).map(
-    ([symbol, info]) => ({ symbol, ...(info as any) })
+    ([symbol, info]) => ({ symbol, ...(info as Partial<Stock>) })
   );
   const credit = (profileRes as Profile).credit;
   const userStocks = (stocksRes as UserStocksResponse).stocks || [];

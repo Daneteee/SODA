@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import ThemeSelector from "@/components/ThemeSelector";
-import Image from "next/image";
 
 export default function Navbar() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
