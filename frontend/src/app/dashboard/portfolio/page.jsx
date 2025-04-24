@@ -14,18 +14,6 @@ import {
 import { useWebSocket } from "@/context/WebSocketProvider";
 import StatsCards from "@/components/StatsCards";
 
-interface Stock {
-  symbol: string;
-  name?: string;
-  price?: number;
-  priceChange?: number;
-  company?: { logo?: string };
-  // for owned:
-  quantity?: number;
-  purchasePrice?: number;
-  purchaseDate?: string;
-}
-
 export default function DashboardPortfolio() {
   const router = useRouter();
   const { stockData } = useWebSocket();
@@ -33,8 +21,8 @@ export default function DashboardPortfolio() {
   // States
   const [searchTerm, setSearchTerm] = useState("");
   const [credit, setCredit] = useState(0);
-  const [userStocks, setUserStocks] = useState<Stock[]>([]);
-  const [favSymbols, setFavSymbols] = useState<string[]>([]);
+  const [userStocks, setUserStocks] = useState([]);
+  const [favSymbols, setFavSymbols] = useState([]);
   const [transactionsCount, setTransactionsCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [loadingFavs, setLoadingFavs] = useState(true);
@@ -85,10 +73,10 @@ export default function DashboardPortfolio() {
   }, []);
 
   // Helpers
-  const getRealtime = (symbol: string) =>
+  const getRealtime = (symbol) =>
     stockData.find((s) => s.symbol === symbol) || {};
 
-  const renderLogo = (symbol: string, logo?: string) => {
+  const renderLogo = (symbol, logo) => {
     if (logo) {
       return (
         <div className="avatar">
@@ -108,7 +96,7 @@ export default function DashboardPortfolio() {
   };
 
   // Build arrays
-  const favoriteStocks: Stock[] = favSymbols.map((symbol) => {
+  const favoriteStocks = favSymbols.map((symbol) => {
     const { price, priceChange, logo } = getRealtime(symbol);
     return { symbol, price, priceChange, company: { logo } };
   });
@@ -191,7 +179,7 @@ export default function DashboardPortfolio() {
                     const rt = getRealtime(s.symbol).price ?? s.purchasePrice ?? 0;
                     const changePct =
                       s.purchasePrice != null
-                        ? ((rt - s.purchasePrice!) / s.purchasePrice!) * 100
+                        ? ((rt - s.purchasePrice) / s.purchasePrice) * 100
                         : 0;
                     return (
                       <tr
@@ -256,7 +244,7 @@ export default function DashboardPortfolio() {
                         </div>
                       </td>
                       <td className="font-mono">${(s.price ?? 0).toFixed(2)}</td>
-                      <td className={`font-mono ${s.priceChange! >= 0 ? "text-success" : "text-error"}`}>
+                      <td className={`font-mono ${s.priceChange >= 0 ? "text-success" : "text-error"}`}>
                         {s.priceChange != null ? (
                           <>
                             {s.priceChange >= 0 ? <TrendingUp className="inline h-4 w-4" /> : <TrendingDown className="inline h-4 w-4" />}

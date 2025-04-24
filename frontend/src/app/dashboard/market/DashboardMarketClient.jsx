@@ -6,33 +6,16 @@ import Image from "next/image";
 import { Search, TrendingUp, TrendingDown, Activity } from "lucide-react";
 import { useWebSocket } from "@/context/WebSocketProvider";
 import StatsCards from "@/components/StatsCards";
-import type { Stock } from "./page";
 
-interface UserStock {
-  symbol: string;
-  purchasePrice: number;
-  quantity: number;
-}
-
-interface Props {
-  initialApiStocks: Stock[];
-  initialCredit: number;
-  initialUserStocks: UserStock[];
-}
-
-const DashboardMarketClient: React.FC<Props> = ({
-  initialApiStocks,
-  initialCredit,
-  initialUserStocks,
-}) => {
+const DashboardMarketClient = ({ initialApiStocks, initialCredit, initialUserStocks }) => {
   const { connected, stockData: wsStockData } = useWebSocket();
   const router = useRouter();
 
   // Estados locales
-  const [apiStocks] = useState<Stock[]>(initialApiStocks);
-  const [credit] = useState<number>(initialCredit);
-  const [userStocks] = useState<UserStock[]>(initialUserStocks);
-  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [apiStocks] = useState(initialApiStocks);
+  const [credit] = useState(initialCredit);
+  const [userStocks] = useState(initialUserStocks);
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Combinar con datos WS
   const mergedStocks = apiStocks.map((stock) => {
@@ -43,7 +26,7 @@ const DashboardMarketClient: React.FC<Props> = ({
     };
   });
 
-  const getRealtimePrice = (symbol: string): number => {
+  const getRealtimePrice = (symbol) => {
     const ws = wsStockData.find((s) => s.symbol === symbol);
     return ws?.price ?? 0;
   };
@@ -69,7 +52,7 @@ const DashboardMarketClient: React.FC<Props> = ({
   const portfolioValue = credit + totalStockValue;
 
   // Render del logo
-  const renderStockLogo = (stock: Stock) => {
+  const renderStockLogo = (stock) => {
     if (stock.logo) {
       return (
         <div className="avatar">
@@ -81,7 +64,7 @@ const DashboardMarketClient: React.FC<Props> = ({
               height={32}
               className="object-cover"
               onError={(e) => {
-                const t = e.target as HTMLImageElement;
+                const t = e.target;
                 t.style.display = "none";
                 t.onerror = null;
               }}
@@ -158,23 +141,21 @@ const DashboardMarketClient: React.FC<Props> = ({
                 <tbody>
                   {filteredStocks.map((stock) => {
                     const change = stock.firstPriceToday
-                      ? ((stock.price! - stock.firstPriceToday) /
-                          stock.firstPriceToday) *
-                        100
+                      ? ((stock.price - stock.firstPriceToday) / stock.firstPriceToday) * 100
                       : 0;
                     const isPositive = change >= 0;
 
                     return (
-                        <tr
-                            key={stock.symbol}
-                            className="hover:bg-base-200 transition-colors duration-200 cursor-pointer"
-                            onClick={() => {
-                            if (typeof window !== "undefined") {
-                                sessionStorage.setItem("selectedStock", JSON.stringify(stock));
-                            }
-                            router.push(`/dashboard/market/${stock.symbol}`);
-                            }}
-                        >
+                      <tr
+                        key={stock.symbol}
+                        className="hover:bg-base-200 transition-colors duration-200 cursor-pointer"
+                        onClick={() => {
+                          if (typeof window !== "undefined") {
+                            sessionStorage.setItem("selectedStock", JSON.stringify(stock));
+                          }
+                          router.push(`/dashboard/market/${stock.symbol}`);
+                        }}
+                      >
                         <td>
                           <div className="flex items-center gap-3">
                             {renderStockLogo(stock)}
@@ -188,9 +169,11 @@ const DashboardMarketClient: React.FC<Props> = ({
                           {stock.price !== undefined ? `$${stock.price}` : "N/A"}
                         </td>
                         <td>
-                          <div className={`flex items-center gap-1 font-bold ${
-                            isPositive ? "text-success" : "text-error"
-                          }`}>
+                          <div
+                            className={`flex items-center gap-1 font-bold ${
+                              isPositive ? "text-success" : "text-error"
+                            }`}
+                          >
                             {isPositive ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
                             {stock.firstPriceToday ? `${change.toFixed(2)}%` : "N/A"}
                           </div>

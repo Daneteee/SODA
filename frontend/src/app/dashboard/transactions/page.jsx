@@ -2,10 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import { Activity, Search } from "lucide-react";
-import type { Transaction } from "@/types/transaction";
 
 const TransactionPage = () => {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [transactions, setTransactions] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
@@ -33,7 +32,7 @@ const TransactionPage = () => {
 
   return (
     <main className="flex-1 p-6 bg-base-200">
-      {/* Tarjetas de estadísticas (puedes agregar más según necesites) */}
+      {/* Tarjetas de estadísticas */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div className="stats shadow bg-primary text-primary-content">
           <div className="stat">
@@ -83,7 +82,7 @@ const TransactionPage = () => {
               <span>No se han encontrado transacciones.</span>
             </div>
           ) : (
-            <div className="overflow-x-auto ">
+            <div className="overflow-x-auto">
               <div className="overflow-y-auto max-h-[445px]">
                 <table className="table table-zebra w-full">
                   <thead>
@@ -100,7 +99,7 @@ const TransactionPage = () => {
                     {filteredTransactions.map((tx) => (
                       <tr
                         key={tx._id}
-                        className="hover:bg-base-200 transition-colors duration-200 "
+                        className="hover:bg-base-200 transition-colors duration-200"
                       >
                         <td className="capitalize">{tx.type}</td>
                         <td>{tx.stock}</td>
@@ -117,7 +116,7 @@ const TransactionPage = () => {
           )}
         </div>
       </div>
-  </main>
+    </main>
   );
 };
 

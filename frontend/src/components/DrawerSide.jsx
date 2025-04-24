@@ -13,7 +13,7 @@ import { useRouter, usePathname } from "next/navigation";
 const DrawerSide = () => {
   const pathname = usePathname();
   const router = useRouter();
-  const [user, setUser] = useState<{ name: string; profileImage: string } | null>(null);
+  const [user, setUser] = useState(null);
 
   // Obtener datos del usuario al cargar el componente
   useEffect(() => {
@@ -39,7 +39,7 @@ const DrawerSide = () => {
     fetchUserData();
   }, []);
 
-  const isActive = (href: string) => {
+  const isActive = (href) => {
     return pathname === href ? "active" : "hover:bg-base-200";
   };
 

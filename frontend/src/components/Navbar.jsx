@@ -6,7 +6,7 @@ import { useRouter, usePathname } from "next/navigation";
 import ThemeSelector from "@/components/ThemeSelector";
 
 export default function Navbar() {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userData, setUserData] = useState({
     profileImage: "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
   });
@@ -17,7 +17,7 @@ export default function Navbar() {
   useEffect(() => {
     const token = document.cookie
       .split("; ")
-      .find(row => row.startsWith("jwtToken="));
+      .find((row) => row.startsWith("jwtToken="));
     setIsAuthenticated(!!token);
 
     if (token) {
@@ -25,7 +25,7 @@ export default function Navbar() {
         try {
           const profileResponse = await fetch("http://localhost:4000/api/user/profile", {
             method: "GET",
-            credentials: "include", // Enviar cookies para autenticación
+            credentials: "include",
           });
           if (!profileResponse.ok) throw new Error("Error obtaining user data");
           const profileData = await profileResponse.json();
@@ -46,43 +46,20 @@ export default function Navbar() {
     router.push("/");
   };
 
-  // Common navigation items
   const navigationItems = (
     <ul tabIndex={0} className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
       <li>
-        <Link href="/">
-          <div className="flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-            </svg>
-            Home
-          </div>
-        </Link>
+        <Link href="/">Home</Link>
       </li>
       <li>
-        <Link href="/portfolio">
-          <div className="flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-            Portfolio
-          </div>
-        </Link>
+        <Link href="/portfolio">Portfolio</Link>
       </li>
       <li>
-        <Link href="/about">
-          <div className="flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            About
-          </div>
-        </Link>
+        <Link href="/about">About</Link>
       </li>
     </ul>
   );
 
-  // Common authenticated user controls
   const authenticatedControls = (
     <>
       <button className="btn btn-ghost btn-circle">
@@ -101,7 +78,7 @@ export default function Navbar() {
       <div className="dropdown dropdown-end">
         <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
           <div className="w-10 rounded-full">
-            <img src={`http://localhost:4000${userData.profileImage}` || "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"} alt="Profile" />
+            <img src={userData.profileImage} alt="Profile" />
           </div>
         </div>
         <ul tabIndex={0} className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
@@ -113,49 +90,12 @@ export default function Navbar() {
     </>
   );
 
-  // Common unauthenticated controls
   const unauthenticatedControls = (
     <div className="flex gap-x-4">
       <Link href="/auth/login" className="btn btn-neutral">Iniciar sesión</Link>
       <Link href="/auth/register" className="btn btn-primary">Registrarse</Link>
     </div>
   );
-
-  if (pathname === '/' || pathname === '/auth/login' || pathname === '/auth/register') {
-    return (
-      <div className="fixed top-4 left-1/2 z-50 w-[90%] max-w-6xl -translate-x-1/2 rounded-2xl bg-opacity-40 backdrop-blur-md shadow-lg bg-base-100">
-        <div className="navbar">
-          <div className="navbar-start">
-            <div className="dropdown">
-              <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h7" />
-                </svg>
-              </div>
-              {navigationItems}
-            </div>
-          </div>
-
-          <div className="navbar-center">
-            <Link href="/" className="p-1">
-              <div className="flex items-center justify-center h-[6vh]">
-                <img
-                  src="/blue_soda.svg"
-                  alt="Logo"
-                  className="h-full w-auto transition-transform duration-200 hover:scale-110"
-                />
-              </div>
-            </Link>
-          </div>
-
-          <div className="navbar-end">
-            <ThemeSelector /> 
-            {isAuthenticated ? authenticatedControls : unauthenticatedControls}
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="navbar bg-base-100 h-auto">
@@ -174,17 +114,9 @@ export default function Navbar() {
         <Link href="/" className="btn btn-ghost text-xl">SODA</Link>
       </div>
 
-
       <div className="navbar-end">
-        <ThemeSelector /> 
-        {isAuthenticated ? (
-          authenticatedControls
-        ) : (
-          <>
-            <div className="skeleton h-10 w-32"></div>
-            <div className="skeleton h-11 w-11 shrink-0 rounded-full"></div>
-          </>
-        )}
+        <ThemeSelector />
+        {isAuthenticated ? authenticatedControls : unauthenticatedControls}
       </div>
     </div>
   );

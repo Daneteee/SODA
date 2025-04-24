@@ -1,19 +1,13 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useRef, useState, ReactNode } from "react";
+import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 
-interface IWebSocketContext {
-  connected: boolean;
-  stockData: any[];
-  ws: WebSocket | null;
-}
+const WebSocketContext = createContext(undefined);
 
-const WebSocketContext = createContext<IWebSocketContext | undefined>(undefined);
-
-export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
-  const ws = useRef<WebSocket | null>(null);
+export const WebSocketProvider = ({ children }) => {
+  const ws = useRef(null);
   const [connected, setConnected] = useState(false);
-  const [stockData, setStockData] = useState<any[]>([]);
+  const [stockData, setStockData] = useState([]);
 
   useEffect(() => {
     ws.current = new WebSocket("ws://localhost:4000");
@@ -28,21 +22,17 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
         const message = JSON.parse(event.data);
         if (message.type === "trade" && Array.isArray(message.data)) {
           setStockData((prevData) => {
-            // Usamos un Map para que cada símbolo sea único
-            const stocksMap = new Map<string, any>();
-            // Agregamos los datos previos
+            const stocksMap = new Map();
             prevData.forEach((stock) => stocksMap.set(stock.symbol, stock));
-            // Recorremos los nuevos datos y calculamos el porcentaje de cambio
-            message.data.forEach((trade: any) => {
-              // Usamos firstPriceToday como previousPrice
+            message.data.forEach((trade) => {
               const firstPriceToday = trade.firstPriceToday;
               const priceChange = firstPriceToday
                 ? ((trade.price - firstPriceToday) / firstPriceToday) * 100
                 : 0;
               const updatedTrade = {
                 ...trade,
-                previousPrice: firstPriceToday, // Establecemos previousPrice como firstPriceToday
-                priceChange
+                previousPrice: firstPriceToday,
+                priceChange,
               };
               stocksMap.set(trade.symbol, updatedTrade);
             });
@@ -53,7 +43,6 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
         console.error("Error al procesar mensaje WebSocket:", error);
       }
     };
-    
 
     ws.current.onclose = () => {
       console.log("🔴 Conexión WebSocket cerrada");
@@ -78,7 +67,7 @@ export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export const useWebSocket = (): IWebSocketContext => {
+export const useWebSocket = () => {
   const context = useContext(WebSocketContext);
   if (context === undefined) {
     throw new Error("useWebSocket debe usarse dentro de un WebSocketProvider");

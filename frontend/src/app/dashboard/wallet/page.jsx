@@ -9,8 +9,8 @@ const WalletPage = () => {
   const [amountToWithdraw, setAmountToWithdraw] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
 
-  // Función para mostrar la alerta (ahora sin autodesaparición)
-  const showAlert = (message: string): void => {
+  // Función para mostrar la alerta
+  const showAlert = (message) => {
     setAlertMessage(message);
   };
 
@@ -93,50 +93,50 @@ const WalletPage = () => {
 
   return (
     <main className="flex-1 p-6 bg-base-200 h-full">
-        <h1 className="text-3xl font-bold mb-6">Mi Wallet</h1>
+      <h1 className="text-3xl font-bold mb-6">Mi Wallet</h1>
 
-        {/* Alerta utilizando el componente Alert sin el SVG y con botón de cierre */}
-        {alertMessage && (
-          <Alert message={alertMessage} onClose={closeAlert} type="success" />
-        )}
+      {/* Alerta utilizando el componente Alert */}
+      {alertMessage && (
+        <Alert message={alertMessage} onClose={closeAlert} type="success" />
+      )}
 
-        {/* Tarjeta de crédito actual */}
-        <div className="card bg-base-100 shadow-xl p-6 mb-8">
-          <h2 className="text-xl font-semibold mb-2">Crédito Actual</h2>
-          <p className="text-2xl font-bold">${credit.toFixed(2)}</p>
+      {/* Tarjeta de crédito actual */}
+      <div className="card bg-base-100 shadow-xl p-6 mb-8">
+        <h2 className="text-xl font-semibold mb-2">Crédito Actual</h2>
+        <p className="text-2xl font-bold">${credit.toFixed(2)}</p>
+      </div>
+
+      {/* Sección para añadir y retirar créditos */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Añadir Créditos */}
+        <div className="card bg-base-100 shadow-xl p-6">
+          <h2 className="text-xl font-semibold mb-4">Añadir Créditos</h2>
+          <input
+            type="number"
+            placeholder="Cantidad a añadir"
+            className="input input-bordered w-full mb-4"
+            value={amountToAdd}
+            onChange={(e) => setAmountToAdd(e.target.value)}
+          />
+          <button className="btn btn-primary w-full" onClick={handleAddCredit}>
+            Añadir
+          </button>
         </div>
-
-        {/* Sección para añadir y retirar créditos */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Añadir Créditos */}
-          <div className="card bg-base-100 shadow-xl p-6">
-            <h2 className="text-xl font-semibold mb-4">Añadir Créditos</h2>
-            <input
-              type="number"
-              placeholder="Cantidad a añadir"
-              className="input input-bordered w-full mb-4"
-              value={amountToAdd}
-              onChange={(e) => setAmountToAdd(e.target.value)}
-            />
-            <button className="btn btn-primary w-full" onClick={handleAddCredit}>
-              Añadir
-            </button>
-          </div>
-          {/* Retirar Créditos */}
-          <div className="card bg-base-100 shadow-xl p-6">
-            <h2 className="text-xl font-semibold mb-4">Retirar Créditos</h2>
-            <input
-              type="number"
-              placeholder="Cantidad a retirar"
-              className="input input-bordered w-full mb-4"
-              value={amountToWithdraw}
-              onChange={(e) => setAmountToWithdraw(e.target.value)}
-            />
-            <button className="btn btn-error w-full" onClick={handleWithdrawCredit}>
-              Retirar
-            </button>
-          </div>
+        {/* Retirar Créditos */}
+        <div className="card bg-base-100 shadow-xl p-6">
+          <h2 className="text-xl font-semibold mb-4">Retirar Créditos</h2>
+          <input
+            type="number"
+            placeholder="Cantidad a retirar"
+            className="input input-bordered w-full mb-4"
+            value={amountToWithdraw}
+            onChange={(e) => setAmountToWithdraw(e.target.value)}
+          />
+          <button className="btn btn-error w-full" onClick={handleWithdrawCredit}>
+            Retirar
+          </button>
         </div>
+      </div>
     </main>
   );
 };

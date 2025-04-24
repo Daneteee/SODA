@@ -1,11 +1,7 @@
 "use client";
 
 import Footer from "@/components/Footer";
-import { 
-  Users, 
-  Newspaper, 
-  TrendingUp, 
-} from "lucide-react";
+import { Users, Newspaper, TrendingUp } from "lucide-react";
 
 export default function Home() {
   const features = [
@@ -13,20 +9,20 @@ export default function Home() {
       icon: Users,
       title: "Comunidades de Inversión",
       description: "Conecta con inversores, comparte estrategias y aprende de expertos en nuestras comunidades interactivas.",
-      color: "text-primary"
+      color: "text-primary",
     },
     {
       icon: Newspaper,
       title: "Noticias en Tiempo Real",
       description: "Mantente informado con análisis de mercado, reportes exclusivos y alertas instantáneas.",
-      color: "text-secondary"
+      color: "text-secondary",
     },
     {
       icon: TrendingUp,
       title: "Herramientas de Análisis",
       description: "Gráficos avanzados, predicciones algorítmicas y seguimiento de tendencias de mercado.",
-      color: "text-accent"
-    }
+      color: "text-accent",
+    },
   ];
 
   const communityTestimonials = [
@@ -34,19 +30,19 @@ export default function Home() {
       name: "María Rodríguez",
       role: "Inversora Principiante",
       quote: "Gracias a Soda, he aprendido más sobre inversiones en un mes que en años por mi cuenta.",
-      avatar: "https://randomuser.me/api/portraits/women/44.jpg"
+      avatar: "https://randomuser.me/api/portraits/women/44.jpg",
     },
     {
       name: "Carlos Martínez",
       role: "Trader Profesional",
       quote: "Las comunidades de Soda me han permitido compartir mis estrategias y aprender de otros inversores.",
-      avatar: "https://randomuser.me/api/portraits/men/79.jpg"
-    }
+      avatar: "https://randomuser.me/api/portraits/men/79.jpg",
+    },
   ];
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-base-200">
-      {/* Bubble Animations (from original code) */}
+      {/* Bubble Animations */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
         {[...Array(15)].map((_, i) => (
           <div
@@ -54,7 +50,7 @@ export default function Home() {
             className={`absolute w-16 h-16 rounded-full opacity-50 animate-bubble ${["bg-primary", "bg-secondary", "bg-accent"][i % 3]}`}
             style={{
               left: `${Math.random() * 100}%`,
-              top: `105vh`, 
+              top: `105vh`,
               animationDelay: `${Math.random() * 10}s`,
               animationDuration: `${8 + Math.random() * 7}s`,
               transform: `scale(${0.5 + Math.random() * 1})`,
@@ -63,16 +59,15 @@ export default function Home() {
         ))}
       </div>
 
-
-      {/* Hero section (from original code) */}
+      {/* Hero Section */}
       <div className="hero min-h-screen bg-transparent">
         <div className="hero-content text-center">
           <div className="max-w-3xl">
             <h1 className="text-7xl font-bold mb-8">
               <span className="text-primary drop-shadow-[0_0_30px_rgba(126,34,206,0.7)]">
                 Burbujeando
-              </span>
-              {" "}tus inversiones
+              </span>{" "}
+              tus inversiones
             </h1>
             <h2 className="text-5xl font-bold mb-8">
               La plataforma más segura
@@ -82,8 +77,8 @@ export default function Home() {
               </span>
             </h2>
             <p className="py-6 text-xl text-base-content/60">
-              SODA añade la seguridad que necesitas a tus inversiones
-              para que puedas hacer crecer tu dinero más rápido que nunca.
+              SODA añade la seguridad que necesitas a tus inversiones para que
+              puedas hacer crecer tu dinero más rápido que nunca.
             </p>
             <div className="flex gap-4 justify-center mt-8">
               <button className="btn btn-primary btn-lg">Comenzar ahora →</button>
@@ -97,13 +92,20 @@ export default function Home() {
       <section className="py-20 bg-base-100 relative z-10">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Lo que hace único a <span className="bg-gradient-to-r from-pink-500 via-blue-500 to-cyan-500 text-transparent bg-clip-text drop-shadow-[0_0_30px_rgba(59,130,246,0.5)]">SODA</span></h2>
-            <p className="text-xl text-base-content/70">Descubre las herramientas que transformarán tu forma de invertir</p>
+            <h2 className="text-4xl font-bold mb-4">
+              Lo que hace único a{" "}
+              <span className="bg-gradient-to-r from-pink-500 via-blue-500 to-cyan-500 text-transparent bg-clip-text drop-shadow-[0_0_30px_rgba(59,130,246,0.5)]">
+                SODA
+              </span>
+            </h2>
+            <p className="text-xl text-base-content/70">
+              Descubre las herramientas que transformarán tu forma de invertir
+            </p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className="card bg-base-200 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
               >
                 <div className="card-body items-center text-center">
@@ -121,13 +123,17 @@ export default function Home() {
       <section className="py-20 bg-base-200">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Lo que dicen nuestros <span className="text-primary">Inversores</span></h2>
-            <p className="text-xl text-base-content/70">Historias reales de crecimiento y éxito</p>
+            <h2 className="text-4xl font-bold mb-4">
+              Lo que dicen nuestros <span className="text-primary">Inversores</span>
+            </h2>
+            <p className="text-xl text-base-content/70">
+              Historias reales de crecimiento y éxito
+            </p>
           </div>
           <div className="grid md:grid-cols-2 gap-8">
             {communityTestimonials.map((testimonial, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300"
               >
                 <div className="card-body">
@@ -157,19 +163,22 @@ export default function Home() {
         <div className="container mx-auto px-4 text-center text-white">
           <h2 className="text-5xl font-bold mb-6">Comienza tu viaje financiero</h2>
           <p className="text-xl mb-8 max-w-2xl mx-auto">
-            Únete a miles de inversores que ya están transformando sus finanzas con SODA. 
-            No dejes que el miedo te detenga, la inversión inteligente está a un clic de distancia.
+            Únete a miles de inversores que ya están transformando sus finanzas
+            con SODA. No dejes que el miedo te detenga, la inversión inteligente
+            está a un clic de distancia.
           </p>
           <div className="flex justify-center gap-4">
-            <button className="btn btn-ghost btn-lg text-white border-2">Más Información</button>
+            <button className="btn btn-ghost btn-lg text-white border-2">
+              Más Información
+            </button>
             <button className="btn btn-accent btn-lg">Crear Cuenta Gratis</button>
           </div>
         </div>
       </section>
-      
+
       <Footer />
 
-      {/* Bubble Animation Styles (from original code) */}
+      {/* Bubble Animation Styles */}
       <style jsx>{`
         @keyframes bubble {
           0% {

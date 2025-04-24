@@ -1,12 +1,6 @@
 import React from "react";
 
-interface AlertProps {
-  type?: "success" | "warning" | "error";
-  message: string;
-  onClose?: () => void;
-}
-
-const Alert: React.FC<AlertProps> = ({ type = "success", message, onClose }) => {
+const Alert = ({ type = "success", message, onClose }) => {
   const alertClass = {
     success: "alert alert-success",
     warning: "alert alert-warning",

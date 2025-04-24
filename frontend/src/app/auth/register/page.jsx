@@ -20,10 +20,10 @@ export default function Register() {
   });
 
   // Estat per mostrar alertes a l'usuari
-  const [alert, setAlert] = useState<{ type: "success" | "warning" | "error"; message: string } | null>(null);
+  const [alert, setAlert] = useState(null);
 
   // Funció per gestionar els canvis en els camps del formulari
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
 
     if (name === "phone") {
@@ -45,7 +45,7 @@ export default function Register() {
   };
 
   // Enviem les dades al backend per registrar l'usuari
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
   
     try {
@@ -75,7 +75,6 @@ export default function Register() {
       <div className="card w-[28rem] bg-base-100 shadow-xl">
         <div className="card-body">
         <h2 className="card-title text-2xl text-center">Registra&apos;t! :)</h2>
-
 
           {/* Mostrem alertes si n'hi ha */}
           {alert && <Alert type={alert.type} message={alert.message} />}

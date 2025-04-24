@@ -1,5 +1,5 @@
 // Obtenim l'històric d'una acció
-export const fetchStockData = async (symbol: string, interval: string = '5m', range: string = '1d') => {
+export const fetchStockData = async (symbol, interval = '5m', range = '1d') => {
     const url = `http://localhost:4000/api/market/${symbol}/?interval=${interval}&range=${range}`;
     const res = await fetch(url);
     if (!res.ok) {
@@ -29,4 +29,5 @@ export const fetchUserData = async () => {
   }
   const stocksData = await stocksResponse.json();
 
-  return { credit: profileData.credit, stocks: stocksData.stocks || [] }};
+  return { credit: profileData.credit, stocks: stocksData.stocks || [] };
+};

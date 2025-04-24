@@ -1,22 +1,5 @@
 import { Wallet, Zap, Info } from "lucide-react";
 
-interface BuySellPanelProps {
-  credit: number;
-  position: {
-    shares: number;
-    price: number;
-  };
-  amount: number;
-  shares: number;
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
-  handleBuy: () => void;
-  handleSell: () => void;
-  handleSellPercentage: (percentage: number) => void;
-  handleAmountChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleSharesChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}
-
 export default function BuySellPanel({
   credit,
   position,
@@ -29,7 +12,7 @@ export default function BuySellPanel({
   handleSellPercentage,
   handleAmountChange,
   handleSharesChange,
-}: BuySellPanelProps) {
+}) {
   return (
     <div className="card bg-base-100 shadow-xl">
       <div className="card-body p-4 md:p-6">

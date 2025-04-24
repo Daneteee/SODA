@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
 
-export function middleware(request: NextRequest) {
+export function middleware(request) {
   // Obtener el token desde la cookie
   const token = request.cookies.get('jwtToken')?.value;
 

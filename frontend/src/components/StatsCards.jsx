@@ -1,20 +1,6 @@
 "use client";
 
-interface StatsCardsProps {
-  portfolioValue: number;
-  gain: number;
-  gainPercent: number;
-  transactionsCount: number;
-  credit: number;
-}
-
-const StatsCards: React.FC<StatsCardsProps> = ({
-  portfolioValue,
-  gain,
-  gainPercent,
-  transactionsCount,
-  credit,
-}) => {
+const StatsCards = ({ portfolioValue, gain, gainPercent, transactionsCount, credit }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
       {/* Portfolio Value */}

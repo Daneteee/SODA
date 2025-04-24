@@ -9,7 +9,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
@@ -31,11 +31,7 @@ export default function LoginPage() {
       Cookies.set('jwtToken', data.token, { expires: 7, path: '/' });
       router.push("/dashboard/market");
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Error desconocido");
-      }
+      setError(err.message || "Error desconocido");
     }
   };
 

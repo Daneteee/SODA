@@ -3,16 +3,10 @@ import { createContext, useState, useEffect, useContext } from "react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 
-interface AuthContextType {
-  user: any;
-  login: (token: string) => void;
-  logout: () => void;
-}
+const AuthContext = createContext(null);
 
-const AuthContext = createContext<AuthContextType | null>(null);
-
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<any>(null);
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -22,7 +16,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, []);
 
-  const fetchUser = async (token: string) => {
+  const fetchUser = async (token) => {
     try {
       const res = await fetch("http://localhost:4000/api/auth/me", {
         headers: {
@@ -40,7 +34,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const login = (token: string) => {
+  const login = (token) => {
     Cookies.set("jwtToken", token, { expires: 7, path: "/" });
     fetchUser(token);
     router.push("/dashboard");

@@ -4,30 +4,13 @@ import { useState, useEffect } from "react";
 import { TrendingUp, TrendingDown, Star } from "lucide-react";
 import { getInterval, getRange } from "@/utils/chartUtils";
 
-interface StockHeaderProps {
-  stock: {
-    image?: string;
-    symbol: string;
-    company?: {
-      name: string;
-    };
-    price?: number;
-    priceChange: number;
-    previousPrice: number;
-  };
-  priceChangeColor: string;
-  activeTimeframe: string;
-  setActiveTimeframe: (period: string) => void;
-  loadStockData: (interval: string, range: string) => void;
-}
-
 export default function StockHeader({
   stock,
   priceChangeColor,
   activeTimeframe,
   setActiveTimeframe,
   loadStockData,
-}: StockHeaderProps) {
+}) {
   const [isFav, setIsFav] = useState(false);
 
   // 1) On mount, load current favs and set initial state
@@ -38,7 +21,7 @@ export default function StockHeader({
           credentials: "include",
         });
         if (!res.ok) throw new Error("Failed to fetch favorites");
-        const { favs }: { favs: string[] } = await res.json();
+        const { favs } = await res.json();
         setIsFav(favs.includes(stock.symbol));
       } catch (err) {
         console.error(err);
@@ -55,7 +38,7 @@ export default function StockHeader({
         credentials: "include",
       });
       if (!res.ok) throw new Error("Toggle failed");
-      const { favs }: { favs: string[] } = await res.json();
+      const { favs } = await res.json();
       setIsFav(favs.includes(stock.symbol));
     } catch (err) {
       console.error(err);
@@ -86,7 +69,7 @@ export default function StockHeader({
           <Star
             className={`h-6 w-6 ${
               isFav
-                ? "text-warning fill-current"     // filled yellow
+                ? "text-warning fill-current" // filled yellow
                 : "text-base-content stroke-current" // outline
             }`}
           />
@@ -111,7 +94,7 @@ export default function StockHeader({
           )}
           {Math.abs(stock.priceChange).toFixed(2)}% (
           {Math.abs(
-            parseFloat((stock.price! - stock.previousPrice).toFixed(2))
+            parseFloat((stock.price - stock.previousPrice).toFixed(2))
           )}{" "}
           €)
         </div>

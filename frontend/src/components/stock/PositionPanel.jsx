@@ -1,20 +1,6 @@
 import { TrendingUp, TrendingDown, Info } from "lucide-react";
 
-interface Position {
-  total: number;
-  performance: number;
-  performancePercent: number;
-  shares: number;
-  buyIn: number;
-  portfolio: number;
-}
-
-interface PositionPanelProps {
-  position: Position;
-  symbol: string;
-}
-
-export default function PositionPanel({ position, symbol }: PositionPanelProps) {
+export default function PositionPanel({ position, symbol }) {
   return (
     <div className="card bg-base-100 shadow-xl">
       <div className="card-body p-4 md:p-6">

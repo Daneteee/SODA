@@ -9,7 +9,6 @@ interface UseStockTransactionsProps {
 
 export function useStockTransactions({
   stock,
-  credit,
   positionShares,
   loadUserData,
 }: UseStockTransactionsProps) {
