@@ -30,8 +30,12 @@ export default function LoginPage() {
       }
       Cookies.set('jwtToken', data.token, { expires: 7, path: '/' });
       router.push("/dashboard/market");
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Error desconocido");
+      }
     }
   };
 
