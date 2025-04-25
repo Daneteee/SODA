@@ -1,15 +1,15 @@
-// src/utils/chartConfig.ts
-import { ChartOptions } from "chart.js";
+// src/utils/chartConfig.js
 
-export const getChartData = (stock: any) => {
-  const times = stock?.history?.map((item: any) =>
-    new Date(item.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-  ) || [];
-  const prices = stock?.history?.map((item: any) => item.close) || [];
+export const getChartData = (stock) => {
+  const times =
+    stock?.history?.map((item) =>
+      new Date(item.date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+    ) || [];
+  const prices = stock?.history?.map((item) => item.close) || [];
   return { times, prices };
 };
 
-export const chartOptions: ChartOptions = {
+export const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
@@ -27,7 +27,7 @@ export const chartOptions: ChartOptions = {
   elements: { line: { tension: 0.4 }, point: { radius: 0 } },
 };
 
-export const getChartConfig = (chartData: { times: string[]; prices: number[] }, stock: any) => ({
+export const getChartConfig = (chartData, stock) => ({
   labels: chartData.times,
   datasets: [
     {

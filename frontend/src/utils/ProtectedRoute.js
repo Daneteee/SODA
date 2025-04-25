@@ -11,5 +11,5 @@ export const useProtectedRoute = () => {
     if (!token) {
       router.replace("/login");
     }
-  }, [router]); 
+  }, [router]);
 };

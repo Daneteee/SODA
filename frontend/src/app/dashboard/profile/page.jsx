@@ -9,13 +9,13 @@ const EditProfilePage = () => {
     name: "",
     email: "",
     phone: "",
-    profileImage: "",
+    profileImage: ""
   });
 
   const [password, setPassword] = useState({
     current: "",
     new: "",
-    confirm: "",
+    confirm: ""
   });
 
   const [validations, setValidations] = useState({
@@ -23,7 +23,7 @@ const EditProfilePage = () => {
     letter: false,
     number: false,
     special: false,
-    match: false,
+    match: false
   });
 
   const [alert, setAlert] = useState(null);
@@ -37,18 +37,17 @@ const EditProfilePage = () => {
           method: "GET",
           credentials: "include",
         });
-
+        
         if (!profileResponse.ok) throw new Error("Error obtaining user data");
-
+        
         const profileData = await profileResponse.json();
         setUserData({
           name: profileData.name || "",
           email: profileData.email || "",
           phone: profileData.phone || "",
-          profileImage:
-            profileData.profileImage ||
-            "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
+          profileImage: profileData.profileImage || "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
         });
+        setAlert(null); 
       } catch (error) {
         console.error("Error fetching user data:", error);
         setAlert({ type: "error", message: "Error loading user profile data." });
@@ -61,11 +60,7 @@ const EditProfilePage = () => {
   // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
-    if (name === "phone" && !/^\d*$/.test(value)) {
-      return; // Only allow numbers in phone field
-    }
-
+    if (name === "phone" && !/^\d*$/.test(value)) return;
     setUserData({ ...userData, [name]: value });
   };
 
@@ -75,23 +70,21 @@ const EditProfilePage = () => {
     const newPasswordState = { ...password, [name]: value };
     setPassword(newPasswordState);
 
-    // Validate password if it's the new password field
     if (name === "new") {
       setValidations({
         length: value.length >= 8,
         letter: /[a-zA-Z]/.test(value),
         number: /\d/.test(value),
         special: /[!@#$%^&*(),.?":{}|<>]/.test(value),
-        match: value === newPasswordState.confirm,
+        match: value === newPasswordState.confirm
       });
     }
 
-    // Check if passwords match when confirm password changes
     if (name === "confirm") {
-      setValidations({
-        ...validations,
-        match: newPasswordState.new === value,
-      });
+      setValidations((v) => ({
+        ...v,
+        match: newPasswordState.new === value
+      }));
     }
   };
 
@@ -107,26 +100,20 @@ const EditProfilePage = () => {
         body: formData,
       })
         .then((res) => res.json())
-        .then((data) => {
-          console.log("Imagen actualizada:", data);
+        .then(() => {
           setShowImageAlert(true);
         })
         .catch((error) => console.error("Error al actualizar la imagen:", error));
     }
   };
 
-  // Handle profile update form submission
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
-
     try {
       setAlert({ type: "warning", message: "Actualizando perfil..." });
-
       const response = await fetch("http://localhost:4000/api/user/profile", {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
           name: userData.name,
@@ -134,7 +121,6 @@ const EditProfilePage = () => {
           phone: userData.phone,
         }),
       });
-
       if (response.ok) {
         setAlert({ type: "success", message: "Perfil actualizado correctamente" });
       } else {
@@ -147,37 +133,27 @@ const EditProfilePage = () => {
     }
   };
 
-  // Handle password update form submission
   const handlePasswordUpdate = async (e) => {
     e.preventDefault();
-
-    // Check if new password meets all criteria
     if (!validations.length || !validations.letter || !validations.number || !validations.special) {
       setAlert({ type: "error", message: "La nueva contraseña no cumple con los requisitos" });
       return;
     }
-
-    // Check if passwords match
     if (password.new !== password.confirm) {
       setAlert({ type: "error", message: "Las contraseñas no coinciden" });
       return;
     }
-
     try {
       setAlert({ type: "warning", message: "Actualizando contraseña..." });
-
       const response = await fetch("http://localhost:4000/api/user/change-password", {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
           currentPassword: password.current,
           newPassword: password.new,
         }),
       });
-
       if (response.ok) {
         setAlert({ type: "success", message: "Contraseña actualizada correctamente" });
         setPassword({ current: "", new: "", confirm: "" });
@@ -193,7 +169,203 @@ const EditProfilePage = () => {
 
   return (
     <main className="flex-1 p-6 bg-base-200">
-      {/* Aquí va el contenido del componente */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold">Editar Perfil</h1>
+        <p className="text-gray-600">
+          Actualiza tu información personal y configuraciones
+        </p>
+      </div>
+
+      {showImageAlert && (
+        <div className="alert shadow-lg mb-4 flex items-center justify-between" role="alert">
+          <div className="flex items-center gap-3">
+            <Camera className="h-6 w-6 text-info" />
+            <div>
+              <h3 className="font-bold">¡Imagen actualizada!</h3>
+              <div className="text-xs">Refresca la página para ver los cambios.</div>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <button className="btn btn-sm btn-primary" onClick={() => window.location.reload()}>
+              Refrescar
+            </button>
+            <button className="btn btn-sm" onClick={() => setShowImageAlert(false)}>
+              Cerrar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {alert && (
+        <div className="mb-4">
+          <Alert type={alert.type} message={alert.message} onClose={() => setAlert(null)} />
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Card de información */}
+        <div className="card bg-base-100 shadow-xl">
+          <div className="card-body">
+            <h2 className="card-title text-xl flex items-center gap-2">
+              <User className="h-5 w-5 text-primary" />
+              Información Personal
+            </h2>
+
+            <form onSubmit={handleProfileUpdate} className="flex flex-col gap-4 mt-4">
+              <div className="flex flex-col items-center mb-4">
+                <div className="avatar">
+                  <div className="w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                    <img
+                      src={
+                        userData.profileImage
+                          ? `http://localhost:4000${userData.profileImage}`
+                          : "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                      }
+                      alt="Profile"
+                    />
+                  </div>
+                </div>
+                <label className="btn btn-sm btn-outline mt-4 gap-2">
+                  <Camera className="h-4 w-4" />
+                  Cambiar Foto
+                  <input
+                    type="file"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleProfilePictureChange}
+                  />
+                </label>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Nombre</label>
+                <input
+                  type="text"
+                  name="name"
+                  className="input input-bordered w-full"
+                  value={userData.name}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Correo Electrónico</label>
+                <input
+                  type="email"
+                  name="email"
+                  className="input input-bordered w-full"
+                  value={userData.email}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Teléfono</label>
+                <input
+                  type="text"
+                  name="phone"
+                  className="input input-bordered w-full"
+                  value={userData.phone}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+
+              <button type="submit" className="btn btn-primary mt-4">
+                Guardar Cambios
+              </button>
+            </form>
+          </div>
+        </div>
+
+        {/* Card de contraseña */}
+        <div className="card bg-base-100 shadow-xl">
+          <div className="card-body">
+            <h2 className="card-title text-xl flex items-center gap-2">
+              <Settings className="h-5 w-5 text-primary" />
+              Cambiar Contraseña
+            </h2>
+
+            <form onSubmit={handlePasswordUpdate} className="flex flex-col gap-4 mt-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Contraseña Actual</label>
+                <input
+                  type="password"
+                  name="current"
+                  className="input input-bordered w-full"
+                  value={password.current}
+                  onChange={handlePasswordChange}
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Nueva Contraseña</label>
+                <input
+                  type="password"
+                  name="new"
+                  className="input input-bordered w-full"
+                  value={password.new}
+                  onChange={handlePasswordChange}
+                  required
+                />
+                <div className="text-xs mt-2">
+                  {[
+                    { label: "Mínimo 8 caracteres", valid: validations.length },
+                    { label: "Al menos 1 letra", valid: validations.letter },
+                    { label: "Al menos 1 número", valid: validations.number },
+                    { label: "Al menos 1 carácter especial", valid: validations.special }
+                  ].map(({ label, valid }, i) => (
+                    <div
+                      key={i}
+                      className={`flex items-center gap-1 ${
+                        valid ? "text-green-500" : "text-red-500"
+                      }`}
+                    >
+                      {valid ? (
+                        <span>✔️</span>
+                      ) : (
+                        <span>❌</span>
+                      )}
+                      {label}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Confirmar Contraseña</label>
+                <input
+                  type="password"
+                  name="confirm"
+                  className="input input-bordered w-full"
+                  value={password.confirm}
+                  onChange={handlePasswordChange}
+                  required
+                />
+                {password.confirm && (
+                  <div
+                    className={`text-xs mt-1 flex items-center gap-1 ${
+                      validations.match ? "text-green-500" : "text-red-500"
+                    }`}
+                  >
+                    {validations.match ? <span>✔️</span> : <span>❌</span>}
+                    {validations.match
+                      ? "Las contraseñas coinciden"
+                      : "Las contraseñas no coinciden"}
+                  </div>
+                )}
+              </div>
+
+              <button type="submit" className="btn btn-primary mt-4">
+                Actualizar Contraseña
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
     </main>
   );
 };

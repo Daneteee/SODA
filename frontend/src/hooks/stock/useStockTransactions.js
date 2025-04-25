@@ -1,21 +1,10 @@
 import { useState } from "react";
 
-interface UseStockTransactionsProps {
-  stock: any;
-  credit: number;
-  positionShares: number;
-  loadUserData: () => Promise<void>;
-}
-
-export function useStockTransactions({
-  stock,
-  positionShares,
-  loadUserData,
-}: UseStockTransactionsProps) {
+export function useStockTransactions({ stock, positionShares, loadUserData }) {
   const [amount, setAmount] = useState(0);
   const [shares, setShares] = useState(0);
 
-  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAmountChange = (e) => {
     const value = parseFloat(e.target.value);
     setAmount(value);
     if (stock?.price && !isNaN(value)) {
@@ -23,7 +12,7 @@ export function useStockTransactions({
     }
   };
 
-  const handleSharesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSharesChange = (e) => {
     const value = parseFloat(e.target.value);
     setShares(value);
     if (stock?.price && !isNaN(value)) {
@@ -89,7 +78,7 @@ export function useStockTransactions({
     }
   };
 
-  const handleSellPercentage = (percent: number) => {
+  const handleSellPercentage = (percent) => {
     if (positionShares) {
       const sellShares = positionShares * percent;
       setShares(sellShares);

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
-export function useNewsData(symbol: string, newsOpen: boolean) {
-  const [newsItems, setNewsItems] = useState<any[]>([]);
+export function useNewsData(symbol, newsOpen) {
+  const [newsItems, setNewsItems] = useState([]);
   const [newsLoading, setNewsLoading] = useState(false);
 
   const loadNewsData = async () => {

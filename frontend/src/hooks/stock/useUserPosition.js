@@ -1,17 +1,7 @@
 import { useState, useEffect } from "react";
 
-interface Position {
-  total: number;
-  performance: number;
-  performancePercent: number;
-  shares: number;
-  buyIn: number;
-  portfolio: number;
-  price: number; // Agregar la propiedad 'price'
-}
-
-export function useUserPosition(stock: any, userStocks: any[], symbol: string) {
-  const [position, setPosition] = useState<Position>({
+export function useUserPosition(stock, userStocks, symbol) {
+  const [position, setPosition] = useState({
     total: 0,
     performance: 0,
     performancePercent: 0,

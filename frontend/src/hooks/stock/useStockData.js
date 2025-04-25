@@ -2,21 +2,21 @@ import { useState, useEffect } from "react";
 import { fetchStockData, fetchUserData } from "@/api/stockApi";
 import { useWebSocket } from "@/context/WebSocketProvider";
 
-export function useStockData(symbol: string) {
+export function useStockData(symbol) {
   const { stockData } = useWebSocket(); // Obtén los datos del WebSocket
-  const [stock, setStock] = useState<any | null>(null); // Estado para los datos de la acción
+  const [stock, setStock] = useState(null); // Estado para los datos de la acción
   const [loading, setLoading] = useState(true); // Estado de carga
-  const [userStocks, setUserStocks] = useState<any[]>([]); // Estado para las acciones del usuario
+  const [userStocks, setUserStocks] = useState([]); // Estado para las acciones del usuario
   const [credit, setCredit] = useState(0); // Estado para el crédito del usuario
   const [dataLoaded, setDataLoaded] = useState({ stock: false, user: false }); // Estado para sincronizar la carga
 
   // Función para cargar los datos históricos de la acción
-  const loadStockData = async (interval: string = "5m", range: string = "1d") => {
+  const loadStockData = async (interval = "5m", range = "1d") => {
     try {
       const historyData = await fetchStockData(symbol, interval, range);
       const previousPrice = historyData[0]?.close || 0; // Obtiene el primer precio de cierre
 
-      setStock((prev: any) => ({
+      setStock((prev) => ({
         ...prev,
         history: historyData,
         previousPrice: previousPrice,
@@ -53,9 +53,9 @@ export function useStockData(symbol: string) {
   useEffect(() => {
     if (!symbol || !stockData) return;
 
-    const realtimeTrade = stockData.find((t: any) => t.symbol === symbol);
+    const realtimeTrade = stockData.find((t) => t.symbol === symbol);
     if (realtimeTrade) {
-      setStock((prevStock: any) => ({
+      setStock((prevStock) => ({
         ...prevStock,
         symbol: realtimeTrade.symbol,
         price: realtimeTrade.price,
