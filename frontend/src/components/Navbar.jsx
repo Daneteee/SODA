@@ -70,7 +70,7 @@ export default function Navbar() {
         </Link>
       </li>
       <li>
-        <Link href="/portfolio">
+        <Link href="/dashboard/portfolio">
           <div className="flex items-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -169,7 +169,7 @@ export default function Navbar() {
             <Link href="/dashboard/market">Perfil</Link>
           </li>
           <li>
-            <Link href="/user/profile">Configuración</Link>
+            <Link href="/dashboard/profile">Configuración</Link>
           </li>
           <li>
             <button onClick={handleLogout}>Cerrar sesión</button>

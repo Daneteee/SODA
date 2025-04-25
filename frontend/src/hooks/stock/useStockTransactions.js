@@ -13,10 +13,12 @@ export function useStockTransactions({ stock, positionShares, loadUserData }) {
   };
 
   const handleSharesChange = (e) => {
-    const value = parseFloat(e.target.value);
-    setShares(value);
-    if (stock?.price && !isNaN(value)) {
-      setAmount(value * stock.price);
+    const value = e.target.value;
+    setShares(value === '' ? 0 : parseFloat(value));
+    if (stock?.price && value !== '') {
+      setAmount(parseFloat(value) * stock.price);
+    } else {
+      setAmount(0);
     }
   };
 

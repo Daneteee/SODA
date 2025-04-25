@@ -6,9 +6,9 @@ export default function Footer() {
           © {new Date().getFullYear()} SODA Inc. Todos los derechos reservados.
         </p>
         <div className="flex gap-4 mt-2">
-          <a href="#" className="link link-hover">Términos</a>
-          <a href="#" className="link link-hover">Privacidad</a>
-          <a href="#" className="link link-hover">Contacto</a>
+          <a href="/terms" className="link link-hover">Términos</a>
+          <a href="/privacy" className="link link-hover">Privacidad</a>
+          <a href="/contact" className="link link-hover">Contacto</a>
         </div>
       </div>
     </footer>

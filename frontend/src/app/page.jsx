@@ -1,6 +1,7 @@
 "use client";
 
 import Footer from "@/components/Footer";
+import Link from "next/link"
 import { Users, Newspaper, TrendingUp } from "lucide-react";
 
 export default function Home() {
@@ -81,7 +82,9 @@ export default function Home() {
               puedas hacer crecer tu dinero más rápido que nunca.
             </p>
             <div className="flex gap-4 justify-center mt-8">
-              <button className="btn btn-primary btn-lg">Comenzar ahora →</button>
+              <Link href="/dashboard/market" className="btn btn-primary btn-lg">
+                Comenzar ahora →
+              </Link>
               <button className="btn btn-neutral btn-lg">Cómo funciona</button>
             </div>
           </div>
