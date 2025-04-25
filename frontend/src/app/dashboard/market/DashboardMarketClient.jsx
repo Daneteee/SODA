@@ -1,55 +1,118 @@
-"use client";
+"use client"
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-import { Search, TrendingUp, TrendingDown, Activity } from "lucide-react";
-import { useWebSocket } from "@/context/WebSocketProvider";
-import StatsCards from "@/components/StatsCards";
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import Image from "next/image"
+import { Search, TrendingUp, TrendingDown, Activity, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
+import { useWebSocket } from "@/context/WebSocketProvider"
+import StatsCards from "@/components/StatsCards"
 
 const DashboardMarketClient = ({ initialApiStocks, initialCredit, initialUserStocks }) => {
-  const { connected, stockData: wsStockData } = useWebSocket();
-  const router = useRouter();
+  const { connected, stockData: wsStockData } = useWebSocket()
+  const router = useRouter()
 
   // Estados locales
-  const [apiStocks] = useState(initialApiStocks);
-  const [credit] = useState(initialCredit);
-  const [userStocks] = useState(initialUserStocks);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [apiStocks] = useState(initialApiStocks)
+  const [credit] = useState(initialCredit)
+  const [userStocks] = useState(initialUserStocks)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [transactions, setTransactions] = useState([])
+  const [transactionsCount, setTransactionsCount] = useState(0)
+  const [loadingTransactions, setLoadingTransactions] = useState(true)
+  const [sortField, setSortField] = useState(null);
+  const [sortDirection, setSortDirection] = useState('asc');
+  
+  // Fetch transactions
+  useEffect(() => {
+    async function fetchTransactions() {
+      try {
+        const response = await fetch("http://localhost:4000/api/transactions", {
+          credentials: "include",
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          setTransactions(data.transactions.slice(0, 5)) 
+          setTransactionsCount(data.transactions.length)
+          setLoadingTransactions(false)
+        }
+      } catch (error) {
+        console.error("Error fetching transactions:", error)
+        setLoadingTransactions(false)
+      }
+    }
+
+    fetchTransactions()
+  }, [])
 
   // Combinar con datos WS
   const mergedStocks = apiStocks.map((stock) => {
-    const wsStock = wsStockData.find((s) => s.symbol === stock.symbol);
+    const wsStock = wsStockData.find((s) => s.symbol === stock.symbol)
     return {
       ...stock,
       price: wsStock?.price ?? stock.firstPriceToday,
-    };
-  });
+    }
+  })
 
   const getRealtimePrice = (symbol) => {
-    const ws = wsStockData.find((s) => s.symbol === symbol);
-    return ws?.price ?? 0;
+    const ws = wsStockData.find((s) => s.symbol === symbol)
+    return ws?.price ?? 0
+  }
+
+  // Añade esta función después de renderStockLogo
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
   };
 
-  // Filtrar
-  const filteredStocks = mergedStocks.filter(
+  const filteredStocks = mergedStocks
+  .filter(
     (stock) =>
       stock.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (stock.name && stock.name.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+      (stock.name && stock.name.toLowerCase().includes(searchTerm.toLowerCase())),
+  )
+  .sort((a, b) => {
+    if (!sortField) return 0;
+    
+    let aValue, bValue;
+    
+    switch (sortField) {
+      case 'name':
+        aValue = (a.name || a.symbol).toLowerCase();
+        bValue = (b.name || b.symbol).toLowerCase();
+        break;
+      case 'price':
+        aValue = a.price || 0;
+        bValue = b.price || 0;
+        break;
+      case 'change':
+        aValue = ((a.price - a.firstPriceToday) / a.firstPriceToday) * 100 || 0;
+        bValue = ((b.price - b.firstPriceToday) / b.firstPriceToday) * 100 || 0;
+        break;
+      default:
+        return 0;
+    }
+
+    if (sortDirection === 'asc') {
+      return aValue > bValue ? 1 : -1;
+    } else {
+      return aValue < bValue ? 1 : -1;
+    }
+  });
 
   // Cálculos de usuario
   const totalStockValue = userStocks.reduce((acc, stk) => {
-    const price = getRealtimePrice(stk.symbol) || stk.purchasePrice;
-    return acc + price * stk.quantity;
-  }, 0);
-  const totalInitialValue = userStocks.reduce(
-    (acc, stk) => acc + stk.purchasePrice * stk.quantity,
-    0
-  );
-  const gain = totalStockValue - totalInitialValue;
-  const gainPercent = totalInitialValue > 0 ? (gain / totalInitialValue) * 100 : 0;
-  const portfolioValue = credit + totalStockValue;
+    const price = getRealtimePrice(stk.symbol) || stk.purchasePrice
+    return acc + price * stk.quantity
+  }, 0)
+  const totalInitialValue = userStocks.reduce((acc, stk) => acc + stk.purchasePrice * stk.quantity, 0)
+  const gain = totalStockValue - totalInitialValue
+  const gainPercent = totalInitialValue > 0 ? (gain / totalInitialValue) * 100 : 0
+  const portfolioValue = credit + totalStockValue
 
   // Render del logo
   const renderStockLogo = (stock) => {
@@ -58,20 +121,20 @@ const DashboardMarketClient = ({ initialApiStocks, initialCredit, initialUserSto
         <div className="avatar">
           <div className="w-8 h-8 rounded-full overflow-hidden">
             <Image
-              src={stock.logo}
+              src={stock.logo || "/placeholder.svg"}
               alt={`${stock.symbol} logo`}
               width={32}
               height={32}
               className="object-cover"
               onError={(e) => {
-                const t = e.target;
-                t.style.display = "none";
-                t.onerror = null;
+                const t = e.target
+                t.style.display = "none"
+                t.onerror = null
               }}
             />
           </div>
         </div>
-      );
+      )
     }
     return (
       <div className="avatar placeholder">
@@ -79,8 +142,8 @@ const DashboardMarketClient = ({ initialApiStocks, initialCredit, initialUserSto
           <span>{stock.symbol.substring(0, 2)}</span>
         </div>
       </div>
-    );
-  };
+    )
+  }
 
   return (
     <main className="flex-1 p-6 bg-base-200">
@@ -88,10 +151,11 @@ const DashboardMarketClient = ({ initialApiStocks, initialCredit, initialUserSto
         portfolioValue={portfolioValue}
         gain={gain}
         gainPercent={gainPercent}
-        transactionsCount={0 /* ya lo muestra el server */}
+        transactionsCount={transactionsCount}
         credit={credit}
       />
 
+      {/* Market Section */}
       <div className="card bg-base-100 shadow-xl">
         <div className="card-body">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
@@ -130,20 +194,56 @@ const DashboardMarketClient = ({ initialApiStocks, initialCredit, initialUserSto
           ) : (
             <div className="overflow-y-auto max-h-[450px]">
               <table className="table table-zebra w-full">
-                <thead>
-                  <tr className="bg-base-200">
-                    <th>Activo</th>
-                    <th>Precio Actual</th>
-                    <th>Cambio</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
+              <thead>
+                <tr className="bg-base-200">
+                  <th 
+                    onClick={() => handleSort('name')}
+                    className="cursor-pointer hover:bg-base-300"
+                  >
+                    <div className="flex items-center gap-2">
+                      Activo
+                      {sortField === 'name' ? (
+                        sortDirection === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />
+                      ) : (
+                        <ArrowUpDown className="h-4 w-4 opacity-50" />
+                      )}
+                    </div>
+                  </th>
+                  <th 
+                    onClick={() => handleSort('price')}
+                    className="cursor-pointer hover:bg-base-300"
+                  >
+                    <div className="flex items-center gap-2">
+                      Precio Actual
+                      {sortField === 'price' ? (
+                        sortDirection === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />
+                      ) : (
+                        <ArrowUpDown className="h-4 w-4 opacity-50" />
+                      )}
+                    </div>
+                  </th>
+                  <th 
+                    onClick={() => handleSort('change')}
+                    className="cursor-pointer hover:bg-base-300"
+                  >
+                    <div className="flex items-center gap-2">
+                      Cambio
+                      {sortField === 'change' ? (
+                        sortDirection === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />
+                      ) : (
+                        <ArrowUpDown className="h-4 w-4 opacity-50" />
+                      )}
+                    </div>
+                  </th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
                 <tbody>
                   {filteredStocks.map((stock) => {
                     const change = stock.firstPriceToday
                       ? ((stock.price - stock.firstPriceToday) / stock.firstPriceToday) * 100
-                      : 0;
-                    const isPositive = change >= 0;
+                      : 0
+                    const isPositive = change >= 0
 
                     return (
                       <tr
@@ -151,9 +251,9 @@ const DashboardMarketClient = ({ initialApiStocks, initialCredit, initialUserSto
                         className="hover:bg-base-200 transition-colors duration-200 cursor-pointer"
                         onClick={() => {
                           if (typeof window !== "undefined") {
-                            sessionStorage.setItem("selectedStock", JSON.stringify(stock));
+                            sessionStorage.setItem("selectedStock", JSON.stringify(stock))
                           }
-                          router.push(`/dashboard/market/${stock.symbol}`);
+                          router.push(`/dashboard/market/${stock.symbol}`)
                         }}
                       >
                         <td>
@@ -165,9 +265,7 @@ const DashboardMarketClient = ({ initialApiStocks, initialCredit, initialUserSto
                             </div>
                           </div>
                         </td>
-                        <td className="font-mono font-bold">
-                          {stock.price !== undefined ? `$${stock.price}` : "N/A"}
-                        </td>
+                        <td className="font-mono font-bold">{stock.price !== undefined ? `$${stock.price}` : "N/A"}</td>
                         <td>
                           <div
                             className={`flex items-center gap-1 font-bold ${
@@ -183,7 +281,7 @@ const DashboardMarketClient = ({ initialApiStocks, initialCredit, initialUserSto
                           <button className="btn btn-sm btn-error text-white">Vender</button>
                         </td>
                       </tr>
-                    );
+                    )
                   })}
                 </tbody>
               </table>
@@ -192,7 +290,7 @@ const DashboardMarketClient = ({ initialApiStocks, initialCredit, initialUserSto
         </div>
       </div>
     </main>
-  );
-};
+  )
+}
 
-export default DashboardMarketClient;
+export default DashboardMarketClient

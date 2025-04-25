@@ -64,8 +64,14 @@ export default function BuySellPanel({
             <input
               type="text"
               className="input input-bordered w-full text-right"
-              value={shares}
-              onChange={handleSharesChange}
+              value={shares || ''} // Cambiamos esto para mostrar string vacío si es 0 o NaN
+              onChange={(e) => {
+                // Solo permitimos números y punto decimal
+                const value = e.target.value;
+                if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                  handleSharesChange(e);
+                }
+              }}
               min="0"
             />
           </div>
