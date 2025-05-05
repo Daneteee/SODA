@@ -12,6 +12,7 @@ const authRoutes = require('./src/routes/authRoutes');
 const marketRoutes = require('./src/routes/marketRoutes');
 const transactionRoutes = require('./src/routes/transactionRoutes');
 const favoriteRoutes = require('./src/routes/favoriteRoutes');
+const chatRoutes = require('./src/routes/chatRoutes');
 
 // Importar WebSocket
 const { initializeWebSocket } = require('./src/controllers/stock/stock');
@@ -35,6 +36,7 @@ app.use('/api/user', userRoutes);
 app.use('/api/market', marketRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/favorites', favoriteRoutes);
+app.use('/api/chats', chatRoutes);
 
 // Archivos estáticos
 app.use(express.static('public'));

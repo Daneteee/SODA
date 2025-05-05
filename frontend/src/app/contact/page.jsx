@@ -186,8 +186,8 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <h3 className="font-bold">Email</h3>
-                      <p className="text-base-content/80">info@archivador.com</p>
-                      <p className="text-base-content/80">soporte@archivador.com</p>
+                      <p className="text-base-content/80">dan.maldonado.2132@lacetania.cat</p>
+                      <p className="text-base-content/80">samuel.hernan.2195@lacetania.cat</p>
                     </div>
                   </div>
 
@@ -208,8 +208,8 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <h3 className="font-bold">Dirección</h3>
-                      <p className="text-base-content/80">Calle Gran Vía, 28</p>
-                      <p className="text-base-content/80">28013 Madrid, España</p>
+                      <p className="text-base-content/80">C\ Ubuntu, 404</p>
+                      <p className="text-base-content/80">28013 Manresa, España</p>
                     </div>
                   </div>
                 </div>
@@ -217,22 +217,18 @@ export default function ContactPage() {
             </div>
 
             {/* Map */}
-            <div className="card bg-base-100 shadow-xl overflow-hidden">
-              <div className="h-64 w-full relative">
-                <Image
-                  src="/placeholder.svg?height=400&width=600"
-                  alt="Mapa de ubicación"
-                  fill
-                  className="object-cover"
-                />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="bg-base-100 p-4 rounded-lg shadow-lg">
-                    <p className="font-bold">Mapa interactivo</p>
-                    <p className="text-sm text-base-content/70">Aquí iría un mapa real de Google Maps o similar</p>
-                  </div>
-                </div>
-              </div>
+            <div className="h-64 w-full relative">
+              <iframe
+                src="https://maps.google.com/maps?width=100%25&amp;height=600&amp;hl=es&amp;q=Lacetania+(Mi%20nombre%20de%20negocios)&amp;t=&amp;z=14&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
             </div>
+
 
             {/* Social Media */}
             <div className="card bg-base-100 shadow-xl">
