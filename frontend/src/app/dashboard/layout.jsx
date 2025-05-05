@@ -2,6 +2,7 @@
 
 import React from "react";
 import DrawerSide from "@/components/DrawerSide";
+import Chat from "@/components/ChatWidget";
 
 export default function DashboardLayout({ children }) {
   return (
@@ -11,6 +12,7 @@ export default function DashboardLayout({ children }) {
         {children}
       </div>
       <DrawerSide />
+      <Chat />
     </div>
   );
 }
