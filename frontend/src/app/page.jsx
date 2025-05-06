@@ -3,7 +3,7 @@
 import Footer from "@/components/Footer";
 import Link from "next/link"
 import { Users, Newspaper, TrendingUp } from "lucide-react";
-
+import CookieConsent from "@/components/CookiesConsent";
 export default function Home() {
   const features = [
     {
@@ -178,7 +178,8 @@ export default function Home() {
           </div>
         </div>
       </section>
-
+      {/* Cookie Consent */}
+      <CookieConsent />
       <Footer />
 
       {/* Bubble Animation Styles */}
