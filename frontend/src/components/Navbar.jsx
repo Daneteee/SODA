@@ -51,7 +51,7 @@ export default function Navbar() {
 
   // Common navigation items
   const navigationItems = (
-    <ul tabIndex={0} className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
+    <ul tabIndex={0} className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[100] mt-3 w-52 p-2 shadow">
       <li>
         <Link href="/">
           <div className="flex items-center">
@@ -188,7 +188,7 @@ export default function Navbar() {
             />
           </div>
         </div>
-        <ul tabIndex={0} className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+        <ul tabIndex={0} className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[100] w-52 p-2 shadow">
           <li>
             <Link href="/dashboard/market">Perfil</Link>
           </li>
@@ -223,13 +223,10 @@ export default function Navbar() {
     </div>
   )
 
-  // Determinar si estamos en la página principal o de autenticación
-  const isMainPage = pathname === "/" || pathname === "/auth/login" || pathname === "/auth/register"
-
-  // Determinar si estamos en la página de cookies
+  const pagesWithFloatingNavbar = ["/", "/auth/login", "/auth/register", "/cookies", "/privacy", "/terms", "/contact"]
   const isCookiesPage = pathname === "/cookies"
 
-  if (isMainPage || isCookiesPage) {
+  if (pagesWithFloatingNavbar.includes(pathname)) {
     return (
       <div
         className={`fixed top-4 left-1/2 z-50 w-[90%] max-w-6xl -translate-x-1/2 rounded-2xl bg-opacity-40 backdrop-blur-md shadow-lg bg-base-100 ${isCookiesPage ? "bg-opacity-80" : ""}`}

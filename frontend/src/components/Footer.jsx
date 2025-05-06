@@ -8,6 +8,7 @@ export default function Footer() {
         <div className="flex gap-4 mt-2">
           <a href="/terms" className="link link-hover">Términos</a>
           <a href="/privacy" className="link link-hover">Privacidad</a>
+          <a href="/cookies" className="link link-hover">Cookies</a>
           <a href="/contact" className="link link-hover">Contacto</a>
         </div>
       </div>

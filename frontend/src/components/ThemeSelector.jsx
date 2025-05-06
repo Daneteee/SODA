@@ -50,7 +50,7 @@ export default function ThemeToggle() {
         <Paintbrush className="w-5 h-5" />
       </button>
       {isOpen && (
-        <ul className="absolute right-0 mt-2 bg-base-300 rounded-box z-[1] w-52 p-2 shadow-2xl">
+        <ul className="absolute right-0 mt-2 bg-base-100 rounded-box z-[100] w-52 p-2 shadow-2xl ">
           {[
             { label: "Default", value: "default" },
             { label: "Light", value: "winter" },
