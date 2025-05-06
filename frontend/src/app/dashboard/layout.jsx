@@ -9,7 +9,9 @@ export default function DashboardLayout({ children }) {
     <div className="drawer lg:drawer-open h-full">
       <input id="dashboard-drawer" type="checkbox" className="drawer-toggle" />
       <div className="drawer-content bg-base-200 h-full">
-        {children}
+        <div className="pb-16 md:pb-0">
+          {children}
+        </div>
       </div>
       <DrawerSide />
       <Chat />
