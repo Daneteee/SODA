@@ -152,7 +152,7 @@ export default function Navbar() {
           </div>
         </button>
       </div>
-      <div className="dropdown dropdown-end">
+      <div className="dropdown dropdown-end hidden md:block">
         <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
           <div className="w-10 rounded-full">
             {userData?.profileImage ? (
@@ -196,36 +196,36 @@ export default function Navbar() {
 
   // Mobile menu items
   const mobileMenuItems = (
-    <ul tabIndex={0} className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[9999] mt-3 w-52 p-2 shadow">
-      {isAuthenticated ? (
-        <>
-          <li>
-            <Link href="/dashboard/market">Perfil</Link>
-          </li>
-          <li>
-            <Link href="/dashboard/profile">Configuración</Link>
-          </li>
-          <li>
-            <button onClick={handleLogout}>Cerrar sesión</button>
-          </li>
-        </>
-      ) : (
-        <>
-          <li>
-            <Link href="/auth/login">Iniciar sesión</Link>
-          </li>
-          <li>
-            <Link href="/auth/register">Registrarse</Link>
-          </li>
-        </>
-      )}
-      <li className="mt-4">
-        <div className="divider my-2"></div>
-        <div className="flex justify-center">
-          <ThemeSelector />
-        </div>
-      </li>
-    </ul>
+    <div className="dropdown-content bg-base-100 rounded-box z-[9999] mt-3 w-52 p-2 shadow">
+      <ul tabIndex={0} className="menu menu-sm">
+        {isAuthenticated ? (
+          <>
+            <li>
+              <Link href="/dashboard/market">Perfil</Link>
+            </li>
+            <li>
+              <Link href="/dashboard/profile">Configuración</Link>
+            </li>
+            <li>
+              <button onClick={handleLogout}>Cerrar sesión</button>
+            </li>
+          </>
+        ) : (
+          <>
+            <li>
+              <Link href="/auth/login">Iniciar sesión</Link>
+            </li>
+            <li>
+              <Link href="/auth/register">Registrarse</Link>
+            </li>
+          </>
+        )}
+      </ul>
+      <div className="divider my-2"></div>
+      <div className="flex justify-center p-2">
+        <ThemeSelector />
+      </div>
+    </div>
   )
 
   const floatingNavbarPages = [
@@ -272,7 +272,9 @@ export default function Navbar() {
           </div>
 
           <div className="navbar-end">
-            <ThemeSelector />
+            <div className="hidden md:block">
+              <ThemeSelector />
+            </div>
             {isAuthenticated ? authenticatedControls : unauthenticatedControls}
             <div className="dropdown dropdown-end md:hidden">
               <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
@@ -390,36 +392,20 @@ export default function Navbar() {
             {unauthenticatedControls}
             <div className="dropdown dropdown-end md:hidden">
               <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
-                {isAuthenticated ? (
-                  <div className="w-10 h-10 rounded-full overflow-hidden">
-                    {userData?.profileImage ? (
-                      <img
-                        src={`http://localhost:4000${userData.profileImage}`}
-                        alt="Profile"
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span className="flex items-center justify-center w-full h-full bg-neutral text-neutral-content">
-                        ?
-                      </span>
-                    )}
-                  </div>
-                ) : (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M4 6h16M4 12h16M4 18h16"
-                    />
-                  </svg>
-                )}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                </svg>
               </div>
               {mobileMenuItems}
             </div>
