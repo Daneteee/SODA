@@ -7,8 +7,9 @@ import ThemeSelector from "@/components/ThemeSelector"
 
 export default function Navbar() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const [userData, setUserData] = useState({
-    profileImage: null,
+    profileImage: "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
   })
   const router = useRouter()
   const pathname = usePathname()
@@ -17,6 +18,7 @@ export default function Navbar() {
   useEffect(() => {
     const token = document.cookie.split("; ").find((row) => row.startsWith("jwtToken="))
     setIsAuthenticated(!!token)
+    setIsLoading(false)
 
     if (token) {
       const fetchUserData = async () => {
@@ -28,10 +30,13 @@ export default function Navbar() {
           if (!profileResponse.ok) throw new Error("Error obtaining user data")
           const profileData = await profileResponse.json()
           setUserData({
-            profileImage: profileData.profileImage || null,
+            profileImage:
+              profileData.profileImage || "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
           })
         } catch (error) {
           console.error("Error fetching user data:", error)
+        } finally {
+          setIsLoading(false)
         }
       }
       fetchUserData()
@@ -46,7 +51,7 @@ export default function Navbar() {
 
   // Common navigation items
   const navigationItems = (
-    <ul tabIndex={0} className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[9999] mt-3 w-52 p-2 shadow">
+    <ul tabIndex={0} className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
       <li>
         <Link href="/">
           <div className="flex items-center">
@@ -110,31 +115,9 @@ export default function Navbar() {
           </div>
         </Link>
       </li>
-    </ul>
-  )
-
-  // Common authenticated user controls
-  const authenticatedControls = (
-    <>
-      <div className="hidden md:flex items-center gap-2">
-        <button className="btn btn-ghost btn-circle">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
-        </button>
-        <button className="btn btn-ghost btn-circle">
-          <div className="indicator">
+      <li>
+        <Link href="/cookies">
+          <div className="flex items-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5"
@@ -146,28 +129,66 @@ export default function Navbar() {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth="2"
-                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
               />
             </svg>
+            Política de Cookies
           </div>
-        </button>
-      </div>
-      <div className="dropdown dropdown-end hidden md:block">
+        </Link>
+      </li>
+    </ul>
+  )
+
+  // Common authenticated user controls
+  const authenticatedControls = (
+    <>
+      <button className="btn btn-ghost btn-circle">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+          />
+        </svg>
+      </button>
+      <button className="btn btn-ghost btn-circle">
+        <div className="indicator">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+            />
+          </svg>
+        </div>
+      </button>
+      <div className="dropdown dropdown-end">
         <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
           <div className="w-10 rounded-full">
-            {userData?.profileImage ? (
-              <img
-                src={`http://localhost:4000${userData.profileImage}`}
-                alt="Profile"
-              />
-            ) : (
-              <span className="flex items-center justify-center w-full h-full bg-neutral text-neutral-content">
-                ?
-              </span>
-            )}
+            <img
+              src={
+                `http://localhost:4000${userData.profileImage || "/placeholder.svg"}` ||
+                "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+              }
+              alt="Profile"
+            />
           </div>
         </div>
-        <ul tabIndex={0} className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[9999] w-52 p-2 shadow">
+        <ul tabIndex={0} className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
           <li>
             <Link href="/dashboard/market">Perfil</Link>
           </li>
@@ -184,7 +205,7 @@ export default function Navbar() {
 
   // Common unauthenticated controls
   const unauthenticatedControls = (
-    <div className="hidden md:flex gap-x-4">
+    <div className="flex gap-x-4">
       <Link href="/auth/login" className="btn btn-neutral">
         Iniciar sesión
       </Link>
@@ -194,53 +215,25 @@ export default function Navbar() {
     </div>
   )
 
-  // Mobile menu items
-  const mobileMenuItems = (
-    <div className="dropdown-content bg-base-100 rounded-box z-[9999] mt-3 w-52 p-2 shadow">
-      <ul tabIndex={0} className="menu menu-sm">
-        {isAuthenticated ? (
-          <>
-            <li>
-              <Link href="/dashboard/market">Perfil</Link>
-            </li>
-            <li>
-              <Link href="/dashboard/profile">Configuración</Link>
-            </li>
-            <li>
-              <button onClick={handleLogout}>Cerrar sesión</button>
-            </li>
-          </>
-        ) : (
-          <>
-            <li>
-              <Link href="/auth/login">Iniciar sesión</Link>
-            </li>
-            <li>
-              <Link href="/auth/register">Registrarse</Link>
-            </li>
-          </>
-        )}
-      </ul>
-      <div className="divider my-2"></div>
-      <div className="flex justify-center p-2">
-        <ThemeSelector />
-      </div>
+  // Mostrar un esqueleto de carga mientras se verifica la autenticación
+  const loadingControls = (
+    <div className="flex items-center gap-4">
+      <div className="skeleton h-10 w-32"></div>
+      <div className="skeleton h-11 w-11 shrink-0 rounded-full"></div>
     </div>
   )
 
-  const floatingNavbarPages = [
-    "/",
-    "/auth/login",
-    "/auth/register",
-    "/cookies",
-    "/terms",
-    "/privacy",
-    "/contact",
-  ];
+  // Determinar si estamos en la página principal o de autenticación
+  const isMainPage = pathname === "/" || pathname === "/auth/login" || pathname === "/auth/register"
 
-  if (floatingNavbarPages.includes(pathname)) {
+  // Determinar si estamos en la página de cookies
+  const isCookiesPage = pathname === "/cookies"
+
+  if (isMainPage || isCookiesPage) {
     return (
-      <div className="fixed top-4 left-1/2 z-50 w-[90%] max-w-6xl -translate-x-1/2 rounded-2xl bg-opacity-40 backdrop-blur-md shadow-lg bg-base-100">
+      <div
+        className={`fixed top-4 left-1/2 z-50 w-[90%] max-w-6xl -translate-x-1/2 rounded-2xl bg-opacity-40 backdrop-blur-md shadow-lg bg-base-100 ${isCookiesPage ? "bg-opacity-80" : ""}`}
+      >
         <div className="navbar">
           <div className="navbar-start">
             <div className="dropdown">
@@ -272,45 +265,8 @@ export default function Navbar() {
           </div>
 
           <div className="navbar-end">
-            <div className="hidden md:block">
-              <ThemeSelector />
-            </div>
-            {isAuthenticated ? authenticatedControls : unauthenticatedControls}
-            <div className="dropdown dropdown-end md:hidden">
-              <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
-                {isAuthenticated ? (
-                  <div className="w-10 h-10 rounded-full overflow-hidden">
-                    {userData?.profileImage ? (
-                      <img
-                        src={`http://localhost:4000${userData.profileImage}`}
-                        alt="Profile"
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span className="flex items-center justify-center w-full h-full bg-neutral text-neutral-content">
-                        ?
-                      </span>
-                    )}
-                  </div>
-                ) : (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M4 6h16M4 12h16M4 18h16"
-                    />
-                  </svg>
-                )}
-              </div>
-              {mobileMenuItems}
-            </div>
+            <ThemeSelector />
+            {isLoading ? loadingControls : isAuthenticated ? authenticatedControls : unauthenticatedControls}
           </div>
         </div>
       </div>
@@ -343,74 +299,8 @@ export default function Navbar() {
       </div>
 
       <div className="navbar-end">
-        <div className="hidden md:block">
-          <ThemeSelector />
-        </div>
-        {isAuthenticated ? (
-          <>
-            <div className="hidden md:flex items-center gap-2">
-              {authenticatedControls}
-            </div>
-            <div className="dropdown dropdown-end md:hidden">
-              <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
-                {isAuthenticated ? (
-                  <div className="w-10 h-10 rounded-full overflow-hidden">
-                    {userData?.profileImage ? (
-                      <img
-                        src={`http://localhost:4000${userData.profileImage}`}
-                        alt="Profile"
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span className="flex items-center justify-center w-full h-full bg-neutral text-neutral-content">
-                        ?
-                      </span>
-                    )}
-                  </div>
-                ) : (
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M4 6h16M4 12h16M4 18h16"
-                    />
-                  </svg>
-                )}
-              </div>
-              {mobileMenuItems}
-            </div>
-          </>
-        ) : (
-          <>
-            {unauthenticatedControls}
-            <div className="dropdown dropdown-end md:hidden">
-              <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                </svg>
-              </div>
-              {mobileMenuItems}
-            </div>
-          </>
-        )}
+        <ThemeSelector />
+        {isLoading ? loadingControls : isAuthenticated ? authenticatedControls : unauthenticatedControls}
       </div>
     </div>
   )

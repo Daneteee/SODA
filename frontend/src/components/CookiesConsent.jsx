@@ -58,16 +58,15 @@ const CookieConsent = () => {
                 Este sitio utiliza cookies para mejorar tu experiencia, personalizar contenido y analizar el tráfico. Al
                 hacer clic en "Aceptar", consientes el uso de todas las cookies.
               </p>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-3 mt-4 md:mt-0">
-              <Link href="/cookies" className="btn btn-outline btn-sm sm:btn-md gap-2">
-                <Info className="w-4 h-4" />
-                Más información
-              </Link>
-              <button onClick={acceptCookies} className="btn btn-primary btn-sm sm:btn-md">
-                Aceptar cookies
-              </button>
+              <div className="flex flex-col items-center sm:flex-row sm:justify-center gap-2 mt-4">
+                <Link href="/cookies" className="btn btn-outline btn-sm px-6 gap-2">
+                  <Info className="w-4 h-4" />
+                  Más información
+                </Link>
+                <button onClick={acceptCookies} className="btn btn-primary btn-sm px-6">
+                  Aceptar cookies
+                </button>
+              </div>
             </div>
 
             <button
@@ -75,7 +74,7 @@ const CookieConsent = () => {
               className="absolute top-2 right-2 btn btn-ghost btn-circle btn-sm"
               aria-label="Cerrar"
             >
-            
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>
