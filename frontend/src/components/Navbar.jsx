@@ -8,7 +8,7 @@ import ThemeSelector from "@/components/ThemeSelector"
 export default function Navbar() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [userData, setUserData] = useState({
-    profileImage: "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
+    profileImage: null,
   })
   const router = useRouter()
   const pathname = usePathname()
@@ -28,8 +28,7 @@ export default function Navbar() {
           if (!profileResponse.ok) throw new Error("Error obtaining user data")
           const profileData = await profileResponse.json()
           setUserData({
-            profileImage:
-              profileData.profileImage || "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
+            profileImage: profileData.profileImage || null,
           })
         } catch (error) {
           console.error("Error fetching user data:", error)
@@ -47,7 +46,7 @@ export default function Navbar() {
 
   // Common navigation items
   const navigationItems = (
-    <ul tabIndex={0} className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
+    <ul tabIndex={0} className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[9999] mt-3 w-52 p-2 shadow">
       <li>
         <Link href="/">
           <div className="flex items-center">
@@ -154,16 +153,19 @@ export default function Navbar() {
       <div className="dropdown dropdown-end">
         <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
           <div className="w-10 rounded-full">
-            <img
-              src={
-                `http://localhost:4000${userData.profileImage}` ||
-                "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-              }
-              alt="Profile"
-            />
+            {userData?.profileImage ? (
+              <img
+                src={`http://localhost:4000${userData.profileImage}`}
+                alt="Profile"
+              />
+            ) : (
+              <span className="flex items-center justify-center w-full h-full bg-neutral text-neutral-content">
+                ?
+              </span>
+            )}
           </div>
         </div>
-        <ul tabIndex={0} className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+        <ul tabIndex={0} className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[9999] w-52 p-2 shadow">
           <li>
             <Link href="/dashboard/market">Perfil</Link>
           </li>
@@ -190,7 +192,19 @@ export default function Navbar() {
     </div>
   )
 
-  if (pathname === "/" || pathname === "/auth/login" || pathname === "/auth/register") {
+  
+
+    const floatingNavbarPages = [
+    "/",
+    "/auth/login",
+    "/auth/register",
+    "/cookies",
+    "/terms",
+    "/privacy",
+    "/contact",
+  ];
+
+  if (floatingNavbarPages.includes(pathname)) {
     return (
       <div className="fixed top-4 left-1/2 z-50 w-[90%] max-w-6xl -translate-x-1/2 rounded-2xl bg-opacity-40 backdrop-blur-md shadow-lg bg-base-100">
         <div className="navbar">

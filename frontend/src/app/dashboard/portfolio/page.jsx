@@ -120,14 +120,6 @@ export default function DashboardPortfolio() {
   const gainPercent = totalInitialValue > 0 ? (gain / totalInitialValue) * 100 : 0;
   const portfolioValue = credit + totalStockValue;
 
-  if (loading || loadingFavs) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <RefreshCw className="animate-spin h-10 w-10 text-primary" />
-      </div>
-    );
-  }
-
   return (
     <main className="p-6 bg-base-200 flex-1">
       <StatsCards

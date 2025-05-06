@@ -19,3 +19,9 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@layer utilities {
+  .drop-shadow-current {
+    filter: drop-shadow(0 0 13px currentColor);
+  }
+}

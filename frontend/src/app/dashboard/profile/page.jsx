@@ -45,7 +45,7 @@ const EditProfilePage = () => {
           name: profileData.name || "",
           email: profileData.email || "",
           phone: profileData.phone || "",
-          profileImage: profileData.profileImage || "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+          profileImage: profileData.profileImage || "Cargando..."
         });
         setAlert(null); 
       } catch (error) {
@@ -215,14 +215,16 @@ const EditProfilePage = () => {
               <div className="flex flex-col items-center mb-4">
                 <div className="avatar">
                   <div className="w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                    <img
-                      src={
-                        userData.profileImage
-                          ? `http://localhost:4000${userData.profileImage}`
-                          : "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-                      }
-                      alt="Profile"
-                    />
+                    {userData.profileImage && userData.profileImage !== "Cargando..." ? (
+                      <img
+                        src={`http://localhost:4000${userData.profileImage}`}
+                        alt="Profile"
+                      />
+                    ) : (
+                      <span className="flex items-center justify-center w-full h-full bg-neutral text-neutral-content text-2xl">
+                        ?
+                      </span>
+                    )}
                   </div>
                 </div>
                 <label className="btn btn-sm btn-outline mt-4 gap-2">

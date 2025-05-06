@@ -65,7 +65,7 @@ export default function Home() {
         <div className="hero-content text-center">
           <div className="max-w-3xl">
             <h1 className="text-7xl font-bold mb-8">
-              <span className="text-primary drop-shadow-[0_0_30px_rgba(126,34,206,0.7)]">
+              <span className="text-primary drop-shadow-current">
                 Burbujeando
               </span>{" "}
               tus inversiones
