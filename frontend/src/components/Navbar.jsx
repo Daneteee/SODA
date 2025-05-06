@@ -7,9 +7,8 @@ import ThemeSelector from "@/components/ThemeSelector"
 
 export default function Navbar() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
   const [userData, setUserData] = useState({
-    profileImage: "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
+    profileImage: null,
   })
   const router = useRouter()
   const pathname = usePathname()
@@ -18,7 +17,6 @@ export default function Navbar() {
   useEffect(() => {
     const token = document.cookie.split("; ").find((row) => row.startsWith("jwtToken="))
     setIsAuthenticated(!!token)
-    setIsLoading(false)
 
     if (token) {
       const fetchUserData = async () => {
@@ -30,13 +28,10 @@ export default function Navbar() {
           if (!profileResponse.ok) throw new Error("Error obtaining user data")
           const profileData = await profileResponse.json()
           setUserData({
-            profileImage:
-              profileData.profileImage || "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
+            profileImage: profileData.profileImage || null,
           })
         } catch (error) {
           console.error("Error fetching user data:", error)
-        } finally {
-          setIsLoading(false)
         }
       }
       fetchUserData()
@@ -51,7 +46,7 @@ export default function Navbar() {
 
   // Common navigation items
   const navigationItems = (
-    <ul tabIndex={0} className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[100] mt-3 w-52 p-2 shadow">
+    <ul tabIndex={0} className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[9999] mt-3 w-52 p-2 shadow">
       <li>
         <Link href="/">
           <div className="flex items-center">
@@ -115,27 +110,6 @@ export default function Navbar() {
           </div>
         </Link>
       </li>
-      <li>
-        <Link href="/cookies">
-          <div className="flex items-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-              />
-            </svg>
-            Política de Cookies
-          </div>
-        </Link>
-      </li>
     </ul>
   )
 
@@ -179,16 +153,19 @@ export default function Navbar() {
       <div className="dropdown dropdown-end">
         <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
           <div className="w-10 rounded-full">
-            <img
-              src={
-                `http://localhost:4000${userData.profileImage || "/placeholder.svg"}` ||
-                "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-              }
-              alt="Profile"
-            />
+            {userData?.profileImage ? (
+              <img
+                src={`http://localhost:4000${userData.profileImage}`}
+                alt="Profile"
+              />
+            ) : (
+              <span className="flex items-center justify-center w-full h-full bg-neutral text-neutral-content">
+                ?
+              </span>
+            )}
           </div>
         </div>
-        <ul tabIndex={0} className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[100] w-52 p-2 shadow">
+        <ul tabIndex={0} className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[9999] w-52 p-2 shadow">
           <li>
             <Link href="/dashboard/market">Perfil</Link>
           </li>
@@ -215,22 +192,21 @@ export default function Navbar() {
     </div>
   )
 
-  // Mostrar un esqueleto de carga mientras se verifica la autenticación
-  const loadingControls = (
-    <div className="flex items-center gap-4">
-      <div className="skeleton h-10 w-32"></div>
-      <div className="skeleton h-11 w-11 shrink-0 rounded-full"></div>
-    </div>
-  )
+  
 
-  const pagesWithFloatingNavbar = ["/", "/auth/login", "/auth/register", "/cookies", "/privacy", "/terms", "/contact"]
-  const isCookiesPage = pathname === "/cookies"
+    const floatingNavbarPages = [
+    "/",
+    "/auth/login",
+    "/auth/register",
+    "/cookies",
+    "/terms",
+    "/privacy",
+    "/contact",
+  ];
 
-  if (pagesWithFloatingNavbar.includes(pathname)) {
+  if (floatingNavbarPages.includes(pathname)) {
     return (
-      <div
-        className={`fixed top-4 left-1/2 z-50 w-[90%] max-w-6xl -translate-x-1/2 rounded-2xl bg-opacity-40 backdrop-blur-md shadow-lg bg-base-100 ${isCookiesPage ? "bg-opacity-80" : ""}`}
-      >
+      <div className="fixed top-4 left-1/2 z-50 w-[90%] max-w-6xl -translate-x-1/2 rounded-2xl bg-opacity-40 backdrop-blur-md shadow-lg bg-base-100">
         <div className="navbar">
           <div className="navbar-start">
             <div className="dropdown">
@@ -263,7 +239,7 @@ export default function Navbar() {
 
           <div className="navbar-end">
             <ThemeSelector />
-            {isLoading ? loadingControls : isAuthenticated ? authenticatedControls : unauthenticatedControls}
+            {isAuthenticated ? authenticatedControls : unauthenticatedControls}
           </div>
         </div>
       </div>
@@ -297,7 +273,14 @@ export default function Navbar() {
 
       <div className="navbar-end">
         <ThemeSelector />
-        {isLoading ? loadingControls : isAuthenticated ? authenticatedControls : unauthenticatedControls}
+        {isAuthenticated ? (
+          authenticatedControls
+        ) : (
+          <>
+            <div className="skeleton h-10 w-32"></div>
+            <div className="skeleton h-11 w-11 shrink-0 rounded-full"></div>
+          </>
+        )}
       </div>
     </div>
   )
