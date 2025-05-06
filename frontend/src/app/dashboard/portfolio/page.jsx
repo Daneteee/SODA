@@ -160,7 +160,8 @@ export default function DashboardPortfolio() {
                   <tr className="bg-base-200">
                     <th>Activo</th>
                     <th>Cantidad</th>
-                    <th>Precio Compra</th>
+                    <th>Precio Ud.</th>
+                    <th>Invertido</th>
                     <th>Precio Actual</th>
                     <th>Cambio %</th>
                     <th>Fecha</th>
@@ -188,6 +189,7 @@ export default function DashboardPortfolio() {
                         </td>
                         <td className="font-mono">{s.quantity}</td>
                         <td className="font-mono">${(s.purchasePrice ?? 0).toFixed(2)}</td>
+                        <td className="font-mono">${((s.purchasePrice ?? 0) * (s.quantity ?? 0)).toFixed(2)}</td>
                         <td className="font-mono">${rt.toFixed(2)}</td>
                         <td className={`font-mono ${changePct >= 0 ? "text-success" : "text-error"}`}>
                           {changePct >= 0 ? <TrendingUp className="inline h-4 w-4" /> : <TrendingDown className="inline h-4 w-4" />}
