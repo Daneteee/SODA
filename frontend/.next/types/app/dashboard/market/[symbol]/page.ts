@@ -1,4 +1,4 @@
-// File: /home/samuel/Sintesis/SODA/frontend/src/app/dashboard/market/[symbol]/page.jsx
+// File: /srv/http/SODA/frontend/src/app/dashboard/market/[symbol]/page.jsx
 import * as entry from '../../../../../../src/app/dashboard/market/[symbol]/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

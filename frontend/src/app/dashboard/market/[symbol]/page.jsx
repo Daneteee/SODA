@@ -14,6 +14,7 @@ import { useNewsData } from "@/hooks/stock/useNewsData";
 import { useUserPosition } from "@/hooks/stock/useUserPosition";
 import { useStockTransactions } from "@/hooks/stock/useStockTransactions";
 import { useWebSocket } from "@/context/WebSocketProvider";
+import { isMarketClosed, MarketClosedAlert } from "@/utils/marketUtils";
 
 export default function StockDetailPage() {
   const { symbol: paramSymbol } = useParams();
@@ -138,6 +139,7 @@ export default function StockDetailPage() {
   return (
     <div className="bg-base-200 p-4 md:p-6">
       <div className="max-w-6xl mx-auto">
+        {isMarketClosed() && <MarketClosedAlert />}
         <div className="flex flex-col md:flex-row gap-4">
           {/* Columna izquierda: Gráfico y detalles */}
           <div className="w-full md:w-8/12 bg-base-100 rounded-xl shadow-xl p-4 md:p-6">

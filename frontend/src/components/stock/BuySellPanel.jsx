@@ -1,4 +1,5 @@
 import { Wallet, Zap, Info } from "lucide-react";
+import { isMarketClosed, MarketClosedAlert } from "@/utils/marketUtils";
 
 export default function BuySellPanel({
   credit,
@@ -13,6 +14,15 @@ export default function BuySellPanel({
   handleAmountChange,
   handleSharesChange,
 }) {
+  const isButtonDisabled = () => {
+    if (isMarketClosed()) return true;
+    if (activeTab === "Buy") {
+      return amount <= 0 || shares <= 0 || amount > credit;
+    } else {
+      return shares <= 0 || shares > position.shares;
+    }
+  };
+
   return (
     <div className="card bg-base-100 shadow-xl">
       <div className="card-body p-4 md:p-6">
@@ -53,6 +63,7 @@ export default function BuySellPanel({
               value={amount || ""}
               onChange={handleAmountChange}
               min="0"
+              disabled={isMarketClosed()}
             />
           </div>
         </div>
@@ -64,15 +75,15 @@ export default function BuySellPanel({
             <input
               type="text"
               className="input input-bordered w-full text-right"
-              value={shares || ''} // Cambiamos esto para mostrar string vacío si es 0 o NaN
+              value={shares || ''}
               onChange={(e) => {
-                // Solo permitimos números y punto decimal
                 const value = e.target.value;
                 if (value === '' || /^\d*\.?\d*$/.test(value)) {
                   handleSharesChange(e);
                 }
               }}
               min="0"
+              disabled={isMarketClosed()}
             />
           </div>
         </div>
@@ -81,18 +92,21 @@ export default function BuySellPanel({
             <button
               className="btn btn-outline btn-sm"
               onClick={() => handleSellPercentage(0.25)}
+              disabled={isMarketClosed()}
             >
               25%
             </button>
             <button
               className="btn btn-outline btn-sm"
               onClick={() => handleSellPercentage(0.5)}
+              disabled={isMarketClosed()}
             >
               50%
             </button>
             <button
               className="btn btn-outline btn-sm"
               onClick={() => handleSellPercentage(1)}
+              disabled={isMarketClosed()}
             >
               100%
             </button>
@@ -100,23 +114,22 @@ export default function BuySellPanel({
         )}
         {activeTab === "Buy" ? (
           <button
-            className={`btn btn-primary w-full ${
-              amount <= 0 || shares <= 0 || amount > credit ? "btn-disabled" : ""
-            }`}
+            className={`btn btn-primary w-full ${isButtonDisabled() ? "btn-disabled" : ""}`}
             onClick={handleBuy}
+            disabled={isButtonDisabled()}
           >
             Comprar
           </button>
         ) : (
           <button
-            className={`btn btn-secondary w-full ${
-              shares <= 0 || shares > position.shares ? "btn-disabled" : ""
-            }`}
+            className={`btn btn-secondary w-full ${isButtonDisabled() ? "btn-disabled" : ""}`}
             onClick={handleSell}
+            disabled={isButtonDisabled()}
           >
             Vender
           </button>
         )}
+        {isMarketClosed() && <MarketClosedAlert />}
         {activeTab === "Buy" && amount > credit && (
           <div className="mt-2 text-error text-sm flex items-center">
             <Info className="h-4 w-4 mr-1" />

@@ -1,11 +1,17 @@
 const User = require('../../models/user');
 const Stock = require('../../models/stock');
 const Transaction = require('../../models/transaction'); // Asegúrate de tener este modelo
+const { isMarketOpen } = require('../../utils/marketHours');
 
 // Función para procesar la compra de acciones
 const buyStock = async (req, res) => {
   const { symbol, quantity, purchasePrice } = req.body;
   console.log("Datos recibidos:", req.body);
+  
+  // Verificar si el mercado está abierto
+  if (!isMarketOpen()) {
+    return res.status(400).json({ message: 'El mercado está cerrado. Las operaciones solo están disponibles durante el horario de mercado (9:30 AM - 4:00 PM ET, Lunes a Viernes)' });
+  }
   
   if (symbol == null || quantity == null || purchasePrice == null) {
     return res.status(400).json({ message: 'Faltan datos requeridos' });

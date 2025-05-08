@@ -6,6 +6,7 @@ import Image from "next/image"
 import { Search, TrendingUp, TrendingDown, Activity, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
 import { useWebSocket } from "@/context/WebSocketProvider"
 import StatsCards from "@/components/StatsCards"
+import { isMarketClosed, MarketClosedAlert } from "@/utils/marketUtils"
 
 const DashboardMarketClient = ({ initialApiStocks, initialCredit, initialUserStocks }) => {
   const { connected, stockData: wsStockData } = useWebSocket()
@@ -45,10 +46,8 @@ const DashboardMarketClient = ({ initialApiStocks, initialCredit, initialUserSto
     fetchTransactions()
   }, [])
 
-  // Combinar con datos WS
   const mergedStocks = apiStocks.map((stock) => {
     const wsStock = wsStockData.find((s) => s.symbol === stock.symbol)
-    console.log('a',stock.lastYahooPrice)
     return {
       ...stock,
       price: wsStock?.price ?? stock.lastYahooPrice ?? stock.firstPriceToday,
@@ -188,6 +187,8 @@ const DashboardMarketClient = ({ initialApiStocks, initialCredit, initialUserSto
             </div>
           </div>
 
+          {isMarketClosed() && <MarketClosedAlert />}
+
           {filteredStocks.length === 0 ? (
             <div className="alert alert-info">
               <span>No se encontraron acciones.</span>
@@ -195,53 +196,52 @@ const DashboardMarketClient = ({ initialApiStocks, initialCredit, initialUserSto
           ) : (
             <div className="overflow-y-auto max-h-[450px]">
               <table className="table table-zebra w-full">
-              <thead>
-                <tr className="bg-base-200">
-                  <th 
-                    onClick={() => handleSort('name')}
-                    className="cursor-pointer hover:bg-base-300"
-                  >
-                    <div className="flex items-center gap-2">
-                      Activo
-                      {sortField === 'name' ? (
-                        sortDirection === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />
-                      ) : (
-                        <ArrowUpDown className="h-4 w-4 opacity-50" />
-                      )}
-                    </div>
-                  </th>
-                  <th 
-                    onClick={() => handleSort('price')}
-                    className="cursor-pointer hover:bg-base-300"
-                  >
-                    <div className="flex items-center gap-2">
-                      Precio Actual
-                      {sortField === 'price' ? (
-                        sortDirection === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />
-                      ) : (
-                        <ArrowUpDown className="h-4 w-4 opacity-50" />
-                      )}
-                    </div>
-                  </th>
-                  <th 
-                    onClick={() => handleSort('change')}
-                    className="cursor-pointer hover:bg-base-300"
-                  >
-                    <div className="flex items-center gap-2">
-                      Cambio
-                      {sortField === 'change' ? (
-                        sortDirection === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />
-                      ) : (
-                        <ArrowUpDown className="h-4 w-4 opacity-50" />
-                      )}
-                    </div>
-                  </th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
+                <thead>
+                  <tr className="bg-base-200">
+                    <th 
+                      onClick={() => handleSort('name')}
+                      className="cursor-pointer hover:bg-base-300"
+                    >
+                      <div className="flex items-center gap-2">
+                        Activo
+                        {sortField === 'name' ? (
+                          sortDirection === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />
+                        ) : (
+                          <ArrowUpDown className="h-4 w-4 opacity-50" />
+                        )}
+                      </div>
+                    </th>
+                    <th 
+                      onClick={() => handleSort('price')}
+                      className="cursor-pointer hover:bg-base-300"
+                    >
+                      <div className="flex items-center gap-2">
+                        Precio Actual
+                        {sortField === 'price' ? (
+                          sortDirection === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />
+                        ) : (
+                          <ArrowUpDown className="h-4 w-4 opacity-50" />
+                        )}
+                      </div>
+                    </th>
+                    <th 
+                      onClick={() => handleSort('change')}
+                      className="cursor-pointer hover:bg-base-300"
+                    >
+                      <div className="flex items-center gap-2">
+                        Cambio
+                        {sortField === 'change' ? (
+                          sortDirection === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />
+                        ) : (
+                          <ArrowUpDown className="h-4 w-4 opacity-50" />
+                        )}
+                      </div>
+                    </th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
                 <tbody>
                   {filteredStocks.map((stock) => {
-                    // Determinar el precio base para el cálculo del cambio
                     const basePrice = stock.firstPriceToday ?? stock.lastYahooPrice ?? 0;
                     const change = basePrice
                       ? ((stock.price - basePrice) / basePrice) * 100
@@ -268,7 +268,7 @@ const DashboardMarketClient = ({ initialApiStocks, initialCredit, initialUserSto
                             </div>
                           </div>
                         </td>
-                        <td className="font-mono font-bold">{stock.price !== undefined ? `$${stock.price}` : "N/A"}</td>
+                        <td className="font-mono font-bold">{stock.price !== undefined ? `$${stock.price.toFixed(2)}` : "N/A"}</td>
                         <td>
                           <div
                             className={`flex items-center gap-1 font-bold ${
@@ -280,8 +280,36 @@ const DashboardMarketClient = ({ initialApiStocks, initialCredit, initialUserSto
                           </div>
                         </td>
                         <td>
-                          <button className="btn btn-sm btn-success text-white mr-2">Comprar</button>
-                          <button className="btn btn-sm btn-error text-white">Vender</button>
+                          <button 
+                            className={`btn btn-sm btn-success text-white mr-2 ${isMarketClosed() ? 'btn-disabled' : ''}`}
+                            disabled={isMarketClosed()}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (!isMarketClosed()) {
+                                if (typeof window !== "undefined") {
+                                  sessionStorage.setItem("selectedStock", JSON.stringify(stock))
+                                }
+                                router.push(`/dashboard/market/${stock.symbol}?action=buy`)
+                              }
+                            }}
+                          >
+                            Comprar
+                          </button>
+                          <button 
+                            className={`btn btn-sm btn-error text-white ${isMarketClosed() ? 'btn-disabled' : ''}`}
+                            disabled={isMarketClosed()}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (!isMarketClosed()) {
+                                if (typeof window !== "undefined") {
+                                  sessionStorage.setItem("selectedStock", JSON.stringify(stock))
+                                }
+                                router.push(`/dashboard/market/${stock.symbol}?action=sell`)
+                              }
+                            }}
+                          >
+                            Vender
+                          </button>
                         </td>
                       </tr>
                     )
