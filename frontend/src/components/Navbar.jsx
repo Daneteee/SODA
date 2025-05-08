@@ -25,7 +25,7 @@ export default function Navbar() {
         try {
           const profileResponse = await fetch("http://localhost:4000/api/user/profile", {
             method: "GET",
-            credentials: "include", // Enviar cookies para autenticación
+            credentials: "include",
           })
           if (!profileResponse.ok) throw new Error("Error obtaining user data")
           const profileData = await profileResponse.json()
@@ -259,16 +259,14 @@ export default function Navbar() {
     </div>
   )
 
-  // Determinar si estamos en la página principal o de autenticación
-  const isMainPage = pathname === "/" || pathname === "/auth/login" || pathname === "/auth/register"
+  // Paginas con NavBar flotante
+  const floatingNavPages = ["/", "/auth/login", "/auth/register", "/cookies", "/terms", "/policy", "/contact"]
+  const isfloatingNavPages = floatingNavPages.includes(pathname)
 
-  // Determinar si estamos en la página de cookies
-  const isCookiesPage = pathname === "/cookies"
-
-  if (isMainPage || isCookiesPage) {
+  if (isfloatingNavPages) {
     return (
       <div
-        className={`fixed top-4 left-1/2 z-50 w-[90%] max-w-6xl -translate-x-1/2 rounded-2xl bg-opacity-40 backdrop-blur-md shadow-lg bg-base-100 ${isCookiesPage ? "bg-opacity-80" : ""}`}
+        className={`fixed top-4 left-1/2 z-50 w-[90%] max-w-6xl -translate-x-1/2 rounded-2xl bg-opacity-40 backdrop-blur-md shadow-lg bg-base-100 bg-opacity-80`}
       >
         <div className="navbar">
           <div className="navbar-start">
