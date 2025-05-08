@@ -50,13 +50,13 @@ export default function ThemeToggle() {
         <Paintbrush className="w-5 h-5" />
       </button>
       {isOpen && (
-        <ul className="absolute right-0 mt-2 bg-base-100 rounded-box z-[100] w-52 p-2 shadow-2xl ">
+        <ul className="absolute left-1/2 -translate-x-1/2 mt-2 bg-base-100 rounded-box z-[9999] w-52 p-2 shadow-2xl">
           {[
-            { label: "Default", value: "default" },
-            { label: "Light", value: "winter" },
-            { label: "Lofi", value: "pastel" },
+            { label: "Default", value: "dark" },
+            { label: "Light", value: "cupcake" },
+            { label: "Emerald", value: "emerald" },
             { label: "Valentine", value: "valentine" },
-            { label: "Aqua", value: "aqua" },
+            { label: "Darker", value: "night" },
           ].map((option) => (
             <li key={option.value}>
               <button

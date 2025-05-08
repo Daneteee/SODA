@@ -64,24 +64,24 @@ export default function Home() {
       <div className="hero min-h-screen bg-transparent">
         <div className="hero-content text-center">
           <div className="max-w-3xl">
-            <h1 className="text-7xl font-bold mb-8">
-              <span className="text-primary drop-shadow-[0_0_30px_rgba(126,34,206,0.7)]">
+            <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold mb-4 md:mb-8">
+              <span className="text-primary drop-shadow-current">
                 Burbujeando
               </span>{" "}
               tus inversiones
             </h1>
-            <h2 className="text-5xl font-bold mb-8">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-8">
               La plataforma más segura
               <br />
               <span className="bg-gradient-to-r from-pink-500 via-blue-500 to-cyan-500 text-transparent bg-clip-text drop-shadow-[0_0_30px_rgba(59,130,246,0.5)]">
                 para tus finanzas
               </span>
             </h2>
-            <p className="py-6 text-xl text-base-content/60">
+            <p className="py-4 md:py-6 text-lg md:text-xl text-base-content/60">
               SODA añade la seguridad que necesitas a tus inversiones para que
               puedas hacer crecer tu dinero más rápido que nunca.
             </p>
-            <div className="flex gap-4 justify-center mt-8">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6 md:mt-8">
               <Link href="/dashboard/market" className="btn btn-primary btn-lg">
                 Comenzar ahora →
               </Link>
@@ -162,15 +162,15 @@ export default function Home() {
       </section>
 
       {/* Call to Action */}
-      <section className="py-20 bg-gradient-to-r from-primary to-secondary">
+      <section className="py-12 md:py-20 bg-gradient-to-r from-primary to-secondary">
         <div className="container mx-auto px-4 text-center text-white">
-          <h2 className="text-5xl font-bold mb-6">Comienza tu viaje financiero</h2>
-          <p className="text-xl mb-8 max-w-2xl mx-auto">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6">Comienza tu viaje financiero</h2>
+          <p className="text-lg md:text-xl mb-6 md:mb-8 max-w-2xl mx-auto">
             Únete a miles de inversores que ya están transformando sus finanzas
             con SODA. No dejes que el miedo te detenga, la inversión inteligente
             está a un clic de distancia.
           </p>
-          <div className="flex justify-center gap-4">
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
             <button className="btn btn-ghost btn-lg text-white border-2">
               Más Información
             </button>

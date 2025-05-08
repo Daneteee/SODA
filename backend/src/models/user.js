@@ -23,7 +23,8 @@ const userSchema = new mongoose.Schema({
   },
   profileImage: {
     type: String, 
-    required: false  
+    required: false,
+    default: "/uploads/default.jpg"
   },
   createdAt: {
     type: Date,

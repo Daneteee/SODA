@@ -120,14 +120,6 @@ export default function DashboardPortfolio() {
   const gainPercent = totalInitialValue > 0 ? (gain / totalInitialValue) * 100 : 0;
   const portfolioValue = credit + totalStockValue;
 
-  if (loading || loadingFavs) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <RefreshCw className="animate-spin h-10 w-10 text-primary" />
-      </div>
-    );
-  }
-
   return (
     <main className="p-6 bg-base-200 flex-1">
       <StatsCards
@@ -168,7 +160,8 @@ export default function DashboardPortfolio() {
                   <tr className="bg-base-200">
                     <th>Activo</th>
                     <th>Cantidad</th>
-                    <th>Precio Compra</th>
+                    <th>Precio Ud.</th>
+                    <th>Invertido</th>
                     <th>Precio Actual</th>
                     <th>Cambio %</th>
                     <th>Fecha</th>
@@ -196,6 +189,7 @@ export default function DashboardPortfolio() {
                         </td>
                         <td className="font-mono">{s.quantity}</td>
                         <td className="font-mono">${(s.purchasePrice ?? 0).toFixed(2)}</td>
+                        <td className="font-mono">${((s.purchasePrice ?? 0) * (s.quantity ?? 0)).toFixed(2)}</td>
                         <td className="font-mono">${rt.toFixed(2)}</td>
                         <td className={`font-mono ${changePct >= 0 ? "text-success" : "text-error"}`}>
                           {changePct >= 0 ? <TrendingUp className="inline h-4 w-4" /> : <TrendingDown className="inline h-4 w-4" />}
