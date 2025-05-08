@@ -23,6 +23,7 @@ export function useStockTransactions({ stock, positionShares, loadUserData }) {
   };
 
   const handleBuyStock = async () => {
+    console.log("ACcion a comprar", stock);
     if (!stock || !stock.price || shares <= 0) return;
     const purchaseData = {
       symbol: stock.symbol,

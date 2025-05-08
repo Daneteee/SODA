@@ -92,7 +92,13 @@ export default function StockHeader({
           ) : (
             <TrendingDown className="h-4 w-4" />
           )}
-          {Math.abs(stock.priceChange).toFixed(2)}% (
+          {(
+            isFinite(stock.priceChange) && !isNaN(stock.priceChange)
+              ? Math.abs(stock.priceChange)
+              : stock.previousPrice && stock.price
+                ? Math.abs(((stock.price - stock.previousPrice) / stock.previousPrice) * 100)
+                : 0
+          ).toFixed(2)}% (
           {Math.abs(
             parseFloat((stock.price - stock.previousPrice).toFixed(2))
           )}{" "}

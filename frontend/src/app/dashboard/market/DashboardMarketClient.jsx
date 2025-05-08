@@ -48,9 +48,10 @@ const DashboardMarketClient = ({ initialApiStocks, initialCredit, initialUserSto
   // Combinar con datos WS
   const mergedStocks = apiStocks.map((stock) => {
     const wsStock = wsStockData.find((s) => s.symbol === stock.symbol)
+    console.log('a',stock.lastYahooPrice)
     return {
       ...stock,
-      price: wsStock?.price ?? stock.firstPriceToday,
+      price: wsStock?.price ?? stock.lastYahooPrice ?? stock.firstPriceToday,
     }
   })
 
@@ -240,10 +241,12 @@ const DashboardMarketClient = ({ initialApiStocks, initialCredit, initialUserSto
               </thead>
                 <tbody>
                   {filteredStocks.map((stock) => {
-                    const change = stock.firstPriceToday
-                      ? ((stock.price - stock.firstPriceToday) / stock.firstPriceToday) * 100
-                      : 0
-                    const isPositive = change >= 0
+                    // Determinar el precio base para el cálculo del cambio
+                    const basePrice = stock.firstPriceToday ?? stock.lastYahooPrice ?? 0;
+                    const change = basePrice
+                      ? ((stock.price - basePrice) / basePrice) * 100
+                      : 0;
+                    const isPositive = change >= 0;
 
                     return (
                       <tr

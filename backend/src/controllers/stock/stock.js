@@ -57,6 +57,7 @@ const getStocksList = async () => {
           console.log('historicalData', historicalData[0].close);
         }
         const firstPrice = historicalData.length > 0 ? historicalData[0].close : null;
+        const lastYahooPrice = historicalData.length > 0 ? historicalData[historicalData.length - 1].close : null;
         
         stockInfoMap[stock.symbol] = { 
           name: stock.name,
@@ -68,7 +69,8 @@ const getStocksList = async () => {
           description: stock.description,
           website: stock.website,
           logo: stock.logo,
-          firstPriceToday: firstPrice
+          firstPriceToday: firstPrice,
+          lastYahooPrice: lastYahooPrice
         };
       } catch (error) {
         console.error(`Error obteniendo datos para ${stock.symbol}:`, error);

@@ -47,6 +47,7 @@ export default function StockDetailPage() {
 
   // Combinar y adaptar todas las fuentes de datos para que coincidan con la estructura esperada por StockHeader
   const combinedStock = {
+    symbol: symbol,
     // Datos base de la API
     ...apiStock,
 
@@ -57,7 +58,11 @@ export default function StockDetailPage() {
     },
 
     // Datos en tiempo real del WebSocket (principalmente el precio)
-    price: wsStock?.price || apiStock?.price,
+    price: wsStock?.price 
+      ?? sessionStockInfo?.lastYahooPrice 
+      ?? sessionStockInfo?.price 
+      ?? apiStock?.lastYahooPrice 
+      ?? apiStock?.price,
 
     // Resto de datos del sessionStorage que puedan ser útiles
     description: sessionStockInfo?.description,
@@ -95,6 +100,14 @@ export default function StockDetailPage() {
   const chartDataValues = getChartData(combinedStock);
   const chartConfig = getChartConfig(chartDataValues, combinedStock);
 
+  // Calcular el porcentaje de cambio dinámicamente según el timeframe
+  const history = combinedStock.history || [];
+  const basePrice = history.length > 0 ? history[0].close : undefined;
+  const currentPrice = combinedStock.price;
+  const priceChange = basePrice
+    ? ((currentPrice - basePrice) / basePrice) * 100
+    : 0;
+
   if (loading)
     return (
       <div className="flex justify-center items-center h-screen bg-base-200">
@@ -131,7 +144,8 @@ export default function StockDetailPage() {
             {/* Encabezado - usando los datos adaptados */}
             <StockHeader
               stock={combinedStock}
-              priceChangeColor={priceChangeColor}
+              priceChangeColor={priceChange >= 0 ? "text-success" : "text-error"}
+              priceChange={priceChange}
               activeTimeframe={activeTimeframe}
               setActiveTimeframe={setActiveTimeframe}
               loadStockData={loadStockData}
