@@ -237,7 +237,6 @@ const DashboardMarketClient = ({ initialApiStocks, initialCredit, initialUserSto
                         )}
                       </div>
                     </th>
-                    <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -278,38 +277,6 @@ const DashboardMarketClient = ({ initialApiStocks, initialCredit, initialUserSto
                             {isPositive ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
                             {stock.firstPriceToday ? `${change.toFixed(2)}%` : "N/A"}
                           </div>
-                        </td>
-                        <td>
-                          <button 
-                            className={`btn btn-sm btn-success text-white mr-2 ${isMarketClosed() ? 'btn-disabled' : ''}`}
-                            disabled={isMarketClosed()}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (!isMarketClosed()) {
-                                if (typeof window !== "undefined") {
-                                  sessionStorage.setItem("selectedStock", JSON.stringify(stock))
-                                }
-                                router.push(`/dashboard/market/${stock.symbol}?action=buy`)
-                              }
-                            }}
-                          >
-                            Comprar
-                          </button>
-                          <button 
-                            className={`btn btn-sm btn-error text-white ${isMarketClosed() ? 'btn-disabled' : ''}`}
-                            disabled={isMarketClosed()}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (!isMarketClosed()) {
-                                if (typeof window !== "undefined") {
-                                  sessionStorage.setItem("selectedStock", JSON.stringify(stock))
-                                }
-                                router.push(`/dashboard/market/${stock.symbol}?action=sell`)
-                              }
-                            }}
-                          >
-                            Vender
-                          </button>
                         </td>
                       </tr>
                     )

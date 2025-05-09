@@ -13,7 +13,7 @@ const StatsCards = ({ portfolioValue, gain, gainPercent, transactionsCount, cred
       </div>
 
       {/* Ganancias */}
-      <div className="stats shadow bg-accent text-accent-content">
+      <div className="stats shadow bg-accent text-accent-content overflow-hidden">
         <div className="stat">
           <div className="stat-title text-accent-content/60">Ganancias</div>
           <div className="stat-value text-accent-content/60">
