@@ -19,7 +19,7 @@ const DrawerSide = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const res = await fetch("http://localhost:4000/api/user/profile", {
+        const res = await fetch(process.env.NEXT_PUBLIC_API_URL + "/user/profile", {
           method: "GET",
           credentials: "include",
         });
@@ -28,7 +28,7 @@ const DrawerSide = () => {
         setUser({
           name: data.name || "Usuario",
           profileImage: data.profileImage
-            ? `http://localhost:4000${data.profileImage}`
+            ? process.env.NEXT_PUBLIC_SERVER_URL + `${data.profileImage}`
             : "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
         });
       } catch (error) {
@@ -50,9 +50,9 @@ const DrawerSide = () => {
 
   return (
     <>
-      <div className="drawer-side hidden md:block min-h-screen">
+      <div className="drawer-side hidden md:block h-full">
         <label htmlFor="my-drawer-2" className="drawer-overlay"></label>
-        <aside className="bg-base-100 w-80 border-r border-base-200 flex flex-col min-h-screen">
+        <aside className="bg-base-100 w-80 border-r border-base-200 flex flex-col h-full">
           {/* Encabezado del usuario */}
           <div className="p-4 bg-primary text-primary-content">
             <div className="flex items-center gap-4">
@@ -109,7 +109,7 @@ const DrawerSide = () => {
           </ul>
 
           {/* Botón de cerrar sesión */}
-          <div className="p-4">
+          <div className="p-4 border-t border-base-200">
             <button className="btn btn-error btn-block" onClick={handleLogout}>
               Cerrar Sesión
             </button>
@@ -143,7 +143,7 @@ const DrawerSide = () => {
         </div>
       </div>
 
-      <div className="md:hidden pb-16"></div>
+      <div className="md:hidden h-16"></div>
     </>
   );
 };

@@ -217,7 +217,7 @@ const EditProfilePage = () => {
                   <div className="w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
                     {userData.profileImage && userData.profileImage !== "Cargando..." ? (
                       <img
-                        src={`${process.env.NEXT_PUBLIC_API_URL}${userData.profileImage}`}
+                        src={`${process.env.NEXT_PUBLIC_SERVER_URL}${userData.profileImage}`}
                         alt="Profile"
                       />
                     ) : (
