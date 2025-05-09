@@ -16,7 +16,7 @@ export default function LoginPage() {
 
     // Connectem a l'API per fer el login
     try {
-      const res = await fetch("http://localhost:4000/api/auth/login", {
+      const res = await fetch(process.env.NEXT_PUBLIC_API_URL + "/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

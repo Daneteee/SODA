@@ -31,7 +31,7 @@ export function useStockTransactions({ stock, positionShares, loadUserData }) {
       purchasePrice: stock.price,
     };
     try {
-      const response = await fetch("http://localhost:4000/api/market/buy", {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL + "/market/buy", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

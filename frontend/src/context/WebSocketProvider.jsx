@@ -20,7 +20,7 @@ export const WebSocketProvider = ({ children }) => {
     }
 
     console.log("🔄 Iniciando conexión WebSocket...");
-    ws.current = new WebSocket("ws://localhost:4000");
+    ws.current = new WebSocket(process.env.NEXT_PUBLIC_WEBSOCKET_URL);
 
     ws.current.onopen = () => {
       console.log("✅ Conexión WebSocket establecida");

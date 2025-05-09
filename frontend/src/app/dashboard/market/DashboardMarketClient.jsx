@@ -27,7 +27,7 @@ const DashboardMarketClient = ({ initialApiStocks, initialCredit, initialUserSto
   useEffect(() => {
     async function fetchTransactions() {
       try {
-        const response = await fetch("http://localhost:4000/api/transactions", {
+        const response = await fetch(process.env.NEXT_PUBLIC_API_URL + "/transactions", {
           credentials: "include",
         })
 

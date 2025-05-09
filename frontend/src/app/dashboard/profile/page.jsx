@@ -33,7 +33,7 @@ const EditProfilePage = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const profileResponse = await fetch("http://localhost:4000/api/user/profile", {
+        const profileResponse = await fetch(process.env.NEXT_PUBLIC_API_URL + "/user/profile", {
           method: "GET",
           credentials: "include",
         });
@@ -94,7 +94,7 @@ const EditProfilePage = () => {
       const formData = new FormData();
       formData.append("profileImage", file);
 
-      fetch("http://localhost:4000/api/user/profile-image", {
+      fetch(process.env.NEXT_PUBLIC_API_URL + "/user/profile-image", {
         method: "PUT",
         credentials: "include",
         body: formData,
@@ -111,7 +111,7 @@ const EditProfilePage = () => {
     e.preventDefault();
     try {
       setAlert({ type: "warning", message: "Actualizando perfil..." });
-      const response = await fetch("http://localhost:4000/api/user/profile", {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL + "/user/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -145,7 +145,7 @@ const EditProfilePage = () => {
     }
     try {
       setAlert({ type: "warning", message: "Actualizando contraseña..." });
-      const response = await fetch("http://localhost:4000/api/user/change-password", {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL + "/user/change-password", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -217,7 +217,7 @@ const EditProfilePage = () => {
                   <div className="w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
                     {userData.profileImage && userData.profileImage !== "Cargando..." ? (
                       <img
-                        src={`http://localhost:4000${userData.profileImage}`}
+                        src={`${process.env.NEXT_PUBLIC_API_URL}${userData.profileImage}`}
                         alt="Profile"
                       />
                     ) : (

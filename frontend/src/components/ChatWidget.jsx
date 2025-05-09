@@ -173,7 +173,7 @@ export default function ChatWidget() {
       }
 
       // Realizar la solicitud con axios
-      const res = await axios.get("http://localhost:4000/api/chats/conversations", {
+      const res = await axios.get(process.env.NEXT_PUBLIC_API_URL + "/chats/conversations", {
         headers: {
           "Content-Type": "application/json",
         },
@@ -209,7 +209,7 @@ export default function ChatWidget() {
       }
 
       // Realizar la solicitud con axios
-      const res = await axios.get("http://localhost:4000/api/chats/users", {
+      const res = await axios.get(process.env.NEXT_PUBLIC_API_URL + "/chats/users", {
         headers: {
           "Content-Type": "application/json",
         },
@@ -242,7 +242,7 @@ export default function ChatWidget() {
       }
 
       // Realizar la solicitud con axios
-      const res = await axios.get(`http://localhost:4000/api/users/search?q=${encodeURIComponent(query)}`, {
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users/search?q=${encodeURIComponent(query)}`, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -270,7 +270,7 @@ export default function ChatWidget() {
       // Actualizamos el lastFetchTime para este chat
       const now = Date.now()
 
-      const res = await axios.get(`http://localhost:4000/api/chats/${conversationId}/messages`, {
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/chats/${conversationId}/messages`, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -312,7 +312,7 @@ export default function ChatWidget() {
 
       // Crear una nueva conversación con el usuario seleccionado
       const res = await axios.post(
-        "http://localhost:4000/api/chats/new",
+        `${process.env.NEXT_PUBLIC_API_URL}/chats/new`,
         { targetUserId: userId },
         {
           headers: {
@@ -370,7 +370,7 @@ export default function ChatWidget() {
       setTimeout(scrollToBottom, 50)
 
       const res = await axios.post(
-        `http://localhost:4000/api/chats/${activeChat}/messages`,
+        `${process.env.NEXT_PUBLIC_API_URL}/chats/${activeChat}/messages`,
         { text: newMessage },
         {
           headers: {
@@ -507,8 +507,8 @@ export default function ChatWidget() {
                                   <img
                                     src={
                                       user.profileImage
-                                        ? `http://localhost:4000${user.profileImage}`
-                                        : "http://localhost:4000/placeholder.svg"
+                                        ? `${process.env.NEXT_PUBLIC_API_URL}${user.profileImage}`
+                                        : `${process.env.NEXT_PUBLIC_API_URL}/placeholder.svg`
                                     }
                                     alt={user.name || "Usuario"}
                                   />
@@ -555,8 +555,8 @@ export default function ChatWidget() {
                               <img
                                 src={
                                   user.user?.profileImage
-                                    ? `http://localhost:4000${user.user.profileImage}`
-                                    : "http://localhost:4000/placeholder.svg"
+                                    ? `${process.env.NEXT_PUBLIC_API_URL}${user.user.profileImage}`
+                                    : `${process.env.NEXT_PUBLIC_API_URL}/placeholder.svg`
                                 }
                                 alt={user.user?.name || "Usuario"}
                               />
@@ -603,8 +603,8 @@ export default function ChatWidget() {
                       <img
                         src={
                           activeUser.user?.profileImage
-                            ? `http://localhost:4000${activeUser.user.profileImage}`
-                            : "http://localhost:4000/placeholder.svg"
+                            ? `${process.env.NEXT_PUBLIC_API_URL}${activeUser.user.profileImage}`
+                            : `${process.env.NEXT_PUBLIC_API_URL}/placeholder.svg`
                         }
                         alt={activeUser.user?.name || "Usuario"}
                       />

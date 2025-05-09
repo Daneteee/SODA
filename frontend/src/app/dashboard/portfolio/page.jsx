@@ -32,19 +32,19 @@ export default function DashboardPortfolio() {
     async function fetchData() {
       try {
         // Profile
-        const p = await fetch("http://localhost:4000/api/user/profile", { credentials: "include" });
+        const p = await fetch(process.env.NEXT_PUBLIC_API_URL + "/user/profile", { credentials: "include" });
         if (!p.ok) throw new Error();
         const { credit } = await p.json();
         setCredit(credit);
 
         // Owned stocks
-        const s = await fetch("http://localhost:4000/api/user/stocks", { credentials: "include" });
+        const s = await fetch(process.env.NEXT_PUBLIC_API_URL + "/user/stocks", { credentials: "include" });
         if (!s.ok) throw new Error();
         const { stocks } = await s.json();
         setUserStocks(stocks || []);
 
         // Transactions
-        const t = await fetch("http://localhost:4000/api/transactions", { credentials: "include" });
+        const t = await fetch(process.env.NEXT_PUBLIC_API_URL + "/transactions", { credentials: "include" });
         if (t.ok) {
           const { transactions } = await t.json();
           setTransactionsCount(transactions.length);
@@ -57,7 +57,7 @@ export default function DashboardPortfolio() {
 
       try {
         // Favorites
-        const f = await fetch("http://localhost:4000/api/favorites", { credentials: "include" });
+        const f = await fetch(process.env.NEXT_PUBLIC_API_URL + "/favorites", { credentials: "include" });
         if (f.ok) {
           const { favs } = await f.json();
           setFavSymbols(favs);

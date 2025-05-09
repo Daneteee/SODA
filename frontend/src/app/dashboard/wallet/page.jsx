@@ -22,7 +22,7 @@ const WalletPage = () => {
   useEffect(() => {
     const fetchCredit = async () => {
       try {
-        const response = await fetch("http://localhost:4000/api/user/profile", {
+        const response = await fetch(process.env.NEXT_PUBLIC_API_URL + "/user/profile", {
           method: "GET",
           credentials: "include",
         });
@@ -40,7 +40,7 @@ const WalletPage = () => {
   // Función para añadir crédito
   const handleAddCredit = async () => {
     try {
-      const response = await fetch("http://localhost:4000/api/user/addCredit", {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL + "/user/addCredit", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -49,7 +49,7 @@ const WalletPage = () => {
       if (!response.ok) throw new Error("Error añadiendo crédito");
 
       // Actualizar el crédito luego de la operación
-      const profileResponse = await fetch("http://localhost:4000/api/user/profile", {
+      const profileResponse = await fetch(process.env.NEXT_PUBLIC_API_URL + "/user/profile", {
         method: "GET",
         credentials: "include",
       });
@@ -67,7 +67,7 @@ const WalletPage = () => {
   // Función para retirar crédito
   const handleWithdrawCredit = async () => {
     try {
-      const response = await fetch("http://localhost:4000/api/user/withdrawCredit", {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL + "/user/withdrawCredit", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -76,7 +76,7 @@ const WalletPage = () => {
       if (!response.ok) throw new Error("Error retirando crédito");
 
       // Actualizar el crédito luego de la operación
-      const profileResponse = await fetch("http://localhost:4000/api/user/profile", {
+      const profileResponse = await fetch(process.env.NEXT_PUBLIC_API_URL + "/user/profile", {
         method: "GET",
         credentials: "include",
       });

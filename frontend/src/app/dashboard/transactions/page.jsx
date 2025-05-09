@@ -10,7 +10,7 @@ const TransactionPage = () => {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const response = await fetch("http://localhost:4000/api/transactions", {
+        const response = await fetch(process.env.NEXT_PUBLIC_API_URL + "/transactions", {
           method: "GET",
           credentials: "include",
         });

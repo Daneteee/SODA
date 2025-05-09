@@ -47,7 +47,7 @@ export function useChatPolling({ isOpen, activeChat, isNewChat }) {
       }
 
       // Realizar la solicitud con axios
-      const res = await axios.get("http://localhost:4000/api/chats/conversations", {
+      const res = await axios.get(process.env.NEXT_PUBLIC_API_URL + "/chats/conversations", {
         headers: {
           "Content-Type": "application/json",
         },
@@ -79,7 +79,7 @@ export function useChatPolling({ isOpen, activeChat, isNewChat }) {
       // Actualizamos el lastFetchTime para este chat
       const now = Date.now()
 
-      const res = await axios.get(`http://localhost:4000/api/chats/${conversationId}/messages`, {
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/chats/${conversationId}/messages`, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -125,7 +125,7 @@ export function useChatPolling({ isOpen, activeChat, isNewChat }) {
       }
 
       // Realizar la solicitud con axios
-      const res = await axios.get("http://localhost:4000/api/chats/users", {
+      const res = await axios.get(process.env.NEXT_PUBLIC_API_URL + "/chats/users", {
         headers: {
           "Content-Type": "application/json",
         },
@@ -158,7 +158,7 @@ export function useChatPolling({ isOpen, activeChat, isNewChat }) {
       }
 
       // Realizar la solicitud con axios
-      const res = await axios.get(`http://localhost:4000/api/users/search?q=${encodeURIComponent(query)}`, {
+      const res = await axios.get(process.env.NEXT_PUBLIC_API_URL + `/users/search?q=${encodeURIComponent(query)}`, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -187,7 +187,7 @@ export function useChatPolling({ isOpen, activeChat, isNewChat }) {
 
       // Crear una nueva conversación con el usuario seleccionado
       const res = await axios.post(
-        "http://localhost:4000/api/chats/new",
+        `${process.env.NEXT_PUBLIC_API_URL}/chats/new`,
         { targetUserId: userId },
         {
           headers: {
@@ -238,7 +238,7 @@ export function useChatPolling({ isOpen, activeChat, isNewChat }) {
       }))
 
       const res = await axios.post(
-        `http://localhost:4000/api/chats/${chatId}/messages`,
+        `${process.env.NEXT_PUBLIC_API_URL}/chats/${chatId}/messages`,
         { text: text },
         {
           headers: {

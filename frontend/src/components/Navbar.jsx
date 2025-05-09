@@ -9,7 +9,7 @@ export default function Navbar() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [userData, setUserData] = useState({
-    profileImage: "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp",
+    profileImage: process.env.NEXT_PUBLIC_SERVER_URL + "/default.jpg",
   })
   const router = useRouter()
   const pathname = usePathname()
@@ -23,7 +23,7 @@ export default function Navbar() {
     if (token) {
       const fetchUserData = async () => {
         try {
-          const profileResponse = await fetch("http://localhost:4000/api/user/profile", {
+          const profileResponse = await fetch(process.env.NEXT_PUBLIC_API_URL + "/user/profile", {
             method: "GET",
             credentials: "include",
           })
@@ -183,7 +183,7 @@ export default function Navbar() {
           <div className="w-10 rounded-full">
             <img
               src={
-                `http://localhost:4000${userData.profileImage || "/placeholder.svg"}` ||
+                `${process.env.NEXT_PUBLIC_SERVER_URL}${userData.profileImage || "/placeholder.svg"}` ||
                 "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
               }
               alt="Profile"
@@ -314,7 +314,7 @@ export default function Navbar() {
                     <div className="w-10 rounded-full">
                       <img
                         src={
-                          `http://localhost:4000${userData.profileImage || "/placeholder.svg"}` ||
+                          process.env.NEXT_PUBLIC_SERVER_URL + `${userData.profileImage || "/placeholder.svg"}` ||
                           "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
                         }
                         alt="Profile"
@@ -395,7 +395,7 @@ export default function Navbar() {
                 <div className="w-10 rounded-full">
                   <img
                     src={
-                      `http://localhost:4000${userData.profileImage || "/placeholder.svg"}` ||
+                      process.env.NEXT_PUBLIC_SERVER_URL + `${userData.profileImage || "/placeholder.svg"}` ||
                       "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
                     }
                     alt="Profile"

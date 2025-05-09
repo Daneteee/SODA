@@ -9,7 +9,7 @@ export const useUserData = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const profileResponse = await fetch("http://localhost:4000/api/user/profile", {
+        const profileResponse = await fetch(process.env.NEXT_PUBLIC_API_URL + "/user/profile", {
           method: "GET",
           credentials: "include",
         });
@@ -17,7 +17,7 @@ export const useUserData = () => {
         const profileData = await profileResponse.json();
         setCredit(profileData.credit);
 
-        const stocksResponse = await fetch("http://localhost:4000/api/user/stocks", {
+        const stocksResponse = await fetch(process.env.NEXT_PUBLIC_API_URL + "/user/stocks", {
           method: "GET",
           credentials: "include",
         });
@@ -25,7 +25,7 @@ export const useUserData = () => {
         const stocksData = await stocksResponse.json();
         setUserStocks(stocksData.stocks || []);
 
-        const transactionsResponse = await fetch("http://localhost:4000/api/transactions", {
+        const transactionsResponse = await fetch(process.env.NEXT_PUBLIC_API_URL + "/transactions", {
           method: "GET",
           credentials: "include",
         });

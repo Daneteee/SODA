@@ -8,7 +8,7 @@ export function useNewsData(symbol, newsOpen) {
     setNewsLoading(true);
     try {
       const response = await fetch(
-        `http://localhost:4000/api/market/news?symbol=${symbol}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/market/news?symbol=${symbol}`,
         {
           method: "GET",
           credentials: "include",
