@@ -5,8 +5,10 @@ const redis = require('redis');
 const axios = require('axios');
 
 // Initialize Redis client
-const redisClient = redis.createClient({});
-
+const redisClient = redis.createClient({
+  host: process.env.REDIS_HOST,
+  port: process.env.REDIS_PORT
+});
 // Environment variables
 const finnhubApiKey = process.env.FINNHUB_API_KEY;
 
