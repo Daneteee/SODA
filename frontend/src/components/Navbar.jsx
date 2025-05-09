@@ -260,7 +260,7 @@ export default function Navbar() {
   )
 
   // Paginas con NavBar flotante
-  const floatingNavPages = ["/", "/auth/login", "/auth/register", "/cookies", "/terms", "/policy", "/contact"]
+  const floatingNavPages = ["/", "/auth/login", "/auth/register", "/cookies", "/terms", "/privacy", "/contact", "/about"]
   const isfloatingNavPages = floatingNavPages.includes(pathname)
 
   if (isfloatingNavPages) {

@@ -51,20 +51,7 @@ export default function CookiesPage() {
         { name: "_gat", purpose: "Limita la tasa de solicitudes", duration: "1 día" },
         { name: "_gid", purpose: "Registra un ID único para estadísticas diarias", duration: "1 día" },
       ],
-    },
-    // {
-    //   id: "marketing",
-    //   title: "Cookies de Marketing",
-    //   icon: Server,
-    //   color: "text-info",
-    //   description:
-    //     "Estas cookies pueden ser establecidas a través de nuestro sitio por nuestros socios publicitarios. Pueden ser utilizadas por esas empresas para crear un perfil de tus intereses y mostrarte anuncios relevantes en otros sitios. No almacenan directamente información personal, sino que se basan en la identificación única de tu navegador y dispositivo de internet.",
-    //   examples: [
-    //     { name: "ads_id", purpose: "Identifica dispositivos para marketing", duration: "1 año" },
-    //     { name: "conversion_tracking", purpose: "Mide conversiones de anuncios", duration: "30 días" },
-    //     { name: "remarketing_id", purpose: "Permite remarketing en otras webs", duration: "90 días" },
-    //   ],
-    // },
+    }
   ]
 
   return (

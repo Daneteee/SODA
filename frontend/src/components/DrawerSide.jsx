@@ -50,9 +50,9 @@ const DrawerSide = () => {
 
   return (
     <>
-      <div className="drawer-side hidden md:block" style={{ height: "calc(100vh - 5em)" }}>
+      <div className="drawer-side hidden md:block min-h-screen">
         <label htmlFor="my-drawer-2" className="drawer-overlay"></label>
-        <aside className="bg-base-100 w-80 border-r border-base-200 flex flex-col h-full">
+        <aside className="bg-base-100 w-80 border-r border-base-200 flex flex-col min-h-screen">
           {/* Encabezado del usuario */}
           <div className="p-4 bg-primary text-primary-content">
             <div className="flex items-center gap-4">

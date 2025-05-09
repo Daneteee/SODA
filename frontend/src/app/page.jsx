@@ -85,7 +85,9 @@ export default function Home() {
               <Link href="/dashboard/market" className="btn btn-primary btn-lg">
                 Comenzar ahora →
               </Link>
-              <button className="btn btn-neutral btn-lg">Cómo funciona</button>
+              <Link href="/about" className="btn btn-neutral btn-lg">
+                Cómo funciona
+              </Link>
             </div>
           </div>
         </div>
@@ -171,9 +173,9 @@ export default function Home() {
             está a un clic de distancia.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <button className="btn btn-ghost btn-lg text-white border-2">
+            <Link href="/about" className="btn btn-ghost btn-lg text-white border-2">
               Más Información
-            </button>
+            </Link>
             <button className="btn btn-accent btn-lg">Crear Cuenta Gratis</button>
           </div>
         </div>

@@ -10,10 +10,8 @@ const isMarketOpen = () => {
     return false;
   }
 
-  // El mercado está abierto de 9:30 AM a 4:00 PM ET (13:30 a 20:00 UTC)
-  // Nota: Esto es una simplificación. En realidad, hay horarios especiales para días festivos
-  // y el horario de verano puede afectar esto
-  return time >= 2130 && time < 2000;
+  // El mercado está abierto de 15:30 AM a 22:00 PM
+  return time >= 1530 && time < 2200;
 };
 
 module.exports = { isMarketOpen }; 
