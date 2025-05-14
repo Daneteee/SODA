@@ -164,7 +164,10 @@ const initializeWebSocket = async (server) => {
 
     redisClient.on('error', (err) => console.error('❌ Redis error:', err));
     
-    const wss = new WebSocket.Server({ server });
+    const wss = new WebSocket.Server({ 
+      server,
+      path: '/websocket'  
+    });
     
     // Get stock list for symbols only - we just need to know what to subscribe to
     const stocksData = await getStocksList();
