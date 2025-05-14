@@ -20,13 +20,33 @@ export const WebSocketProvider = ({ children }) => {
     }
 
     console.log("🔄 Iniciando conexión WebSocket...");
-    const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-    const host = window.location.hostname;
-    const port = window.location.port ? `:${window.location.port}` : '';
-    const url = `${protocol}${host}${port}${process.env.NEXT_PUBLIC_WEBSOCKET_URL}`;
+    
+    // Usar directamente la URL del entorno o construir una relativa al servidor actual
+    const wsUrl = process.env.NEXT_PUBLIC_WEBSOCKET_URL;
+    console.log("📌 Valor de NEXT_PUBLIC_WEBSOCKET_URL:", wsUrl);
+    let url;
+    
+    if (wsUrl && (wsUrl.startsWith('ws://') || wsUrl.startsWith('wss://'))) {
+      // Si la URL ya incluye el protocolo, usarla directamente
+      url = wsUrl;
+      console.log("🔍 Usando URL completa del .env");
+    } else {
+      // Si es solo una ruta, construir la URL relativa al servidor actual
+      const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+      console.log("🔍 Protocolo:", protocol);
+      
+      const host = window.location.hostname;
+      console.log("🔍 Hostname:", host);
+      
+      const port = window.location.port ? `:${window.location.port}` : '';
+      console.log("🔍 Puerto:", port);
+      
+      url = `${protocol}${host}${port}${wsUrl || ''}`;
+      console.log("🔍 URL construida a partir de componentes");
+    }
 
+    console.log("🔗 Conectando a:", url);
     ws.current = new WebSocket(url);
-
 
     ws.current.onopen = () => {
       console.log("✅ Conexión WebSocket establecida");
