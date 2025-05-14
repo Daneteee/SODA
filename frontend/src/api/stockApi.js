@@ -1,6 +1,6 @@
 // Obtenim l'històric d'una acció
 export const fetchStockData = async (symbol, interval = '5m', range = '1d') => {
-    const url = `http://localhost:4000/api/market/${symbol}/?interval=${interval}&range=${range}`;
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/market/${symbol}/?interval=${interval}&range=${range}`;
     const res = await fetch(url);
     if (!res.ok) {
       throw new Error("Error obteniendo datos históricos");
@@ -10,7 +10,7 @@ export const fetchStockData = async (symbol, interval = '5m', range = '1d') => {
   
 // Obtenim les dades de l'usuari autenticat i les seves accions
 export const fetchUserData = async () => {
-  const profileResponse = await fetch("http://localhost:4000/api/user/profile", {
+  const profileResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/profile`, {
     method: "GET",
     credentials: "include",
   });
@@ -20,7 +20,7 @@ export const fetchUserData = async () => {
   const profileData = await profileResponse.json();
 
   // Obtenim les accions de l'usuari
-  const stocksResponse = await fetch("http://localhost:4000/api/user/stocks", {
+  const stocksResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/stocks`, {
     method: "GET",
     credentials: "include",
   });
