@@ -54,6 +54,9 @@ export default function StockDetailPage() {
 
     // Adaptación para el componente StockHeader
     image: sessionStockInfo?.logo || apiStock?.image,
+    // Asegurarnos de que la imagen tenga el formato correcto para Next.js Image
+    logo: sessionStockInfo?.logo || apiStock?.logo,
+    
     company: {
       name: sessionStockInfo?.name || apiStock?.company?.name || symbol,
     },

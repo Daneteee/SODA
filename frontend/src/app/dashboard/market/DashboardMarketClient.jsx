@@ -119,17 +119,20 @@ const DashboardMarketClient = ({ initialApiStocks, initialCredit, initialUserSto
     if (stock.logo) {
       return (
         <div className="avatar">
-          <div className="w-8 h-8 rounded-full overflow-hidden">
+          <div className="w-8 h-8 rounded-full overflow-hidden relative">
             <Image
               src={stock.logo || "/placeholder.svg"}
               alt={`${stock.symbol} logo`}
-              width={32}
-              height={32}
+              fill
+              sizes="32px"
               className="object-cover"
               onError={(e) => {
-                const t = e.target
-                t.style.display = "none"
-                t.onerror = null
+                e.target.style.display = "none";
+                // Mostrar el placeholder cuando la imagen falla
+                const placeholder = document.createElement('div');
+                placeholder.className = "bg-neutral text-neutral-content rounded-full w-8 h-8 flex items-center justify-center";
+                placeholder.innerHTML = `<span>${stock.symbol.substring(0, 2)}</span>`;
+                e.target.parentNode.appendChild(placeholder);
               }}
             />
           </div>
@@ -138,7 +141,7 @@ const DashboardMarketClient = ({ initialApiStocks, initialCredit, initialUserSto
     }
     return (
       <div className="avatar placeholder">
-        <div className="bg-neutral text-neutral-content rounded-full w-8">
+        <div className="bg-neutral text-neutral-content rounded-full w-8 flex items-center justify-center">
           <span>{stock.symbol.substring(0, 2)}</span>
         </div>
       </div>

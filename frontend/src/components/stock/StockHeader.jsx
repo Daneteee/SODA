@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { TrendingUp, TrendingDown, Star } from "lucide-react";
+import Image from "next/image";
 import { getInterval, getRange } from "@/utils/chartUtils";
 
 export default function StockHeader({
@@ -12,12 +13,13 @@ export default function StockHeader({
   loadStockData,
 }) {
   const [isFav, setIsFav] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   // 1) On mount, load current favs and set initial state
   useEffect(() => {
     async function fetchFavs() {
       try {
-        const res = await fetch("http://localhost:4000/api/favorites", {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/favorites`, {
           credentials: "include",
         });
         if (!res.ok) throw new Error("Failed to fetch favorites");
@@ -33,7 +35,7 @@ export default function StockHeader({
   // 2) Toggle the favorite on click
   const handleToggle = async () => {
     try {
-      const res = await fetch(`http://localhost:4000/api/favorites/${stock.symbol}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/favorites/${stock.symbol}`, {
         method: "PATCH",
         credentials: "include",
       });
@@ -49,14 +51,24 @@ export default function StockHeader({
     <>
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center gap-3">
-          {stock.image ? (
-            <img
-              src={stock.image}
-              alt={`${stock.company?.name} icon`}
-              className="h-10 w-10 rounded-full"
-            />
+          {stock.image && !imageError ? (
+            <div className="relative h-10 w-10 rounded-full overflow-hidden">
+              <Image
+                src={stock.image}
+                alt={`${stock.company?.name || stock.symbol} icon`}
+                fill
+                sizes="40px"
+                className="object-cover"
+                onError={() => setImageError(true)}
+                priority
+              />
+            </div>
           ) : (
-            <div className="text-4xl font-bold">{stock.symbol}</div>
+            <div className="avatar placeholder">
+              <div className="bg-neutral text-neutral-content rounded-full w-10 h-10 flex items-center justify-center">
+                <span className="text-lg font-bold">{stock.symbol.substring(0, 2)}</span>
+              </div>
+            </div>
           )}
         </div>
 
@@ -78,7 +90,7 @@ export default function StockHeader({
 
       {/* Company name */}
       <div className="text-3xl font-bold mb-2">
-        {stock.company?.name || "Cargando"}
+        {stock.company?.name || stock.symbol || "Cargando"}
       </div>
 
       {/* Price and change */}
