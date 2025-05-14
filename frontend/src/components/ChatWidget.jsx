@@ -507,8 +507,8 @@ export default function ChatWidget() {
                                   <img
                                     src={
                                       user.profileImage
-                                        ? `${process.env.NEXT_PUBLIC_API_URL}${user.profileImage}`
-                                        : `${process.env.NEXT_PUBLIC_API_URL}/placeholder.svg`
+                                        ? `${process.env.NEXT_PUBLIC_SERVER_URL}${user.profileImage}`
+                                        : `${process.env.NEXT_PUBLIC_SERVER_URL}/default.jpg`
                                     }
                                     alt={user.name || "Usuario"}
                                   />
@@ -555,8 +555,8 @@ export default function ChatWidget() {
                               <img
                                 src={
                                   user.user?.profileImage
-                                    ? `${process.env.NEXT_PUBLIC_API_URL}${user.user.profileImage}`
-                                    : `${process.env.NEXT_PUBLIC_API_URL}/placeholder.svg`
+                                    ? `${process.env.NEXT_PUBLIC_SERVER_URL}${user.user.profileImage}`
+                                    : `${process.env.NEXT_PUBLIC_SERVER_URL}/default.jpg`
                                 }
                                 alt={user.user?.name || "Usuario"}
                               />
@@ -603,8 +603,8 @@ export default function ChatWidget() {
                       <img
                         src={
                           activeUser.user?.profileImage
-                            ? `${process.env.NEXT_PUBLIC_API_URL}${activeUser.user.profileImage}`
-                            : `${process.env.NEXT_PUBLIC_API_URL}/placeholder.svg`
+                            ? `${process.env.NEXT_PUBLIC_SERVER_URL}${activeUser.user.profileImage}`
+                            : `${process.env.NEXT_PUBLIC_SERVER_URL}/default.jpg`
                         }
                         alt={activeUser.user?.name || "Usuario"}
                       />
