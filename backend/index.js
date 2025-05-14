@@ -26,6 +26,7 @@ connectDB();
 app.use(cookieParser());
 app.use(cors({
   origin: 'http://localhost:3000',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
 app.use(bodyParser.json());

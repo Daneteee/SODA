@@ -6,9 +6,9 @@ const axios = require('axios');
 
 // Initialize Redis client
 const redisClient = redis.createClient({
-  host: process.env.REDIS_HOST,
-  port: process.env.REDIS_PORT
+  url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`
 });
+
 // Environment variables
 const finnhubApiKey = process.env.FINNHUB_API_KEY;
 
@@ -170,42 +170,99 @@ const initializeWebSocket = async (server) => {
     const stocksData = await getStocksList();
     const symbols = Object.keys(stocksData);
 
-    const finnhubSocket = new WebSocket(`wss://ws.finnhub.io?token=${finnhubApiKey}`);
-
-    finnhubSocket.on('open', () => {
-      console.log('✅ Connected to Finnhub WebSocket');
-      // Subscribe to all symbols
-      symbols.forEach(symbol => {
-        finnhubSocket.send(JSON.stringify({ type: 'subscribe', symbol }));
-      });
-    });
-
-    finnhubSocket.on('message', async (data) => {
-      const message = JSON.parse(data);
+    let finnhubSocket;
+    let reconnectInterval;
     
-      if (message.type === 'trade' && message.data) {
-        // Send only the trade data, without enriching it with company info
-        const tradeData = message.data.map(trade => ({
-          symbol: trade.s,
-          price: trade.p,
-          timestamp: trade.t,
-          volume: trade.v
-        }));
-        
-        wss.clients.forEach(client => {
-          if (client.readyState === WebSocket.OPEN) {
-            client.send(JSON.stringify({ type: 'trade', data: tradeData }));
+    const connectToFinnhub = () => {
+      finnhubSocket = new WebSocket(`wss://ws.finnhub.io?token=${finnhubApiKey}`);
+
+      finnhubSocket.on('open', () => {
+        console.log('✅ Connected to Finnhub WebSocket');
+        // Clear any existing reconnect interval
+        if (reconnectInterval) {
+          clearInterval(reconnectInterval);
+          reconnectInterval = null;
+        }
+        // Subscribe to all symbols
+        symbols.forEach(symbol => {
+          try {
+            finnhubSocket.send(JSON.stringify({ type: 'subscribe', symbol }));
+          } catch (error) {
+            console.error(`Error subscribing to ${symbol}:`, error);
           }
         });
-      }
-    });
+      });
+
+      finnhubSocket.on('message', async (data) => {
+        try {
+          const message = JSON.parse(data);
+        
+          if (message.type === 'trade' && message.data) {
+            // Send only the trade data, without enriching it with company info
+            const tradeData = message.data.map(trade => ({
+              symbol: trade.s,
+              price: trade.p,
+              timestamp: trade.t,
+              volume: trade.v
+            }));
+            
+            // Send to all connected clients with error handling
+            wss.clients.forEach(client => {
+              if (client.readyState === WebSocket.OPEN) {
+                try {
+                  client.send(JSON.stringify({ type: 'trade', data: tradeData }));
+                } catch (error) {
+                  console.error('Error sending message to client:', error);
+                }
+              }
+            });
+          }
+        } catch (error) {
+          console.error('Error processing Finnhub message:', error);
+        }
+      });
+
+      finnhubSocket.on('error', (error) => {
+        console.error('❌ Finnhub WebSocket error:', error);
+      });
+
+      finnhubSocket.on('close', (code, reason) => {
+        console.warn(`🔴 Finnhub WebSocket closed: ${code} - ${reason}`);
+        // Attempt to reconnect after 5 seconds
+        if (!reconnectInterval) {
+          reconnectInterval = setTimeout(() => {
+            console.log('🔄 Attempting to reconnect to Finnhub...');
+            connectToFinnhub();
+          }, 5000);
+        }
+      });
+    };
+
+    // Initial connection
+    connectToFinnhub();
     
     wss.on('connection', (ws) => {
       console.log('🟢 New client connected to WebSocket');
 
+      ws.on('error', (error) => {
+        console.error('Client WebSocket error:', error);
+      });
+
       ws.on('close', () => {
         console.log('🔴 Client disconnected from WebSocket');
       });
+    });
+
+    // Handle server shutdown gracefully
+    process.on('SIGTERM', () => {
+      console.log('🔄 Shutting down WebSocket connections...');
+      if (finnhubSocket && finnhubSocket.readyState === WebSocket.OPEN) {
+        finnhubSocket.close();
+      }
+      wss.close();
+      if (reconnectInterval) {
+        clearTimeout(reconnectInterval);
+      }
     });
     
     return wss;
@@ -243,8 +300,6 @@ const getAllStocks = async (req, res) => {
     res.status(500).json({ error: 'Error retrieving stocks list' });
   }
 };
-
-
 
 /**
  * API endpoint to get stock news

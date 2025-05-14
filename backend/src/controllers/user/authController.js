@@ -45,7 +45,19 @@ const registerUser = async (req, res) => {
 
     jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' }, (err, token) => {
       if (err) throw err;
-      res.status(200).json({ msg: 'Usuario registrado', token });
+      
+      // Configurar cookie para cross-origin
+      res.cookie('authToken', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production', // Solo HTTPS en producción
+        sameSite: 'none', // Permite cookies cross-site
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 días en ms
+      });
+      
+      res.json({ 
+        msg: 'Usuario registrado',
+        token // Mantén también la respuesta JSON por compatibilidad
+      });
     });
 
   } 
@@ -83,7 +95,20 @@ const loginUser = async (req, res) => {
 
     jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' }, (err, token) => {
       if (err) throw err;
-      res.json({ token });
+      
+      // Configurar cookie para cross-origin
+      res.cookie('authToken', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production', // Solo HTTPS en producción
+        sameSite: 'none', // Permite cookies cross-site
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 días en ms
+        domain: '.tudominio.com' // Si tienes subdominio común
+      });
+      
+      res.json({ 
+        msg: 'Usuario registrado',
+        token // Mantén también la respuesta JSON por compatibilidad
+      });
     });
   } catch (err) {
     console.error(err.message);
@@ -91,6 +116,11 @@ const loginUser = async (req, res) => {
   }
 };
 
+const logoutUser = async (req, res) => {
+  res.clearCookie('authToken');
+  res.json({ msg: 'Cierre de sesión exitoso' });
+};
+
 module.exports = {
-  registerUser, loginUser
+  registerUser, loginUser, logoutUser
 };

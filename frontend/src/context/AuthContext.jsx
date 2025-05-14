@@ -10,18 +10,34 @@ export const AuthProvider = ({ children }) => {
   const router = useRouter();
 
   useEffect(() => {
-    const token = Cookies.get("jwtToken");
-    if (token) {
-      fetchUser(token);
-    }
+    checkAuthStatus();
   }, []);
 
-  const fetchUser = async (token) => {
+  const checkAuthStatus = async () => {
     try {
-        const res = await fetch(process.env.NEXT_PUBLIC_API_URL + "/auth/me", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const res = await fetch(process.env.NEXT_PUBLIC_API_URL + "/auth/me", {
+        credentials: 'include',
+      });
+
+      if (res.ok) {
+        const userData = await res.json();
+        setUser(userData);
+      }
+    } catch (error) {
+      setUser(null);
+    }
+  };
+
+  const fetchUser = async (token = null) => {
+    try {
+      const headers = {};
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+
+      const res = await fetch(process.env.NEXT_PUBLIC_API_URL + "/auth/me", {
+        credentials: 'include',
+        headers,
       });
 
       if (!res.ok) throw new Error("Token inválido");
@@ -29,19 +45,24 @@ export const AuthProvider = ({ children }) => {
       const userData = await res.json();
       setUser(userData);
     } catch (error) {
-      Cookies.remove("jwtToken");
       setUser(null);
     }
   };
 
   const login = (token) => {
-    Cookies.set("jwtToken", token, { expires: 7, path: "/" });
-    fetchUser(token);
+    fetchUser();
     router.push("/dashboard");
   };
 
-  const logout = () => {
-    Cookies.remove("jwtToken");
+  const logout = async () => {
+    try {
+      await fetch(process.env.NEXT_PUBLIC_API_URL + "/auth/logout", {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
     setUser(null);
     router.push("/login");
   };
