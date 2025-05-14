@@ -20,7 +20,13 @@ export const WebSocketProvider = ({ children }) => {
     }
 
     console.log("🔄 Iniciando conexión WebSocket...");
-    ws.current = new WebSocket(`ws://${window.location.hostname}:${window.location.port}${process.env.NEXT_PUBLIC_WEBSOCKET_URL}`);
+    const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+    const host = window.location.hostname;
+    const port = window.location.port ? `:${window.location.port}` : '';
+    const url = `${protocol}${host}${port}${process.env.NEXT_PUBLIC_WEBSOCKET_URL}`;
+
+    ws.current = new WebSocket(url);
+
 
     ws.current.onopen = () => {
       console.log("✅ Conexión WebSocket establecida");
