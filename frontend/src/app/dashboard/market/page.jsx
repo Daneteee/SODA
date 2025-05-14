@@ -9,23 +9,23 @@ export default async function DashboardMarketPage() {
 
   // 2. Parallel fetch (reenviando la cookie al perfil)
   const [marketRes, profileRes, stocksRes] = await Promise.all([
-    fetch(process.env.NEXT_PUBLIC_API_URL + "/market/stocks").then((r) => {
+    fetch(process.env.NEXT_PUBLIC_SERVICE_NAME + "/market/stocks").then((r) => {
       if (!r.ok) throw new Error("Error fetching market stocks");
       return r.json();
     }),
-    fetch(process.env.NEXT_PUBLIC_API_URL + "/user/profile", {
+    fetch(process.env.NEXT_PUBLIC_SERVICE_NAME + "/user/profile", {
       headers: { cookie },
     }).then((r) => {
       if (!r.ok) throw new Error("Error fetching profile");
       return r.json();
     }),
-    fetch(process.env.NEXT_PUBLIC_API_URL + "/user/stocks", {
+    fetch(process.env.NEXT_PUBLIC_SERVICE_NAME + "/user/stocks", {
       headers: { cookie },
     }).then((r) => {
       if (!r.ok) throw new Error("Error fetching user stocks");
       return r.json();
     }),
-    fetch(process.env.NEXT_PUBLIC_API_URL + "/transactions", {
+    fetch(process.env.NEXT_PUBLIC_SERVICE_NAME + "/transactions", {
       headers: { cookie },
     }).then((r) => {
       if (!r.ok) return { transactions: [] };
