@@ -60,7 +60,7 @@ export function useStockTransactions({ stock, positionShares, loadUserData }) {
       sellPrice: stock.price,
     };
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL + "/api/market/sell", {
+      const response = await fetch(process.env.NEXT_PUBLIC_API_URL + "/market/sell", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
