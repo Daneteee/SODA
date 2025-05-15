@@ -6,7 +6,28 @@ const axios = require('axios');
 
 // Initialize Redis client
 const redisClient = redis.createClient({
-  url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`
+  url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
+  socket: {
+    reconnectStrategy: (retries) => {
+      // Reconectar con backoff exponencial
+      const delay = Math.min(1000 * 2 ** retries, 30000); // max delay 30 seconds
+      console.log(`🔄 Redis reconnecting in ${delay}ms (attempt ${retries})`);
+      return delay;
+    }
+  }
+});
+
+// Manejar eventos de Redis
+redisClient.on('error', (err) => {
+  console.error('❌ Redis error:', err);
+});
+
+redisClient.on('connect', () => {
+  console.log('✅ Connected to Redis');
+});
+
+redisClient.on('reconnecting', () => {
+  console.log('🔄 Redis reconnecting...');
 });
 
 // Environment variables
@@ -158,11 +179,15 @@ const getStockHistoricalData = async (symbol, interval = '1d', range = '1mo') =>
  */
 const initializeWebSocket = async (server) => {
   try {
-    // Connect to Redis explicitly
-    await redisClient.connect();
-    console.log('✅ Connected to Redis');
-
-    redisClient.on('error', (err) => console.error('❌ Redis error:', err));
+    // Connect to Redis explicitly with retry
+    try {
+      if (!redisClient.isOpen) {
+        await redisClient.connect();
+      }
+    } catch (redisError) {
+      console.error('❌ Initial Redis connection failed, will retry automatically:', redisError);
+      // La estrategia de reconexión debería manejar esto automáticamente
+    }
     
     const wss = new WebSocket.Server({ 
       server,
@@ -177,15 +202,35 @@ const initializeWebSocket = async (server) => {
     let reconnectInterval;
     
     const connectToFinnhub = () => {
+      // Limpiar cualquier intento de reconexión previo
+      if (reconnectInterval) {
+        clearTimeout(reconnectInterval);
+        reconnectInterval = null;
+      }
+
+      console.log('🔄 Intentando conectar a Finnhub WebSocket...');
       finnhubSocket = new WebSocket(`wss://ws.finnhub.io?token=${finnhubApiKey}`);
+
+      // Establecer un timeout por si la conexión no se establece rápidamente
+      const connectionTimeout = setTimeout(() => {
+        console.error('⚠️ Timeout conectando a Finnhub WebSocket');
+        if (finnhubSocket.readyState !== WebSocket.OPEN) {
+          finnhubSocket.terminate();
+          scheduleReconnect();
+        }
+      }, 10000); // 10 segundos para establecer la conexión
 
       finnhubSocket.on('open', () => {
         console.log('✅ Connected to Finnhub WebSocket');
-        // Clear any existing reconnect interval
+        // Limpiar el timeout ya que la conexión fue exitosa
+        clearTimeout(connectionTimeout);
+        
+        // Limpiar cualquier intento de reconexión pendiente
         if (reconnectInterval) {
-          clearInterval(reconnectInterval);
+          clearTimeout(reconnectInterval);
           reconnectInterval = null;
         }
+        
         // Subscribe to all symbols
         symbols.forEach(symbol => {
           try {
@@ -227,18 +272,52 @@ const initializeWebSocket = async (server) => {
 
       finnhubSocket.on('error', (error) => {
         console.error('❌ Finnhub WebSocket error:', error);
+        clearTimeout(connectionTimeout); // Limpiar el timeout si ocurre un error
+        scheduleReconnect();
       });
 
       finnhubSocket.on('close', (code, reason) => {
         console.warn(`🔴 Finnhub WebSocket closed: ${code} - ${reason}`);
-        // Attempt to reconnect after 5 seconds
-        if (!reconnectInterval) {
-          reconnectInterval = setTimeout(() => {
-            console.log('🔄 Attempting to reconnect to Finnhub...');
-            connectToFinnhub();
-          }, 5000);
-        }
+        clearTimeout(connectionTimeout); // Limpiar el timeout si la conexión se cierra
+        scheduleReconnect();
       });
+    };
+
+    // Función auxiliar para programar reconexiones
+    const scheduleReconnect = () => {
+      if (!reconnectInterval) {
+        // Determinar el retraso basado en la hora actual
+        const now = new Date();
+        const hour = now.getHours();
+        const minute = now.getMinutes();
+        const currentTime = hour * 60 + minute;
+        
+        // Market hours aproximados para Finnhub (15:00 - 22:00)
+        const marketOpen = 15 * 60; // 15:00
+        const marketClose = 22 * 60; // 22:00
+        
+        let delay = 5000; // 5 segundos por defecto
+        
+        // Si estamos fuera del horario de mercado, usamos una estrategia diferente
+        if (currentTime < marketOpen || currentTime >= marketClose) {
+          // Durante las horas nocturnas (22:00 - 15:00), hacer intentos menos frecuentes
+          // Verificar cada 5 minutos
+          delay = 5 * 60 * 1000; // 5 minutos
+          
+          // Si estamos cerca de la apertura del mercado (14:50 - 15:10), intentar más frecuentemente
+          if (currentTime >= marketOpen - 10 && currentTime < marketOpen + 10) {
+            delay = 30 * 1000; // 30 segundos
+          }
+          
+          console.log(`🔄 Fuera de horario de mercado. Programando reconexión en ${delay/1000} segundos...`);
+        } else {
+          console.log(`🔄 Programando reconexión en ${delay/1000} segundos...`);
+        }
+        
+        reconnectInterval = setTimeout(() => {
+          connectToFinnhub();
+        }, delay);
+      }
     };
 
     // Initial connection
