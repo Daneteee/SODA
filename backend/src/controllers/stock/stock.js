@@ -35,7 +35,11 @@ const finnhubApiKey = process.env.FINNHUB_API_KEY;
 
 // Cache constants
 const STOCKS_CACHE_KEY = 'stocks:list';
-const STOCKS_CACHE_TTL = 3600 * 24; // 24 hours
+const STOCKS_CACHE_TTL = 300; 
+
+// Finnhub WebSocket status tracking
+let finnhubSubscriptionActive = false;
+let subscribedSymbols = new Set();
 
 /**
  * Cache TTL helper function
@@ -174,8 +178,47 @@ const getStockHistoricalData = async (symbol, interval = '1d', range = '1mo') =>
 };
 
 /**
- * Initialize WebSocket connection for real-time stock data ONLY
- * This no longer sends company data, just price updates
+ * Function to subscribe to stock symbols
+ */
+const subscribeToSymbols = (socket, symbols) => {
+  if (socket && socket.readyState === WebSocket.OPEN) {
+    console.log(`🔔 Subscribing to ${symbols.length} symbols...`);
+    
+    // Clear previous subscriptions tracking
+    subscribedSymbols.clear();
+    
+    // Subscribe to each symbol and track them
+    symbols.forEach(symbol => {
+      try {
+        socket.send(JSON.stringify({ type: 'subscribe', symbol }));
+        subscribedSymbols.add(symbol);
+      } catch (error) {
+        console.error(`Error subscribing to ${symbol}:`, error);
+      }
+    });
+    
+    finnhubSubscriptionActive = true;
+    console.log(`✅ Subscribed to ${subscribedSymbols.size} symbols`);
+  } else {
+    console.error('❌ Cannot subscribe - socket not open');
+    finnhubSubscriptionActive = false;
+  }
+};
+
+/**
+ * Check subscription status and resubscribe if needed
+ */
+const checkSubscriptions = (socket, symbols) => {
+  if (socket && socket.readyState === WebSocket.OPEN && !finnhubSubscriptionActive) {
+    console.log('🔄 Checking subscriptions - resubscribing to all symbols');
+    subscribeToSymbols(socket, symbols);
+    return true;
+  }
+  return false;
+};
+
+/**
+ * Initialize WebSocket connection for real-time stock data
  */
 const initializeWebSocket = async (server) => {
   try {
@@ -186,7 +229,6 @@ const initializeWebSocket = async (server) => {
       }
     } catch (redisError) {
       console.error('❌ Initial Redis connection failed, will retry automatically:', redisError);
-      // La estrategia de reconexión debería manejar esto automáticamente
     }
     
     const wss = new WebSocket.Server({ 
@@ -200,6 +242,8 @@ const initializeWebSocket = async (server) => {
 
     let finnhubSocket;
     let reconnectInterval;
+    let pingInterval;
+    let subscriptionCheckInterval;
     
     const connectToFinnhub = () => {
       // Limpiar cualquier intento de reconexión previo
@@ -207,14 +251,26 @@ const initializeWebSocket = async (server) => {
         clearTimeout(reconnectInterval);
         reconnectInterval = null;
       }
+      
+      // Limpiar intervalos existentes
+      if (pingInterval) {
+        clearInterval(pingInterval);
+        pingInterval = null;
+      }
+      
+      if (subscriptionCheckInterval) {
+        clearInterval(subscriptionCheckInterval);
+        subscriptionCheckInterval = null;
+      }
 
       console.log('🔄 Intentando conectar a Finnhub WebSocket...');
       finnhubSocket = new WebSocket(`wss://ws.finnhub.io?token=${finnhubApiKey}`);
+      finnhubSubscriptionActive = false;
 
       // Establecer un timeout por si la conexión no se establece rápidamente
       const connectionTimeout = setTimeout(() => {
         console.error('⚠️ Timeout conectando a Finnhub WebSocket');
-        if (finnhubSocket.readyState !== WebSocket.OPEN) {
+        if (finnhubSocket && finnhubSocket.readyState !== WebSocket.OPEN) {
           finnhubSocket.terminate();
           scheduleReconnect();
         }
@@ -232,21 +288,39 @@ const initializeWebSocket = async (server) => {
         }
         
         // Subscribe to all symbols
-        symbols.forEach(symbol => {
-          try {
-            finnhubSocket.send(JSON.stringify({ type: 'subscribe', symbol }));
-          } catch (error) {
-            console.error(`Error subscribing to ${symbol}:`, error);
+        subscribeToSymbols(finnhubSocket, symbols);
+        
+        // Set up a ping every 30 seconds to keep the connection alive
+        pingInterval = setInterval(() => {
+          if (finnhubSocket && finnhubSocket.readyState === WebSocket.OPEN) {
+            try {
+              finnhubSocket.send(JSON.stringify({ type: 'ping' }));
+              console.log('📡 Sent ping to Finnhub');
+            } catch (error) {
+              console.error('Error sending ping:', error);
+              // If ping fails, force reconnection
+              if (finnhubSocket) {
+                finnhubSocket.terminate();
+                scheduleReconnect();
+              }
+            }
           }
-        });
+        }, 30000); // 30 seconds
+        
+        // Check subscriptions every 2 minutes
+        subscriptionCheckInterval = setInterval(() => {
+          checkSubscriptions(finnhubSocket, symbols);
+        }, 120000); // 2 minutes
       });
 
       finnhubSocket.on('message', async (data) => {
         try {
           const message = JSON.parse(data);
-        
+          
           if (message.type === 'trade' && message.data) {
-            // Send only the trade data, without enriching it with company info
+            // Reset reconnection logic since we're receiving data
+            finnhubSubscriptionActive = true;
+            
             const tradeData = message.data.map(trade => ({
               symbol: trade.s,
               price: trade.p,
@@ -264,6 +338,8 @@ const initializeWebSocket = async (server) => {
                 }
               }
             });
+          } else if (message.type === 'pong') {
+            console.log('📡 Received pong from Finnhub');
           }
         } catch (error) {
           console.error('Error processing Finnhub message:', error);
@@ -273,12 +349,26 @@ const initializeWebSocket = async (server) => {
       finnhubSocket.on('error', (error) => {
         console.error('❌ Finnhub WebSocket error:', error);
         clearTimeout(connectionTimeout); // Limpiar el timeout si ocurre un error
+        finnhubSubscriptionActive = false;
         scheduleReconnect();
       });
 
       finnhubSocket.on('close', (code, reason) => {
         console.warn(`🔴 Finnhub WebSocket closed: ${code} - ${reason}`);
         clearTimeout(connectionTimeout); // Limpiar el timeout si la conexión se cierra
+        finnhubSubscriptionActive = false;
+        
+        // Clear intervals on close
+        if (pingInterval) {
+          clearInterval(pingInterval);
+          pingInterval = null;
+        }
+        
+        if (subscriptionCheckInterval) {
+          clearInterval(subscriptionCheckInterval);
+          subscriptionCheckInterval = null;
+        }
+        
         scheduleReconnect();
       });
     };
@@ -315,6 +405,13 @@ const initializeWebSocket = async (server) => {
         }
         
         reconnectInterval = setTimeout(() => {
+          if (finnhubSocket) {
+            // Ensure any existing socket is properly closed before reconnecting
+            if (finnhubSocket.readyState === WebSocket.OPEN || 
+                finnhubSocket.readyState === WebSocket.CONNECTING) {
+              finnhubSocket.terminate();
+            }
+          }
           connectToFinnhub();
         }, delay);
       }
@@ -322,6 +419,21 @@ const initializeWebSocket = async (server) => {
 
     // Initial connection
     connectToFinnhub();
+    
+    // Set up a heartbeat to check connection status every 5 minutes
+    const heartbeatInterval = setInterval(() => {
+      if (finnhubSocket && finnhubSocket.readyState === WebSocket.OPEN) {
+        if (!finnhubSubscriptionActive) {
+          console.log('❤️‍🩹 Heartbeat detected inactive subscriptions - resubscribing');
+          subscribeToSymbols(finnhubSocket, symbols);
+        } else {
+          console.log('❤️ Heartbeat - Finnhub connection is active');
+        }
+      } else {
+        console.log('💔 Heartbeat - Finnhub connection is not active');
+        scheduleReconnect();
+      }
+    }, 5 * 60 * 1000); // 5 minutes
     
     wss.on('connection', (ws) => {
       console.log('🟢 New client connected to WebSocket');
@@ -344,6 +456,15 @@ const initializeWebSocket = async (server) => {
       wss.close();
       if (reconnectInterval) {
         clearTimeout(reconnectInterval);
+      }
+      if (pingInterval) {
+        clearInterval(pingInterval);
+      }
+      if (subscriptionCheckInterval) {
+        clearInterval(subscriptionCheckInterval);
+      }
+      if (heartbeatInterval) {
+        clearInterval(heartbeatInterval);
       }
     });
     
