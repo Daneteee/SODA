@@ -46,7 +46,7 @@ export default function CommentItem({ comment, currentUser, postId }) {
     <div className="flex gap-4">
       <div className="avatar placeholder hidden sm:flex">
         <div className="w-10 h-10 rounded-full overflow-hidden bg-base-300 text-base-content flex items-center justify-center">
-          <Image
+          <img
             src={comment.author?.profileImage ? `${process.env.NEXT_PUBLIC_SERVER_URL}${comment.author.profileImage}` : "/default-avatar.png"}
             alt={comment.author?.name || "Usuario"}
             width={40}
@@ -62,7 +62,7 @@ export default function CommentItem({ comment, currentUser, postId }) {
             <div className="flex items-center gap-2">
               <div className="avatar placeholder sm:hidden mr-2">
                 <div className="w-6 h-6 rounded-full overflow-hidden bg-base-300 text-base-content flex items-center justify-center">
-                  <Image
+                  <img
                     src={comment.author?.profileImage ? `${process.env.NEXT_PUBLIC_SERVER_URL}${comment.author.profileImage}` : "/default-avatar.png"}
                     alt={comment.author?.name || "Usuario"}
                     width={24}

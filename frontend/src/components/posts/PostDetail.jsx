@@ -85,7 +85,7 @@ export default function PostDetail({ post, likesCount, userLiked, onLikeToggle }
         <div className="flex items-center mb-6">
           <div className="avatar mr-2">
             <div className="w-10 h-10 rounded-full overflow-hidden bg-neutral text-neutral-content flex items-center justify-center">
-              <Image
+              <img
                 src={post.author?.profileImage ? `${process.env.NEXT_PUBLIC_SERVER_URL}${post.author.profileImage}` : "/default-avatar.png"}
                 alt={post.author?.name || "Usuario"}
                 width={40}
