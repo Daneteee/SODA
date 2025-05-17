@@ -42,23 +42,13 @@ export default function PostCard({ post }) {
   return (
     <Link href={`/dashboard/posts/${post._id}`}>
       <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300 h-full flex flex-col">
-        {post.image && !imageError ? (
+        
           <figure className="relative h-48 w-full">
-            <Image
-              src={`${process.env.NEXT_PUBLIC_SERVER_URL}${post.image}`}
-              alt={post.title}
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              className="object-cover"
-              onError={() => setImageError(true)}
-            />
+            <img src={`${process.env.NEXT_PUBLIC_SERVER_URL}${post.image}`} alt={post.title}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover" 
+            onError={() => setImageError(true)}/>
           </figure>
-        ) : (
-          <div className="h-48 bg-gradient-to-r from-primary/30 to-secondary/30 flex items-center justify-center">
-            <span className="text-4xl">📊</span>
-          </div>
-        )}
-
         <div className="card-body flex-grow">
           <div className="flex items-center gap-2 mb-2">
             <span className={`badge ${categoryColors[post.category] || "badge-neutral"}`}>

@@ -51,19 +51,14 @@ export default function PostDetail({ post, likesCount, userLiked, onLikeToggle }
 
   return (
     <div className="card bg-base-100 shadow-xl mb-8">
-      {post.image && !imageError ? (
+
         <figure className="relative h-64 md:h-96 w-full">
-          <Image
-            src={`${process.env.NEXT_PUBLIC_SERVER_URL}${post.image}`}
-            alt={post.title}
-            fill
+            <img src={`${process.env.NEXT_PUBLIC_SERVER_URL}${post.image}`} alt={post.title}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-cover"
-            onError={() => setImageError(true)}
-            priority
-          />
+            className="object-cover" 
+            onError={() => setImageError(true)}/>
         </figure>
-      ) : null}
+
 
       <div className="card-body">
         <div className="flex flex-wrap items-center gap-2 mb-4">
