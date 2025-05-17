@@ -1,5 +1,5 @@
 import { Geist, Geist_Mono } from "next/font/google";
-import Navbar from "@/components/Navbar"; 
+import Navbar from "@/components/Navbar";
 import { WebSocketProvider } from "../context/WebSocketProvider"; // Asegúrate de ajustar la ruta
 import "./globals.css";
 

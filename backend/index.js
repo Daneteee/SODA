@@ -7,6 +7,7 @@ const http = require('http');
 require('dotenv').config();
 
 // Importar rutas
+const postRoutes = require('./src/routes/postRoutes');
 const userRoutes = require('./src/routes/userRoutes');
 const authRoutes = require('./src/routes/authRoutes');
 const marketRoutes = require('./src/routes/marketRoutes');
@@ -38,6 +39,7 @@ app.use('/api/market', marketRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/favorites', favoriteRoutes);
 app.use('/api/chats', chatRoutes);
+app.use('/api/posts', postRoutes);
 
 // Archivos estáticos
 app.use(express.static('public'));

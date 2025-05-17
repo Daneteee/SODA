@@ -6,6 +6,7 @@ import {
   Wallet,
   History,
   Settings,
+  Users
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
@@ -98,6 +99,12 @@ const DrawerSide = () => {
               <Link href="/dashboard/transactions" className={isActive("/dashboard/transactions")}>
                 <History className="h-5 w-5" />
                 Historial
+              </Link>
+            </li>
+            <li>
+              <Link href="/dashboard/posts" className={isActive("/dashboard/posts")}>
+                <Users className="h-5 w-5" />
+                Posts
               </Link>
             </li>
             <li>
