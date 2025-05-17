@@ -67,7 +67,7 @@ export default function PostCard({ post }) {
           <div className="flex items-center mt-auto">
             <div className="avatar mr-2">
               <div className="w-8 h-8 rounded-full overflow-hidden">
-                <Image
+                <img
                   src={post.author?.profileImage ? `${process.env.NEXT_PUBLIC_SERVER_URL}${post.author.profileImage}` : "/default-avatar.png"}
                   alt={post.author?.name || "Usuario"}
                   width={32}
