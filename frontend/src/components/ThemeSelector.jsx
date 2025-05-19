@@ -53,8 +53,8 @@ export default function ThemeToggle() {
         <ul className="absolute left-1/2 -translate-x-1/2 mt-2 bg-base-100 rounded-box z-[9999] w-52 p-2 shadow-2xl">
           {[
             { label: "Default", value: "dark" },
-            { label: "Light", value: "cupcake" },
-            { label: "Emerald", value: "emerald" },
+            { label: "Light", value: "corporate" },
+            { label: "Black", value: "black" },
             { label: "Valentine", value: "valentine" },
             { label: "Darker", value: "night" },
           ].map((option) => (

@@ -51,7 +51,7 @@ const DrawerSide = () => {
 
   return (
     <>
-      <div className="drawer-side hidden md:block h-full">
+      <div className="drawer-side hidden lg:block h-full">
         <label htmlFor="my-drawer-2" className="drawer-overlay"></label>
         <aside className="bg-base-100 w-80 border-r border-base-200 flex flex-col h-full">
           {/* Encabezado del usuario */}
@@ -125,7 +125,7 @@ const DrawerSide = () => {
       </div>
 
       {/* Bottom Navigation Bar for Mobile */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-base-100 border-t border-base-200 z-50">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-base-100 border-t border-base-200 z-50">
         <div className="flex justify-around items-center p-2">
           <Link href="/dashboard/market" className={`flex flex-col items-center p-2 ${isActive("/dashboard/market")}`}>
             <LayoutDashboard className="h-6 w-6" />
@@ -150,7 +150,7 @@ const DrawerSide = () => {
         </div>
       </div>
 
-      <div className="md:hidden h-16"></div>
+      <div className="lg:hidden h-16"></div>
     </>
   );
 };
