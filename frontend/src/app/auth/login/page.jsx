@@ -30,7 +30,7 @@ export default function LoginPage() {
         throw new Error(data.msg || "Error al iniciar sesión");
       }
       Cookies.set('jwtToken', data.token, { expires: 7, path: '/' });
-      router.push("/dashboard/market");
+      window.location.href = "/dashboard/market";
     } catch (err) {
       setError(err.message || "Error desconocido");
     }

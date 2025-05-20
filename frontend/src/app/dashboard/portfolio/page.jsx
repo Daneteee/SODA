@@ -33,24 +33,33 @@ export default function DashboardPortfolio() {
       try {
         // Profile
         const p = await fetch(process.env.NEXT_PUBLIC_API_URL + "/user/profile", { credentials: "include" });
-        if (!p.ok) throw new Error();
+        if (!p.ok) {
+          console.error('Error fetching profile:', p.statusText);
+          return;
+        }
         const { credit } = await p.json();
         setCredit(credit);
 
         // Owned stocks
         const s = await fetch(process.env.NEXT_PUBLIC_API_URL + "/user/stocks", { credentials: "include" });
-        if (!s.ok) throw new Error();
-        const { stocks } = await s.json();
-        setUserStocks(stocks || []);
+        if (!s.ok) {
+          console.error('Error fetching stocks:', s.statusText);
+          if (s.status === 401) {
+            router.push('/auth/login');
+            return;
+          }
+        }
+        const { stocks = [] } = await s.json();
+        setUserStocks(stocks);
 
         // Transactions
         const t = await fetch(process.env.NEXT_PUBLIC_API_URL + "/transactions", { credentials: "include" });
         if (t.ok) {
-          const { transactions } = await t.json();
+          const { transactions = [] } = await t.json();
           setTransactionsCount(transactions.length);
         }
       } catch (e) {
-        console.error(e);
+        console.error('Error fetching data:', e);
       } finally {
         setLoading(false);
       }
@@ -59,18 +68,18 @@ export default function DashboardPortfolio() {
         // Favorites
         const f = await fetch(process.env.NEXT_PUBLIC_API_URL + "/favorites", { credentials: "include" });
         if (f.ok) {
-          const { favs } = await f.json();
+          const { favs = [] } = await f.json();
           setFavSymbols(favs);
         }
       } catch (e) {
-        console.error(e);
+        console.error('Error fetching favorites:', e);
       } finally {
         setLoadingFavs(false);
       }
     }
 
     fetchData();
-  }, []);
+  }, [router]);
 
   // Helpers
   const getRealtime = (symbol) =>
