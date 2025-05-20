@@ -72,9 +72,17 @@ export function useStockTransactions({ stock, positionShares, loadUserData }) {
       } else {
         const result = await response.json();
         console.log("Venta realizada exitosamente:", result);
+        // Forzar una actualización completa de los datos del usuario
         await loadUserData();
         setAmount(0);
         setShares(0);
+        
+        // Verificar si se vendieron todas las acciones
+        const isSellAll = Math.abs(positionShares - shares) < 0.000001;
+        if (isSellAll) {
+          // Forzar una actualización adicional para asegurar que la UI refleje que no hay acciones
+          setTimeout(() => loadUserData(), 100);
+        }
       }
     } catch (error) {
       console.error("Error en la venta de acciones:", error);

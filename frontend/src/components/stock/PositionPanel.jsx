@@ -1,11 +1,14 @@
 import { TrendingUp, TrendingDown, Info } from "lucide-react";
 
 export default function PositionPanel({ position, symbol }) {
+  // Asegurarse de que position.shares sea un número y no sea NaN
+  const hasShares = position && typeof position.shares === 'number' && !isNaN(position.shares) && position.shares > 0;
+  
   return (
     <div className="card bg-base-100 shadow-xl">
       <div className="card-body p-4 md:p-6">
         <h2 className="card-title mb-4">Posición</h2>
-        {position.shares > 0 ? (
+        {hasShares ? (
           <>
             <div className="mb-4">
               <div className="text-sm text-base-content/70">Total</div>
