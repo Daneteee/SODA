@@ -40,13 +40,30 @@ const WalletPage = () => {
   // Función para añadir crédito
   const handleAddCredit = async () => {
     try {
+      const amount = Number(amountToAdd);
+      
+      // Validaciones básicas
+      if (!amount || amount <= 0) {
+        showAlert("La cantidad debe ser un número positivo.");
+        return;
+      }
+      const newCredit = credit + amount;
+      if (newCredit > 1000001) {
+        showAlert("El crédito máximo permitido es 1.000.000.");
+        return;
+      }
+
       const response = await fetch(process.env.NEXT_PUBLIC_API_URL + "/user/addCredit", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ amount: Number(amountToAdd) }),
       });
-      if (!response.ok) throw new Error("Error añadiendo crédito");
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Error añadiendo crédito");
+      }
 
       // Actualizar el crédito luego de la operación
       const profileResponse = await fetch(process.env.NEXT_PUBLIC_API_URL + "/user/profile", {
@@ -61,6 +78,7 @@ const WalletPage = () => {
       showAlert("Fondos añadidos correctamente.");
     } catch (error) {
       console.error("Error al añadir crédito:", error);
+      showAlert(error.message || "Error al añadir crédito");
     }
   };
 
@@ -97,7 +115,11 @@ const WalletPage = () => {
 
       {/* Alerta utilizando el componente Alert */}
       {alertMessage && (
-        <Alert message={alertMessage} onClose={closeAlert} type="success" />
+        <Alert 
+          message={alertMessage} 
+          onClose={closeAlert} 
+          type={alertMessage.includes("1.000.000") ? "error" : "success"} 
+        />
       )}
 
       {/* Tarjeta de crédito actual */}

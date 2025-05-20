@@ -16,7 +16,13 @@ const addCredit = async (req, res) => {
       return res.status(404).json({ error: "Usuario no encontrado." });
     }
 
-    user.credit = (user.credit || 0) + amount;
+    // Verificar el límite de crédito
+    const newCredit = (user.credit || 0) + amount;
+    if (newCredit > 1000001) {
+      return res.status(400).json({ error: "El crédito máximo permitido es 1.000.000." });
+    }
+
+    user.credit = newCredit;
     await user.save();
 
     return res.status(200).json({ credit: user.credit });

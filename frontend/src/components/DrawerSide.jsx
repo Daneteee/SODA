@@ -143,6 +143,10 @@ const DrawerSide = () => {
             <History className="h-6 w-6" />
             <span className="text-xs mt-1">Historial</span>
           </Link>
+          <Link href="/dashboard/posts" className={`flex flex-col items-center p-2 ${isActive("/dashboard/posts")}`}>
+            <Users className="h-6 w-6" />
+            <span className="text-xs mt-1">Posts</span>
+          </Link>
           <Link href="/dashboard/profile" className={`flex flex-col items-center p-2 ${isActive("/dashboard/profile")}`}>
             <Settings className="h-6 w-6" />
             <span className="text-xs mt-1">Config</span>
