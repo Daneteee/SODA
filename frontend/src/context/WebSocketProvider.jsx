@@ -22,8 +22,8 @@ export const WebSocketProvider = ({ children }) => {
     console.log("🔄 Iniciando conexión WebSocket...");
     
     // Usar directamente la URL del entorno o construir una relativa al servidor actual
-    // const wsUrl = process.env.NEXT_PUBLIC_WEBSOCKET_URL;
-    const wsUrl = "ws://localhost:4000";
+    const wsUrl = process.env.NEXT_PUBLIC_WEBSOCKET_URL;
+    // const wsUrl = "ws://localhost:4000";
     console.log("📌 Valor de NEXT_PUBLIC_WEBSOCKET_URL:", wsUrl);
     let url;
     

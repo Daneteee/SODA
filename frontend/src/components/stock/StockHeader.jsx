@@ -24,7 +24,12 @@ export default function StockHeader({
         });
         if (!res.ok) throw new Error("Failed to fetch favorites");
         const { favs } = await res.json();
-        setIsFav(favs.includes(stock.symbol));
+        // Verificar si el símbolo está en favoritos (ahora favs es un array de objetos)
+        setIsFav(favs.some(fav => 
+          typeof fav === 'string' 
+            ? fav === stock.symbol 
+            : fav.symbol === stock.symbol
+        ));
       } catch (err) {
         console.error(err);
       }
@@ -41,7 +46,12 @@ export default function StockHeader({
       });
       if (!res.ok) throw new Error("Toggle failed");
       const { favs } = await res.json();
-      setIsFav(favs.includes(stock.symbol));
+      // Verificar si el símbolo está en favoritos (ahora favs es un array de objetos)
+      setIsFav(favs.some(fav => 
+        typeof fav === 'string' 
+          ? fav === stock.symbol 
+          : fav.symbol === stock.symbol
+      ));
     } catch (err) {
       console.error(err);
     }
