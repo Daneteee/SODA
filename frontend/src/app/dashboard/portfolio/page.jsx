@@ -195,7 +195,12 @@ export default function DashboardPortfolio() {
                       <tr
                         key={s.symbol}
                         className="hover:bg-base-200 cursor-pointer"
-                        onClick={() => router.push(`/dashboard/market/${s.symbol}`)}
+                        onClick={() => {
+                          if (typeof window !== "undefined") {
+                            sessionStorage.setItem("selectedStock", JSON.stringify(s))
+                          }
+                          router.push(`/dashboard/market/${s.symbol}`)}
+                        }
                       >
                         <td className="flex items-center gap-3">
                           {renderLogo(s.symbol, s.logo)}
@@ -236,34 +241,19 @@ export default function DashboardPortfolio() {
                 <thead>
                   <tr className="bg-base-200">
                     <th>Activo</th>
-                    <th>Precio Actual</th>
-                    <th>Cambio %</th>
                   </tr>
                 </thead>
                 <tbody>
                   {favoriteStocks.map((s) => (
                     <tr
                       key={s.symbol}
-                      className="hover:bg-base-200 cursor-pointer"
-                      onClick={() => router.push(`/dashboard/market/${s.symbol}`)}
-                    >
+                      className="hover:bg-base-200 cursor-pointer">
                       <td className="flex items-center gap-3">
                         {renderLogo(s.symbol, s.logo)}
                         <div>
                           <div className="font-bold">{s.name || s.symbol}</div>
                           <div className="text-sm opacity-50">{s.symbol}</div>
                         </div>
-                      </td>
-                      <td className="font-mono">${(s.price ?? 0).toFixed(2)}</td>
-                      <td className={`font-mono ${s.priceChange >= 0 ? "text-success" : "text-error"}`}>
-                        {s.priceChange != null ? (
-                          <>
-                            {s.priceChange >= 0 ? <TrendingUp className="inline h-4 w-4" /> : <TrendingDown className="inline h-4 w-4" />}
-                            {s.priceChange.toFixed(2)}%
-                          </>
-                        ) : (
-                          "—"
-                        )}
                       </td>
                     </tr>
                   ))}
