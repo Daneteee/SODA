@@ -35,7 +35,16 @@ const userSchema = new mongoose.Schema({
       symbol: { type: String, required: true },  
       quantity: { type: Number, required: true },
       purchasePrice: { type: Number, required: true }, 
-      purchaseDate: { type: Date, default: Date.now } 
+      purchaseDate: { type: Date, default: Date.now },
+      name: { type: String },
+      sector: String,
+      industry: String,
+      exchange: String,
+      country: String,
+      currency: String,
+      description: String,
+      website: String,
+      logo: String
     }
   ],
   credit: {
@@ -43,9 +52,17 @@ const userSchema = new mongoose.Schema({
     default: 50000
   },
   favs: [
-    { 
-      type: String, 
-      required: false 
+    {
+      symbol: { type: String, required: true },
+      name: { type: String },
+      sector: String,
+      industry: String,
+      exchange: String,
+      country: String,
+      currency: String,
+      description: String,
+      website: String,
+      logo: String
     }
   ]
 });

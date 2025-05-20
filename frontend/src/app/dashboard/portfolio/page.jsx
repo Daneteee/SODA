@@ -105,9 +105,17 @@ export default function DashboardPortfolio() {
   };
 
   // Build arrays
-  const favoriteStocks = favSymbols.map((symbol) => {
-    const { price, priceChange, logo } = getRealtime(symbol);
-    return { symbol, price, priceChange, company: { logo } };
+  const favoriteStocks = favSymbols.map((fav) => {
+    // Ahora favSymbols contiene objetos completos, no solo strings
+    const symbol = typeof fav === 'string' ? fav : fav.symbol;
+    const { price, priceChange } = getRealtime(symbol);
+    return { 
+      symbol, 
+      name: fav.name || symbol,
+      price, 
+      priceChange, 
+      logo: fav.logo || null
+    };
   });
 
   const filteredUserStocks = userStocks.filter(
@@ -190,7 +198,7 @@ export default function DashboardPortfolio() {
                         onClick={() => router.push(`/dashboard/market/${s.symbol}`)}
                       >
                         <td className="flex items-center gap-3">
-                          {renderLogo(s.symbol, s.company?.logo)}
+                          {renderLogo(s.symbol, s.logo)}
                           <div>
                             <div className="font-bold">{s.name || s.symbol}</div>
                             <div className="text-sm opacity-50">{s.symbol}</div>
@@ -240,7 +248,7 @@ export default function DashboardPortfolio() {
                       onClick={() => router.push(`/dashboard/market/${s.symbol}`)}
                     >
                       <td className="flex items-center gap-3">
-                        {renderLogo(s.symbol, s.company?.logo)}
+                        {renderLogo(s.symbol, s.logo)}
                         <div>
                           <div className="font-bold">{s.name || s.symbol}</div>
                           <div className="text-sm opacity-50">{s.symbol}</div>

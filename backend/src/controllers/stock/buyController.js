@@ -51,13 +51,23 @@ const buyStock = async (req, res) => {
       existingStock.quantity = totalQuantity;
       existingStock.purchasePrice = newPurchasePrice;
       existingStock.purchaseDate = new Date();
+      // Mantener los demás datos del stock
     } else {
-      // Agregar una nueva entrada en el arreglo de stocks del usuario
+      // Agregar una nueva entrada en el arreglo de stocks del usuario con todos los datos del stock
       user.stocks.push({
-        symbol,
+        symbol: stockInfo.symbol,
         quantity,
         purchasePrice,
-        purchaseDate: new Date()
+        purchaseDate: new Date(),
+        name: stockInfo.name,
+        sector: stockInfo.sector,
+        industry: stockInfo.industry,
+        exchange: stockInfo.exchange,
+        country: stockInfo.country,
+        currency: stockInfo.currency,
+        description: stockInfo.description,
+        website: stockInfo.website,
+        logo: stockInfo.logo
       });
     }
 
