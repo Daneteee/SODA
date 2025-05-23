@@ -1,5 +1,16 @@
+/**
+ * @module useUserData
+ * @description Hook personalizado para obtener y gestionar los datos del usuario relacionados con acciones
+ * @requires react
+ */
+
 import { useState, useEffect } from "react";
 
+/**
+ * Hook personalizado para obtener los datos del usuario, incluyendo crédito, acciones y transacciones
+ * @function useUserData
+ * @returns {Object} Datos del usuario y estado de carga
+ */
 export const useUserData = () => {
   const [credit, setCredit] = useState(0);
   const [userStocks, setUserStocks] = useState([]);
@@ -7,6 +18,12 @@ export const useUserData = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    /**
+     * Obtiene los datos del usuario desde el servidor
+     * @function fetchUserData
+     * @async
+     * @description Realiza peticiones al servidor para obtener perfil, acciones y transacciones del usuario
+     */
     const fetchUserData = async () => {
       try {
         const profileResponse = await fetch(process.env.NEXT_PUBLIC_API_URL + "/user/profile", {

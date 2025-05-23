@@ -1,7 +1,22 @@
-// creditController.js
+/**
+ * @module controllers/user/creditController
+ * @description Controlador para gestionar las operaciones de crédito de los usuarios
+ * @requires models/user
+ */
 
 const User = require('../../models/user'); // Asegúrate de ajustar la ruta al modelo de usuario
 
+/**
+ * @function addCredit
+ * @description Añade crédito a la cuenta del usuario autenticado
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} req.body - Datos de la operación
+ * @param {number} req.body.amount - Cantidad de crédito a añadir
+ * @param {Object} req.user - Información del usuario autenticado
+ * @param {string} req.user.id - ID del usuario autenticado
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Object} Crédito actualizado del usuario
+ */
 const addCredit = async (req, res) => {
   try {
     const { amount } = req.body;
@@ -33,8 +48,15 @@ const addCredit = async (req, res) => {
 };
 
 /**
- * Retira créditos del usuario.
- * Se espera que el body de la petición incluya { amount: number }.
+ * @function withdrawCredit
+ * @description Retira crédito de la cuenta del usuario autenticado
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} req.body - Datos de la operación
+ * @param {number} req.body.amount - Cantidad de crédito a retirar
+ * @param {Object} req.user - Información del usuario autenticado
+ * @param {string} req.user.id - ID del usuario autenticado
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Object} Crédito actualizado del usuario
  */
 const withdrawCredit = async (req, res) => {
   try {
@@ -63,6 +85,10 @@ const withdrawCredit = async (req, res) => {
   }
 };
 
+/**
+ * Exportación de los controladores de crédito
+ * @exports creditController
+ */
 module.exports = {
   addCredit,
   withdrawCredit,

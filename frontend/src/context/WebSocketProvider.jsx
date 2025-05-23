@@ -1,9 +1,26 @@
 "use client";
 
+/**
+ * @module WebSocketProvider
+ * @description Proveedor de contexto para la conexión WebSocket que gestiona datos de acciones en tiempo real
+ * @requires react
+ */
+
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 
+/**
+ * Contexto para la conexión WebSocket
+ * @type {React.Context}
+ */
 const WebSocketContext = createContext(undefined);
 
+/**
+ * Componente proveedor que gestiona la conexión WebSocket para datos de acciones en tiempo real
+ * @component
+ * @param {Object} props - Propiedades del componente
+ * @param {React.ReactNode} props.children - Componentes hijos que tendrán acceso al contexto
+ * @returns {React.ReactElement} Proveedor de contexto WebSocket
+ */
 export const WebSocketProvider = ({ children }) => {
   const ws = useRef(null);
   const [connected, setConnected] = useState(false);
@@ -13,6 +30,11 @@ export const WebSocketProvider = ({ children }) => {
   const MAX_RECONNECT_ATTEMPTS = 5;
   const RECONNECT_DELAY = 3000; // 3 segundos
 
+  /**
+   * Establece la conexión WebSocket con el servidor
+   * @function connectWebSocket
+   * @description Crea una nueva conexión WebSocket y configura los manejadores de eventos
+   */
   const connectWebSocket = () => {
     if (ws.current?.readyState === WebSocket.OPEN) {
       console.log("⚠️ Ya existe una conexión WebSocket abierta");
@@ -49,12 +71,23 @@ export const WebSocketProvider = ({ children }) => {
     console.log("🔗 Conectando a:", url);
     ws.current = new WebSocket(url);
 
+    /**
+     * Manejador del evento de apertura de conexión
+     * @event onopen
+     * @description Se ejecuta cuando la conexión WebSocket se establece correctamente
+     */
     ws.current.onopen = () => {
       console.log("✅ Conexión WebSocket establecida");
       setConnected(true);
       reconnectAttemptsRef.current = 0;
     };
 
+    /**
+     * Manejador del evento de recepción de mensajes
+     * @event onmessage
+     * @param {MessageEvent} event - Evento con los datos recibidos del servidor
+     * @description Procesa los mensajes recibidos del servidor y actualiza el estado según el tipo de mensaje
+     */
     ws.current.onmessage = (event) => {
       try {
         const message = JSON.parse(event.data);
@@ -96,6 +129,12 @@ export const WebSocketProvider = ({ children }) => {
       }
     };
 
+    /**
+     * Manejador del evento de cierre de conexión
+     * @event onclose
+     * @param {CloseEvent} event - Evento con información sobre el cierre de la conexión
+     * @description Se ejecuta cuando la conexión WebSocket se cierra e intenta reconectar
+     */
     ws.current.onclose = (event) => {
       console.log("🔴 Conexión WebSocket cerrada", {
         code: event.code,
@@ -106,12 +145,23 @@ export const WebSocketProvider = ({ children }) => {
       handleReconnect();
     };
 
+    /**
+     * Manejador del evento de error en la conexión
+     * @event onerror
+     * @param {Event} error - Evento con información sobre el error
+     * @description Se ejecuta cuando ocurre un error en la conexión WebSocket
+     */
     ws.current.onerror = (error) => {
       console.error("❌ Error en WebSocket:", error);
       setConnected(false);
     };
   };
 
+  /**
+   * Gestiona la lógica de reconexión con retraso exponencial
+   * @function handleReconnect
+   * @description Intenta reconectar con un retraso exponencial hasta alcanzar el máximo de intentos
+   */
   const handleReconnect = () => {
     if (reconnectAttemptsRef.current >= MAX_RECONNECT_ATTEMPTS) {
       console.error("❌ Máximo número de intentos de reconexión alcanzado");
@@ -147,6 +197,11 @@ export const WebSocketProvider = ({ children }) => {
     };
   }, []);
 
+  /**
+   * Fuerza una reconexión manual al WebSocket
+   * @function reconnect
+   * @description Cierra la conexión actual y establece una nueva, reiniciando el contador de intentos
+   */
   const reconnect = () => {
     console.log("🔄 Reconexión manual iniciada");
     reconnectAttemptsRef.current = 0;
@@ -163,6 +218,12 @@ export const WebSocketProvider = ({ children }) => {
   );
 };
 
+/**
+ * Hook personalizado para acceder al contexto WebSocket
+ * @function useWebSocket
+ * @returns {Object} Objeto con el estado de conexión, datos de acciones y funciones de control
+ * @throws {Error} Si se utiliza fuera de un WebSocketProvider
+ */
 export const useWebSocket = () => {
   const context = useContext(WebSocketContext);
   if (context === undefined) {

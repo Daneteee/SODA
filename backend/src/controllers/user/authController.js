@@ -1,8 +1,29 @@
+/**
+ * @module controllers/user/authController
+ * @description Controlador para gestionar la autenticación de usuarios (registro, inicio y cierre de sesión)
+ * @requires express-validator
+ * @requires bcryptjs
+ * @requires models/user
+ * @requires jsonwebtoken
+ */
+
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const User = require('../../models/user'); 
 const jwt = require('jsonwebtoken');
 
+/**
+ * @function registerUser
+ * @description Registra un nuevo usuario en el sistema
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} req.body - Datos del usuario a registrar
+ * @param {string} req.body.name - Nombre del usuario
+ * @param {string} req.body.email - Correo electrónico del usuario
+ * @param {string} req.body.password - Contraseña del usuario
+ * @param {string} req.body.phone - Número de teléfono del usuario
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Object} Token JWT y mensaje de confirmación
+ */
 const registerUser = async (req, res) => {
   console.log(req.body);
   const errors = validationResult(req);
@@ -67,6 +88,16 @@ const registerUser = async (req, res) => {
   }
 };
 
+/**
+ * @function loginUser
+ * @description Autentica a un usuario en el sistema
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} req.body - Credenciales del usuario
+ * @param {string} req.body.email - Correo electrónico del usuario
+ * @param {string} req.body.password - Contraseña del usuario
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Object} Token JWT y mensaje de confirmación
+ */
 const loginUser = async (req, res) => {
   console.log('llega al login')
   const errors = validationResult(req);
@@ -116,11 +147,21 @@ const loginUser = async (req, res) => {
   }
 };
 
+/**
+ * @function logoutUser
+ * @description Cierra la sesión de un usuario eliminando la cookie de autenticación
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Object} Mensaje de confirmación
+ */
 const logoutUser = async (req, res) => {
   res.clearCookie('authToken');
   res.json({ msg: 'Cierre de sesión exitoso' });
 };
-
+/**
+ * Exportación de los controladores de autenticación
+ * @exports authController
+ */
 module.exports = {
   registerUser, loginUser, logoutUser
 };

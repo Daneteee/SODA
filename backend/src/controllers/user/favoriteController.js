@@ -1,7 +1,24 @@
+/**
+ * @module controllers/user/favoriteController
+ * @description Controlador para gestionar los favoritos de acciones de los usuarios
+ * @requires models/user
+ * @requires models/stock
+ */
+
 const User = require('../../models/user');
 const Stock = require('../../models/stock');
 
-// Toggle a symbol in the user's favs array
+/**
+ * @function toggleFavorite
+ * @description Añade o elimina una acción de la lista de favoritos del usuario
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} req.params - Parámetros de la solicitud
+ * @param {string} req.params.symbol - Símbolo de la acción a añadir/eliminar
+ * @param {Object} req.user - Información del usuario autenticado
+ * @param {string} req.user.id - ID del usuario autenticado
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Object} Lista actualizada de favoritos del usuario
+ */
 exports.toggleFavorite = async (req, res) => {
   const userId = req.user.id;              // set by authMiddleware
   const { symbol } = req.params;           // e.g. PATCH /api/favorites/AAPL
@@ -51,6 +68,15 @@ exports.toggleFavorite = async (req, res) => {
   }
 };
 
+/**
+ * @function getFavorites
+ * @description Obtiene la lista de acciones favoritas del usuario
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} req.user - Información del usuario autenticado
+ * @param {string} req.user.id - ID del usuario autenticado
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Object} Lista de favoritos del usuario
+ */
 exports.getFavorites = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('favs');

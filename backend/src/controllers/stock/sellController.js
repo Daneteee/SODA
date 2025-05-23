@@ -1,9 +1,30 @@
+/**
+ * @module controllers/stock/sellController
+ * @description Controlador para gestionar la venta de acciones por parte de los usuarios
+ * @requires models/user
+ * @requires models/stock
+ * @requires models/transaction
+ * @requires utils/marketHours
+ */
+
 const User = require('../../models/user');
 const Stock = require('../../models/stock');
 const Transaction = require('../../models/transaction'); // Asegúrate de tener este modelo
 const { isMarketOpen } = require('../../utils/marketHours');
 
-// Función para procesar la venta de acciones
+/**
+ * @function sellStock
+ * @description Procesa la venta de acciones por parte de un usuario
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} req.body - Datos de la venta
+ * @param {string} req.body.symbol - Símbolo de la acción a vender
+ * @param {number} req.body.quantity - Cantidad de acciones a vender
+ * @param {number} req.body.sellPrice - Precio unitario de venta
+ * @param {Object} req.user - Información del usuario autenticado
+ * @param {string} req.user.id - ID del usuario autenticado
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Object} Respuesta con el resultado de la operación
+ */
 const sellStock = async (req, res) => {
   const { symbol, quantity, sellPrice } = req.body;
   console.log("Datos recibidos para venta:", req.body);
@@ -76,5 +97,8 @@ const sellStock = async (req, res) => {
     return res.status(500).json({ message: 'Error en el servidor' });
   }
 };
-
+/**
+ * Exportación del controlador de venta de acciones
+ * @exports sellController
+ */
 module.exports = { sellStock };

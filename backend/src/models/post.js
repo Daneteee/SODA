@@ -1,5 +1,15 @@
+/**
+ * @module models/post
+ * @description Modelo para las publicaciones de la red social
+ * @requires mongoose
+ */
+
 const mongoose = require('mongoose');
 
+/**
+ * @schema postSchema
+ * @description Esquema de mongoose para las publicaciones
+ */
 const postSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -42,4 +52,8 @@ const postSchema = new mongoose.Schema({
   timestamps: true
 });
 
+/**
+ * Modelo de publicación
+ * @type {mongoose.Model}
+ */
 module.exports = mongoose.model('Post', postSchema);

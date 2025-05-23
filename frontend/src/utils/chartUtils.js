@@ -1,4 +1,10 @@
 export const getInterval = (period) => {
+  /**
+   * Obtiene el intervalo de tiempo para los datos históricos
+   * @function getInterval
+   * @param {string} period - Período de tiempo para los datos históricos
+   * @returns {string} Intervalo de tiempo para los datos históricos
+   */
   switch (period) {
     case "1D":
       return "5m";
@@ -18,6 +24,12 @@ export const getInterval = (period) => {
 };
 
 export const getRange = (period) => {
+  /**
+   * Obtiene el rango de tiempo para los datos históricos
+   * @function getRange
+   * @param {string} period - Período de tiempo para los datos históricos
+   * @returns {string} Rango de tiempo para los datos históricos
+   */
   switch (period) {
     case "1D":
       return "1d";

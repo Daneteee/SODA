@@ -1,9 +1,28 @@
+/**
+ * @module useNewsData
+ * @description Hook personalizado para obtener y gestionar noticias relacionadas con acciones
+ * @requires react
+ */
+
 import { useState, useEffect } from "react";
 
+/**
+ * Hook personalizado para cargar noticias relacionadas con una acción específica
+ * @function useNewsData
+ * @param {string} symbol - Símbolo de la acción para la que se desean obtener noticias
+ * @param {boolean} newsOpen - Indica si el panel de noticias está abierto
+ * @returns {Object} Estado y funciones para gestionar las noticias
+ */
 export function useNewsData(symbol, newsOpen) {
   const [newsItems, setNewsItems] = useState([]);
   const [newsLoading, setNewsLoading] = useState(false);
 
+  /**
+   * Carga las noticias relacionadas con el símbolo de acción especificado
+   * @function loadNewsData
+   * @async
+   * @description Realiza una petición al servidor para obtener noticias relacionadas con la acción
+   */
   const loadNewsData = async () => {
     setNewsLoading(true);
     try {

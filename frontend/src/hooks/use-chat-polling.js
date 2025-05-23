@@ -1,9 +1,26 @@
 "use client"
 
+/**
+ * @module useChatPolling
+ * @description Hook personalizado para gestionar el sistema de chat en tiempo real mediante polling
+ * @requires react
+ * @requires axios
+ * @requires auth-utils
+ */
+
 import { useState, useEffect, useRef, useCallback } from "react"
 import axios from "axios"
 import { hasAuthToken } from "@/lib/auth-utils"
 
+/**
+ * Hook personalizado para gestionar conversaciones y mensajes de chat mediante polling
+ * @function useChatPolling
+ * @param {Object} options - Opciones de configuración
+ * @param {boolean} options.isOpen - Indica si el widget de chat está abierto
+ * @param {string|null} options.activeChat - ID de la conversación activa
+ * @param {boolean} options.isNewChat - Indica si se está creando una nueva conversación
+ * @returns {Object} Estado y funciones para gestionar el chat
+ */
 export function useChatPolling({ isOpen, activeChat, isNewChat }) {
   const [users, setUsers] = useState([])
   const [allUsers, setAllUsers] = useState([]) // Todos los usuarios disponibles
@@ -34,8 +51,16 @@ export function useChatPolling({ isOpen, activeChat, isNewChat }) {
   const CONVERSATIONS_POLLING_INTERVAL = 5000 // 5 segundos
   const MESSAGES_POLLING_INTERVAL = 3000 // 3 segundos
 
+  /**
+   * Obtiene la lista de conversaciones del usuario
+   * @function fetchConversations
+   * @async
+   * @param {boolean} showLoading - Indica si se debe mostrar el estado de carga
+   * @description Obtiene todas las conversaciones del usuario desde el servidor
+   */
   // Función fetchConversations memoizada para evitar recreaciones en cada render
   const fetchConversations = useCallback(async (showLoading = true) => {
+    
     try {
       if (showLoading) setLoading(true)
       setError(null)
@@ -71,6 +96,14 @@ export function useChatPolling({ isOpen, activeChat, isNewChat }) {
     }
   }, []);
 
+  /**
+   * Obtiene los mensajes de una conversación específica
+   * @function fetchMessages
+   * @async
+   * @param {string} conversationId - ID de la conversación
+   * @param {boolean} showLoading - Indica si se debe mostrar el estado de carga
+   * @description Obtiene todos los mensajes de una conversación desde el servidor
+   */
   // Función fetchMessages memoizada
   const fetchMessages = useCallback(async (conversationId, showLoading = true) => {
     try {
@@ -282,7 +315,11 @@ export function useChatPolling({ isOpen, activeChat, isNewChat }) {
 
   // Iniciar/detener polling de conversaciones cuando el widget está abierto/cerrado
   useEffect(() => {
-    // Función que se ejecuta para polling de conversaciones
+    /**
+     * Realiza polling de conversaciones cuando la página está visible
+     * @function pollConversations
+     * @description Actualiza periódicamente la lista de conversaciones si la página está visible
+     */
     const pollConversations = () => {
       if (document.visibilityState === "visible" && !isNewChat) {
         fetchConversations(false) // No mostrar loading en polling
@@ -314,7 +351,11 @@ export function useChatPolling({ isOpen, activeChat, isNewChat }) {
 
   // Gestionar el polling de mensajes cuando cambia el chat activo
   useEffect(() => {
-    // Función que se ejecuta para polling de mensajes
+    /**
+     * Realiza polling de mensajes cuando la página está visible
+     * @function pollMessages
+     * @description Actualiza periódicamente los mensajes de la conversación activa si la página está visible
+     */
     const pollMessages = () => {
       if (document.visibilityState === "visible" && activeChatRef.current) {
         fetchMessages(activeChatRef.current, false) // Sin loading en polling
@@ -345,6 +386,11 @@ export function useChatPolling({ isOpen, activeChat, isNewChat }) {
 
   // Pausar polling cuando la página no está visible
   useEffect(() => {
+    /**
+     * Maneja cambios en la visibilidad de la página
+     * @function handleVisibilityChange
+     * @description Actualiza datos cuando el usuario vuelve a la pestaña del navegador
+     */
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible" && isOpen) {
         // Al volver a la pestaña, actualizamos inmediatamente

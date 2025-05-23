@@ -1,3 +1,18 @@
+/**
+ * @module controllers/stock/searchStock
+ * @description Controlador para buscar acciones por nombre de empresa en la API de Alpha Vantage
+ * @requires axios
+ */
+
+/**
+ * @function searchSymbol
+ * @description Busca símbolos de acciones que coincidan con el nombre de empresa proporcionado
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} req.params - Parámetros de la solicitud
+ * @param {string} req.params.companyName - Nombre de la empresa a buscar
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Object} Lista de símbolos y nombres de empresas que coinciden con la búsqueda
+ */
 const searchSymbol = async (req, res) => {
     // Acceder al parámetro de la URL (companyName)
     const companyName = req.params.companyName;
@@ -36,5 +51,9 @@ const searchSymbol = async (req, res) => {
     }
   };
   
-  module.exports = { searchSymbol };
+/**
+ * Exportación del controlador de búsqueda de acciones
+ * @exports searchStock
+ */
+module.exports = { searchSymbol };
   

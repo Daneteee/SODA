@@ -1,9 +1,24 @@
+/**
+ * @module controllers/post/likeController
+ * @description Controlador para gestionar los likes en publicaciones y comentarios
+ * @requires models/like
+ * @requires models/post
+ * @requires models/comment
+ */
+
 const Like = require('../../models/like');
 const Post = require('../../models/post');
 const Comment = require('../../models/comment');
 
-// Dar like a un post
+/**
+ * @function likePost
+ * @description Añade un like de un usuario a una publicación
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Object} Mensaje de confirmación
+ */
 const likePost = async (req, res) => {
+  
   try {
     const { postId } = req.params;
     
@@ -50,7 +65,13 @@ const likePost = async (req, res) => {
   }
 };
 
-// Quitar like de un post
+/**
+ * @function unlikePost
+ * @description Elimina el like de un usuario en una publicación
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Object} Mensaje de confirmación
+ */
 const unlikePost = async (req, res) => {
   try {
     const { postId } = req.params;
@@ -90,7 +111,13 @@ const unlikePost = async (req, res) => {
   }
 };
 
-// Dar like a un comentario
+/**
+ * @function likeComment
+ * @description Añade un like de un usuario a un comentario
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Object} Mensaje de confirmación
+ */
 const likeComment = async (req, res) => {
   try {
     const { commentId } = req.params;
@@ -138,8 +165,15 @@ const likeComment = async (req, res) => {
   }
 };
 
-// Quitar like de un comentario
+/**
+ * @function unlikeComment
+ * @description Elimina el like de un usuario en un comentario
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Object} Mensaje de confirmación
+ */
 const unlikeComment = async (req, res) => {
+
   try {
     const { commentId } = req.params;
     
@@ -178,7 +212,13 @@ const unlikeComment = async (req, res) => {
   }
 };
 
-// Obtener los likes de un post
+/**
+ * @function getPostLikes
+ * @description Obtiene todos los likes de una publicación con información de los usuarios
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Array} Lista de likes con información de usuarios
+ */
 const getPostLikes = async (req, res) => {
   try {
     const { postId } = req.params;
@@ -200,7 +240,13 @@ const getPostLikes = async (req, res) => {
   }
 };
 
-// Obtener los likes de un comentario
+/**
+ * @function getCommentLikes
+ * @description Obtiene todos los likes de un comentario con información de los usuarios
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Array} Lista de likes con información de usuarios
+ */
 const getCommentLikes = async (req, res) => {
   try {
     const { commentId } = req.params;
@@ -222,7 +268,10 @@ const getCommentLikes = async (req, res) => {
   }
 };
 
-// Exportar los controladores
+/**
+ * Exportación de los controladores de likes
+ * @exports likeController
+ */
 module.exports = {
   likePost,
   unlikePost,

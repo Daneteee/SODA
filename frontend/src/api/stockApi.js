@@ -1,4 +1,18 @@
-// Obtenim l'històric d'una acció
+/**
+ * @module stockApi
+ * @description Módulo para realizar peticiones a la API relacionadas con acciones y datos del usuario
+ */
+
+/**
+ * Obtiene los datos históricos de una acción
+ * @function fetchStockData
+ * @async
+ * @param {string} symbol - Símbolo de la acción
+ * @param {string} interval - Intervalo de tiempo entre datos (por defecto '5m')
+ * @param {string} range - Rango de tiempo para los datos históricos (por defecto '1d')
+ * @returns {Promise<Array>} Datos históricos de la acción
+ * @throws {Error} Si hay un problema al obtener los datos
+ */
 export const fetchStockData = async (symbol, interval = '5m', range = '1d') => {
     const url = `${process.env.NEXT_PUBLIC_API_URL}/market/${symbol}/?interval=${interval}&range=${range}`;
     const res = await fetch(url);
@@ -8,7 +22,13 @@ export const fetchStockData = async (symbol, interval = '5m', range = '1d') => {
     return res.json();
   };
   
-// Obtenim les dades de l'usuari autenticat i les seves accions
+/**
+ * Obtiene los datos del usuario autenticado y sus acciones
+ * @function fetchUserData
+ * @async
+ * @returns {Promise<Object>} Objeto con el crédito del usuario y sus acciones
+ * @throws {Error} Si hay un problema al obtener los datos del usuario o sus acciones
+ */
 export const fetchUserData = async () => {
   const profileResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/profile`, {
     method: "GET",

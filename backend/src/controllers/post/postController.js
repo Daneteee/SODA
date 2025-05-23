@@ -1,10 +1,26 @@
+/**
+ * @module controllers/post/postController
+ * @description Controlador para gestionar las publicaciones
+ * @requires models/post
+ * @requires models/comment
+ * @requires models/like
+ * @requires path
+ * @requires fs
+ */
+
 const Post = require('../../models/post');
 const Comment = require('../../models/comment');
 const Like = require('../../models/like');
 const path = require('path');
 const fs = require('fs');
 
-// Crear un nuevo post
+/**
+ * @function createPost
+ * @description Crea una nueva publicación con los datos proporcionados
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Object} Publicación creada
+ */
 const createPost = async (req, res) => {
   try {
     console.log('Datos recibidos:', req.body);
@@ -51,7 +67,13 @@ const createPost = async (req, res) => {
   }
 };
 
-// Obtener todos los posts
+/**
+ * @function getPosts
+ * @description Obtiene todas las publicaciones ordenadas por fecha de creación
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Array} Lista de publicaciones con información de autores
+ */
 const getPosts = async (req, res) => {
   try {
     const posts = await Post.find()
@@ -72,7 +94,13 @@ const getPosts = async (req, res) => {
   }
 };
 
-// Obtener un post por su ID
+/**
+ * @function getPostById
+ * @description Obtiene una publicación específica por su ID
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Object} Publicación con información del autor
+ */
 const getPostById = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id)
@@ -98,7 +126,13 @@ const getPostById = async (req, res) => {
   }
 };
 
-// Actualizar un post
+/**
+ * @function updatePost
+ * @description Actualiza una publicación existente
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Object} Publicación actualizada
+ */
 const updatePost = async (req, res) => {
   try {
     let post = await Post.findById(req.params.id);
@@ -151,7 +185,13 @@ const updatePost = async (req, res) => {
   }
 };
 
-// Eliminar un post
+/**
+ * @function deletePost
+ * @description Elimina una publicación y sus recursos asociados (comentarios, likes, imágenes)
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Object} Mensaje de confirmación
+ */
 const deletePost = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
@@ -202,7 +242,13 @@ const deletePost = async (req, res) => {
   }
 };
 
-// Obtener posts por usuario
+/**
+ * @function getPostsByUser
+ * @description Obtiene todas las publicaciones de un usuario específico
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Array} Lista de publicaciones del usuario
+ */
 const getPostsByUser = async (req, res) => {
   try {
     const posts = await Post.find({ author: req.params.userId })
@@ -222,7 +268,10 @@ const getPostsByUser = async (req, res) => {
     });
   }
 }; 
-// Exportar los controladores
+/**
+ * Exportación de los controladores de publicaciones
+ * @exports postController
+ */
 module.exports = {
   createPost,
   getPosts,

@@ -1,3 +1,13 @@
+/**
+ * @module controllers/stock/stock
+ * @description Controlador principal para gestionar acciones, datos en tiempo real y comunicación WebSocket
+ * @requires ws
+ * @requires mongoose
+ * @requires models/stock
+ * @requires redis
+ * @requires axios
+ */
+
 const WebSocket = require('ws');
 const mongoose = require('mongoose');
 const Stock = require('../../models/stock'); 
@@ -8,6 +18,12 @@ const axios = require('axios');
 const redisClient = redis.createClient({
   url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
   socket: {
+    /**
+     * @function reconnectStrategy
+     * @description Estrategia de reconexión para Redis con backoff exponencial
+     * @param {number} retries - Número de intentos de reconexión realizados
+     * @returns {number} Tiempo de espera en milisegundos antes del próximo intento
+     */
     reconnectStrategy: (retries) => {
       // Reconectar con backoff exponencial
       const delay = Math.min(1000 * 2 ** retries, 30000); // max delay 30 seconds
@@ -42,7 +58,10 @@ let finnhubSubscriptionActive = false;
 let subscribedSymbols = new Set();
 
 /**
- * Cache TTL helper function
+ * @function getCacheTTL
+ * @description Determina el tiempo de vida (TTL) en caché según el rango de tiempo solicitado
+ * @param {string} range - Rango de tiempo ('1d', '1wk', '1mo', '1y')
+ * @returns {number} Tiempo en segundos que los datos deben permanecer en caché
  */
 const getCacheTTL = (range) => {
   switch (range) {
@@ -55,7 +74,9 @@ const getCacheTTL = (range) => {
 };
 
 /**
- * Get stock list from database with caching
+ * @function getStocksList
+ * @description Obtiene la lista de acciones desde la base de datos con sistema de caché
+ * @returns {Promise<Object>} Mapa de símbolos de acciones con sus datos completos
  */
 const getStocksList = async () => {
   // flush
@@ -121,7 +142,12 @@ const getStocksList = async () => {
 };
 
 /**
- * Get historical data for a stock
+ * @function getStockHistoricalData
+ * @description Obtiene datos históricos de una acción con sistema de caché
+ * @param {string} symbol - Símbolo de la acción
+ * @param {string} interval - Intervalo de tiempo entre datos ('1d', '5m', etc.)
+ * @param {string} range - Rango de tiempo a consultar ('1d', '1mo', '1y', etc.)
+ * @returns {Promise<Array>} Datos históricos de la acción
  */
 const getStockHistoricalData = async (symbol, interval = '1d', range = '1mo') => {
   const cacheKey = `stock:${symbol}:${interval}:${range}`;
@@ -178,7 +204,10 @@ const getStockHistoricalData = async (symbol, interval = '1d', range = '1mo') =>
 };
 
 /**
- * Function to subscribe to stock symbols
+ * @function subscribeToSymbols
+ * @description Suscribe el WebSocket a los símbolos de acciones para recibir datos en tiempo real
+ * @param {WebSocket} socket - Conexión WebSocket con Finnhub
+ * @param {Array<string>} symbols - Lista de símbolos de acciones a suscribir
  */
 const subscribeToSymbols = (socket, symbols) => {
   if (socket && socket.readyState === WebSocket.OPEN) {
@@ -206,7 +235,10 @@ const subscribeToSymbols = (socket, symbols) => {
 };
 
 /**
- * Check subscription status and resubscribe if needed
+ * @function checkSubscriptions
+ * @description Verifica el estado de las suscripciones y reintenta si es necesario
+ * @param {WebSocket} socket - Conexión WebSocket con Finnhub
+ * @param {Array<string>} symbols - Lista de símbolos de acciones a verificar
  */
 const checkSubscriptions = (socket, symbols) => {
   if (socket && socket.readyState === WebSocket.OPEN && !finnhubSubscriptionActive) {
@@ -218,7 +250,10 @@ const checkSubscriptions = (socket, symbols) => {
 };
 
 /**
- * Initialize WebSocket connection for real-time stock data
+ * @function initializeWebSocket
+ * @description Inicializa la conexión WebSocket para datos de acciones en tiempo real
+ * @param {http.Server} server - Servidor HTTP para adjuntar el servidor WebSocket
+ * @returns {WebSocket.Server} Servidor WebSocket inicializado
  */
 const initializeWebSocket = async (server) => {
   try {
@@ -245,6 +280,7 @@ const initializeWebSocket = async (server) => {
     let pingInterval;
     let subscriptionCheckInterval;
     
+    // Función para conectar con Finnhub WebSocket
     const connectToFinnhub = () => {
       // Limpiar cualquier intento de reconexión previo
       if (reconnectInterval) {
@@ -373,7 +409,9 @@ const initializeWebSocket = async (server) => {
       });
     };
 
-    // Función auxiliar para programar reconexiones
+    /**
+     * Función auxiliar para programar reconexiones con backoff exponencial
+     */
     const scheduleReconnect = () => {
       if (!reconnectInterval) {
         // Determinar el retraso basado en la hora actual
@@ -476,7 +514,16 @@ const initializeWebSocket = async (server) => {
 };
 
 /**
- * API endpoint to get stock detail/historical data
+ * @function stockDetail
+ * @description Endpoint de API para obtener datos históricos de una acción específica
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} req.params - Parámetros de la URL
+ * @param {string} req.params.symbol - Símbolo de la acción
+ * @param {Object} req.query - Parámetros de consulta
+ * @param {string} req.query.interval - Intervalo de tiempo entre datos
+ * @param {string} req.query.range - Rango de tiempo a consultar
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Array} Datos históricos de la acción
  */
 const stockDetail = async (req, res) => {
   const { symbol } = req.params;
@@ -492,7 +539,11 @@ const stockDetail = async (req, res) => {
 };
 
 /**
- * API endpoint to get all stocks information
+ * @function getAllStocks
+ * @description Endpoint de API para obtener información de todas las acciones disponibles
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Object} Mapa de símbolos de acciones con sus datos completos
  */
 const getAllStocks = async (req, res) => {
   try {
@@ -505,7 +556,13 @@ const getAllStocks = async (req, res) => {
 };
 
 /**
- * API endpoint to get stock news
+ * @function getNews
+ * @description Endpoint de API para obtener noticias relacionadas con una acción
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} req.query - Parámetros de consulta
+ * @param {string} req.query.symbol - Símbolo de la acción
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Object} Artículos de noticias relacionados con la acción
  */
 const getNews = async (req, res) => {
   const { symbol } = req.query;
@@ -533,7 +590,13 @@ const getNews = async (req, res) => {
   }
 };
 
-// Cache flush utility function (for development/testing)
+/**
+ * @function flushCache
+ * @description Función utilitaria para limpiar la caché (desarrollo/pruebas)
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Object} Mensaje de confirmación
+ */
 const flushCache = async (req, res) => {
   try {
     await redisClient.flushAll();
@@ -544,6 +607,10 @@ const flushCache = async (req, res) => {
   }
 };
 
+/**
+ * Exportación de los controladores de acciones
+ * @exports stockController
+ */
 module.exports = { 
   initializeWebSocket,
   stockDetail,

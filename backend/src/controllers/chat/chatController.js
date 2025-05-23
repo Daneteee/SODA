@@ -1,8 +1,22 @@
+/**
+ * @module controllers/chat/chatController
+ * @description Controlador para gestionar las funcionalidades de chat entre usuarios
+ * @requires models/message
+ * @requires models/user
+ * @requires models/conversation
+ */
+
 const Message = require("../../models/message");
 const User = require("../../models/user");
 const Conversation = require("../../models/conversation");
 
-// Obtener todas las conversaciones del usuario
+/**
+ * @function getChatUsers
+ * @description Obtiene todas las conversaciones del usuario actual con su último mensaje
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Array} Lista de conversaciones con información del otro usuario y último mensaje
+ */
 const getChatUsers = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -45,7 +59,13 @@ const getChatUsers = async (req, res) => {
   }
 };
 
-// Obtener mensajes de una conversación específica
+/**
+ * @function getChatMessages
+ * @description Obtiene todos los mensajes de una conversación específica
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Array} Lista de mensajes formateados con indicador de si son del usuario actual
+ */
 const getChatMessages = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -97,7 +117,13 @@ const getChatMessages = async (req, res) => {
   }
 };
 
-// Enviar un nuevo mensaje
+/**
+ * @function sendMessage
+ * @description Envía un nuevo mensaje en una conversación existente
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Object} Mensaje enviado formateado con su ID y timestamp
+ */
 const sendMessage = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -159,7 +185,13 @@ const sendMessage = async (req, res) => {
   }
 };
 
-// Crear una nueva conversación
+/**
+ * @function createConversation
+ * @description Crea una nueva conversación entre el usuario actual y otro usuario
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Object} ID de la conversación creada o existente
+ */
 const createConversation = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -207,6 +239,13 @@ const createConversation = async (req, res) => {
   }
 };
 
+/**
+ * @function getAllUsers
+ * @description Obtiene todos los usuarios excepto el usuario actual
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Array} Lista de usuarios sin incluir contraseñas ni emails
+ */
 const getAllUsers = async (req, res) => {
   try {
     user = req.user.id;

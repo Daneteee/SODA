@@ -1,7 +1,21 @@
+/**
+ * @module useStockData
+ * @description Hook personalizado para obtener y gestionar datos de acciones en tiempo real y datos históricos
+ * @requires react
+ * @requires stockApi
+ * @requires WebSocketProvider
+ */
+
 import { useState, useEffect } from "react";
 import { fetchStockData, fetchUserData } from "@/api/stockApi";
 import { useWebSocket } from "@/context/WebSocketProvider";
 
+/**
+ * Hook personalizado para gestionar datos de una acción específica, combinando datos en tiempo real e históricos
+ * @function useStockData
+ * @param {string} symbol - Símbolo de la acción para la que se desean obtener datos
+ * @returns {Object} Estado y funciones para gestionar los datos de la acción
+ */
 export function useStockData(symbol) {
   const { stockData } = useWebSocket(); // Obtén los datos del WebSocket
   const [stock, setStock] = useState(null); // Estado para los datos de la acción
@@ -10,7 +24,14 @@ export function useStockData(symbol) {
   const [credit, setCredit] = useState(0); // Estado para el crédito del usuario
   const [dataLoaded, setDataLoaded] = useState({ stock: false, user: false }); // Estado para sincronizar la carga
 
-  // Función para cargar los datos históricos de la acción
+  /**
+   * Carga los datos históricos de la acción
+   * @function loadStockData
+   * @async
+   * @param {string} interval - Intervalo de tiempo entre datos (por defecto "5m")
+   * @param {string} range - Rango de tiempo para los datos históricos (por defecto "1d")
+   * @description Obtiene datos históricos de la acción y actualiza el estado
+   */
   const loadStockData = async (interval = "5m", range = "1d") => {
     try {
       const historyData = await fetchStockData(symbol, interval, range);
@@ -27,7 +48,12 @@ export function useStockData(symbol) {
     }
   };
 
-  // Función para cargar los datos del usuario
+  /**
+   * Carga los datos del usuario, incluyendo crédito y acciones en posesión
+   * @function loadUserData
+   * @async
+   * @description Obtiene los datos del usuario desde el servidor y actualiza el estado
+   */
   const loadUserData = async () => {
     try {
       const { credit, stocks } = await fetchUserData();

@@ -1,6 +1,17 @@
+/**
+ * @module models/user
+ * @description Modelo para los usuarios de la plataforma
+ * @requires mongoose
+ * @requires bcryptjs
+ */
+
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
+/**
+ * @schema userSchema
+ * @description Esquema de mongoose para los usuarios
+ */
 const userSchema = new mongoose.Schema({
   name: { 
     type: String, 
@@ -67,9 +78,18 @@ const userSchema = new mongoose.Schema({
   ]
 });
 
-// Método para comparar contraseñas en el login
+/**
+ * Método para comparar la contraseña ingresada con la almacenada en la base de datos
+ * @method matchPassword
+ * @param {string} enteredPassword - Contraseña ingresada por el usuario
+ * @returns {Promise<boolean>} - Verdadero si las contraseñas coinciden, falso en caso contrario
+ */
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
+/**
+ * Modelo de usuario
+ * @type {mongoose.Model}
+ */
 module.exports = mongoose.model('User', userSchema);

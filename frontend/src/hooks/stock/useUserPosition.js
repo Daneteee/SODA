@@ -1,5 +1,19 @@
+/**
+ * @module useUserPosition
+ * @description Hook personalizado para calcular la posición del usuario en una acción específica
+ * @requires react
+ */
+
 import { useState, useEffect } from "react";
 
+/**
+ * Hook personalizado para calcular la posición del usuario en una acción específica
+ * @function useUserPosition
+ * @param {Object} stock - Datos actuales de la acción
+ * @param {Array} userStocks - Lista de acciones que posee el usuario
+ * @param {string} symbol - Símbolo de la acción a analizar
+ * @returns {Object} Posición del usuario con valores calculados
+ */
 export function useUserPosition(stock, userStocks, symbol) {
   const [position, setPosition] = useState({
     total: 0,
@@ -11,6 +25,11 @@ export function useUserPosition(stock, userStocks, symbol) {
     price: 0, // Inicializar 'price'
   });
 
+  /**
+   * Efecto que calcula la posición del usuario cuando cambian los datos
+   * @effect
+   * @description Calcula el valor actual, rendimiento, porcentaje del portafolio y otros datos de la posición
+   */
   useEffect(() => {
     // Si no hay stock o si userStocks no está definido, reiniciar la posición
     if (!stock || !userStocks) {

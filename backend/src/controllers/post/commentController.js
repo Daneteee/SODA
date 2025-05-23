@@ -1,8 +1,22 @@
+/**
+ * @module controllers/post/commentController
+ * @description Controlador para gestionar los comentarios en publicaciones
+ * @requires models/comment
+ * @requires models/post
+ * @requires models/like
+ */
+
 const Comment = require('../../models/comment');
 const Post = require('../../models/post');
 const Like = require('../../models/like');
 
-// Crear un nuevo comentario
+/**
+ * @function createComment
+ * @description Crea un nuevo comentario en una publicación
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Object} Comentario creado con información del autor
+ */
 const createComment = async (req, res) => {
   try {
     const { content } = req.body;
@@ -48,7 +62,12 @@ const createComment = async (req, res) => {
   }
 };
 
-// Función para recalcular el contador de comentarios
+/**
+ * @function recalculateCommentCount
+ * @description Recalcula y actualiza el contador de comentarios de una publicación
+ * @param {string} postId - ID de la publicación
+ * @returns {number} Número de comentarios actualizados
+ */
 const recalculateCommentCount = async (postId) => {
   try {
     const count = await Comment.countDocuments({ postId });
@@ -60,7 +79,13 @@ const recalculateCommentCount = async (postId) => {
   }
 };
 
-// Obtener comentarios de un post
+/**
+ * @function getCommentsByPost
+ * @description Obtiene todos los comentarios de una publicación específica
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Array} Lista de comentarios con información de sus autores
+ */
 const getCommentsByPost = async (req, res) => {
   try {
     const comments = await Comment.find({ postId: req.params.postId })
@@ -86,7 +111,13 @@ const getCommentsByPost = async (req, res) => {
   }
 };
 
-// Actualizar un comentario
+/**
+ * @function updateComment
+ * @description Actualiza el contenido de un comentario existente
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Object} Comentario actualizado con información del autor
+ */
 const updateComment = async (req, res) => {
   try {
     let comment = await Comment.findById(req.params.id);
@@ -125,7 +156,13 @@ const updateComment = async (req, res) => {
   }
 };
 
-// Eliminar un comentario
+/**
+ * @function deleteComment
+ * @description Elimina un comentario y sus likes asociados
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Object} Mensaje de confirmación de eliminación
+ */
 const deleteComment = async (req, res) => {
   try {
     const comment = await Comment.findById(req.params.id);

@@ -1,5 +1,18 @@
+/**
+ * @module middleware
+ * @description Middleware de Next.js para control de autenticación y redirecciones
+ * @requires next/server
+ */
+
 import { NextResponse } from 'next/server';
 
+/**
+ * Middleware que se ejecuta en cada petición para verificar la autenticación
+ * @function middleware
+ * @param {Request} request - Objeto de petición de Next.js
+ * @returns {NextResponse} Respuesta que puede ser una redirección o continuar con la petición
+ * @description Verifica si el usuario está autenticado mediante un token JWT y redirige según corresponda
+ */
 export function middleware(request) {
   // Obtener el token desde la cookie
   const token = request.cookies.get('jwtToken')?.value;
@@ -38,7 +51,12 @@ export function middleware(request) {
   return NextResponse.next();
 }
 
-// Configurar las rutas que usarán el middleware
+/**
+ * Configuración del middleware
+ * @constant {Object} config
+ * @property {string} matcher - Patrón de rutas donde se aplicará el middleware
+ * @description Define en qué rutas se ejecutará el middleware
+ */
 export const config = {
   matcher: '/:path*',
 };

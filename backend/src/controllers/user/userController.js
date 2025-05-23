@@ -1,7 +1,22 @@
+/**
+ * @module controllers/user/userController
+ * @description Controlador para gestionar operaciones relacionadas con el perfil de usuario
+ * @requires models/user
+ * @requires bcryptjs
+ */
+
 const User = require("../../models/user");
 const bcrypt = require("bcryptjs");
 
-// Función para obtener el perfil del usuario autenticado
+/**
+ * @function getUserProfile
+ * @description Obtiene el perfil completo del usuario autenticado
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} req.user - Información del usuario autenticado
+ * @param {string} req.user.id - ID del usuario autenticado
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Object} Datos del perfil del usuario sin la contraseña
+ */
 const getUserProfile = async (req, res) => {  
   try {
     if (!req.user || !req.user.id) {
@@ -19,6 +34,20 @@ const getUserProfile = async (req, res) => {
   }
 };
 
+/**
+ * @function updateUserProfile
+ * @description Actualiza la información del perfil del usuario autenticado
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} req.body - Datos a actualizar
+ * @param {string} [req.body.name] - Nombre del usuario
+ * @param {string} [req.body.email] - Correo electrónico del usuario
+ * @param {string} [req.body.phone] - Número de teléfono del usuario
+ * @param {string} [req.body.profileImage] - Ruta de la imagen de perfil
+ * @param {Object} req.user - Información del usuario autenticado
+ * @param {string} req.user.id - ID del usuario autenticado
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Object} Datos actualizados del usuario
+ */
 const updateUserProfile = async (req, res) => {
   try {
     if (!req.user || !req.user.id) {
@@ -47,7 +76,15 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
-// Función para obtener las acciones (stocks) del usuario autenticado
+/**
+ * @function getUserStocks
+ * @description Obtiene las acciones (stocks) que posee el usuario autenticado
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} req.user - Información del usuario autenticado
+ * @param {string} req.user.id - ID del usuario autenticado
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Object} Lista de acciones del usuario
+ */
 const getUserStocks = async (req, res) => {
   try {
     if (!req.user || !req.user.id) {
@@ -65,6 +102,18 @@ const getUserStocks = async (req, res) => {
   }
 };
 
+/**
+ * @function changePassword
+ * @description Cambia la contraseña del usuario autenticado
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} req.body - Datos para el cambio de contraseña
+ * @param {string} req.body.currentPassword - Contraseña actual del usuario
+ * @param {string} req.body.newPassword - Nueva contraseña del usuario
+ * @param {Object} req.user - Información del usuario autenticado
+ * @param {string} req.user.id - ID del usuario autenticado
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Object} Mensaje de confirmación
+ */
 const changePassword = async (req, res) => {
   try {
     if (!req.user || !req.user.id) {
@@ -105,4 +154,8 @@ const changePassword = async (req, res) => {
   }
 };
 
+/**
+ * Exportación de los controladores de usuario
+ * @exports userController
+ */
 module.exports = { getUserProfile, updateUserProfile, getUserStocks, changePassword };

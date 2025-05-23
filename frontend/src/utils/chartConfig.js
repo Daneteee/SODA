@@ -1,6 +1,12 @@
 // src/utils/chartConfig.js
 
 export const getChartData = (stock) => {
+  /**
+   * Obtiene los datos históricos de una acción
+   * @function getChartData
+   * @param {Object} stock - Objeto con los datos de la acción
+   * @returns {Object} Objeto con los datos históricos de la acción
+   */
   const times =
     stock?.history?.map((item) =>
       new Date(item.date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
@@ -10,6 +16,11 @@ export const getChartData = (stock) => {
 };
 
 export const chartOptions = {
+  /**
+   * Configuración de opciones para el gráfico
+   * @type {Object}
+   */
+
   responsive: true,
   maintainAspectRatio: false,
   plugins: {

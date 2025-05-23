@@ -1,9 +1,30 @@
+/**
+ * @module controllers/stock/buyController
+ * @description Controlador para gestionar la compra de acciones por parte de los usuarios
+ * @requires models/user
+ * @requires models/stock
+ * @requires models/transaction
+ * @requires utils/marketHours
+ */
+
 const User = require('../../models/user');
 const Stock = require('../../models/stock');
 const Transaction = require('../../models/transaction'); // Asegúrate de tener este modelo
 const { isMarketOpen } = require('../../utils/marketHours');
 
-// Función para procesar la compra de acciones
+/**
+ * @function buyStock
+ * @description Procesa la compra de acciones por parte de un usuario
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} req.body - Datos de la compra
+ * @param {string} req.body.symbol - Símbolo de la acción a comprar
+ * @param {number} req.body.quantity - Cantidad de acciones a comprar
+ * @param {number} req.body.purchasePrice - Precio unitario de compra
+ * @param {Object} req.user - Información del usuario autenticado
+ * @param {string} req.user.id - ID del usuario autenticado
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Object} Respuesta con el resultado de la operación
+ */
 const buyStock = async (req, res) => {
   const { symbol, quantity, purchasePrice } = req.body;
   console.log("Datos recibidos:", req.body);
@@ -92,5 +113,8 @@ const buyStock = async (req, res) => {
     return res.status(500).json({ message: 'Error en el servidor' });
   }
 };
-
+/**
+ * Exportación del controlador de compra de acciones
+ * @exports buyController
+ */
 module.exports = { buyStock };

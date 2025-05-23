@@ -1,5 +1,15 @@
+/**
+ * @module models/message
+ * @description Modelo para los mensajes de chat entre usuarios
+ * @requires mongoose
+ */
+
 const mongoose = require('mongoose');
 
+/**
+ * @schema messageSchema
+ * @description Esquema de mongoose para los mensajes de chat
+ */
 const messageSchema = new mongoose.Schema({
   from: { 
     type: mongoose.Schema.Types.ObjectId, 
@@ -21,4 +31,8 @@ const messageSchema = new mongoose.Schema({
   }
 });
 
+/**
+ * Modelo de mensaje
+ * @type {mongoose.Model}
+ */
 module.exports = mongoose.model('Message', messageSchema);

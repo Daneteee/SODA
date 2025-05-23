@@ -1,5 +1,22 @@
+/**
+ * @module controllers/user/updateProfileImage
+ * @description Controlador para actualizar la imagen de perfil del usuario
+ * @requires models/user
+ */
+
 const User = require('../../models/user');
 
+/**
+ * @function updateProfileImage
+ * @description Actualiza la imagen de perfil del usuario autenticado
+ * @param {Object} req - Objeto de solicitud Express
+ * @param {Object} req.file - Archivo de imagen subido por multer
+ * @param {string} req.file.filename - Nombre del archivo guardado
+ * @param {Object} req.user - Información del usuario autenticado
+ * @param {string} req.user.id - ID del usuario autenticado
+ * @param {Object} res - Objeto de respuesta Express
+ * @returns {Object} Datos del usuario con la imagen actualizada
+ */
 const updateProfileImage = async (req, res) => {
   try {
     if (!req.file) {
@@ -27,4 +44,8 @@ const updateProfileImage = async (req, res) => {
   }
 };
 
+/**
+ * Exportación del controlador de actualización de imagen de perfil
+ * @exports updateProfileImage
+ */
 module.exports = { updateProfileImage };
