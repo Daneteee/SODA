@@ -26,7 +26,7 @@ connectDB();
 // Middlewares
 app.use(cookieParser());
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: ['http://infla.cat:39000/','http://10.52.5.102:32005', 'kube0.lacetania.cat:32005']
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   credentials: true
 }));
