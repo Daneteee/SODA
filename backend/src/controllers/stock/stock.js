@@ -566,7 +566,6 @@ const getAllStocks = async (req, res) => {
  */
 const getNews = async (req, res) => {
   const { symbol } = req.query;
-  const apiKey = '1522002a63ee4ce58b110b2753308adf';
   const today = new Date();
   const firstDay = new Date(today.getFullYear(), today.getMonth(), 1)
     .toISOString()
